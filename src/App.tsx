@@ -1,0 +1,280 @@
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { useLocalNotes } from '@/hooks/useLocalNotes'
+import { ViewMode } from '@/types'
+import Navigation from '@/components/layout/Navigation'
+import Sidebar from '@/components/layout/Sidebar'
+import StatusBar from '@/components/layout/StatusBar'
+import WorkspaceView from '@/components/workspace/WorkspaceView'
+import SearchView from '@/components/search/SearchView'
+import SettingsView from '@/components/settings/SettingsView'
+import CanvasView from '@/components/canvas/CanvasView'
+import AuthModal from '@/components/auth/AuthModal'
+import CommandPalette from '@/components/command/CommandPalette'
+import InstallPrompt from '@/components/InstallPrompt'
+import TimelineView from '@/components/timeline/TimelineView'
+
+function App() {
+  const { user, loading, signOut } = useAuth()
+  const { 
+    notes, 
+    syncing, 
+    syncEnabled, 
+    createNote, 
+    updateNote, 
+    deleteNote, 
+    restoreNote,
+    permanentlyDeleteNote,
+    trashNotes,
+    enableSync, 
+    disableSync 
+  } = useLocalNotes(user?.id)
+  const [currentView, setCurrentView] = useState<ViewMode>('workspace')
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false)
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false)
+  const [activeNoteId, setActiveNoteId] = useState<string | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showCommandPalette, setShowCommandPalette] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
+  const [hasUserToggledSidebar, setHasUserToggledSidebar] = useState(false)
+
+  // Auto-enable sync when user logs in
+  React.useEffect(() => {
+    if (user?.id && !syncEnabled) {
+      enableSync()
+    }
+  }, [user?.id, syncEnabled, enableSync])
+
+  // Responsive: Detect mobile/desktop
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024
+      setIsMobile(mobile)
+      
+      // Only auto-manage sidebar if user hasn't manually toggled it
+      if (!hasUserToggledSidebar) {
+        // Auto-close sidebar on mobile, auto-open on desktop
+        if (mobile && leftSidebarOpen) {
+          setLeftSidebarOpen(false)
+        } else if (!mobile && !leftSidebarOpen) {
+          setLeftSidebarOpen(true)
+        }
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    // Initial check
+    handleResize()
+    return () => window.removeEventListener('resize', handleResize)
+  }, [leftSidebarOpen, hasUserToggledSidebar])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K: Open command palette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setShowCommandPalette(true)
+      }
+      // Cmd/Ctrl + N: Create new note
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+        e.preventDefault()
+        handleCreateNote()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Manual sync function - just toggle sync to trigger a refresh
+  const handleManualSync = () => {
+    if (user?.id && syncEnabled) {
+      disableSync()
+      setTimeout(() => enableSync(), 100)
+    }
+  }
+
+  const handleCreateNote = async () => {
+    const result = await createNote('Nouvelle note', '')
+    if (result.data) {
+      setActiveNoteId(result.data.id)
+      setCurrentView('workspace')
+    }
+  }
+
+  // Wrapper pour créer une note depuis le modal IA
+  const handleCreateNoteFromAI = async (title: string, content: string, folderId?: string): Promise<any> => {
+    const result = await createNote(title, content, folderId)
+    return result.data || null
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary-500 border-t-transparent mx-auto"></div>
+          <p className="text-body text-neutral-700">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const renderView = () => {
+    switch (currentView) {
+      case 'workspace':
+        return (
+          <WorkspaceView
+            userId={user?.id}
+            activeNoteId={activeNoteId}
+            onNoteChange={setActiveNoteId}
+            rightSidebarOpen={rightSidebarOpen}
+            notes={notes}
+            updateNote={updateNote}
+            createNote={handleCreateNoteFromAI}
+          />
+        )
+      case 'search':
+        return (
+          <SearchView 
+            userId={user?.id} 
+            notes={notes}
+            onSelectNote={(noteId) => {
+              setActiveNoteId(noteId)
+              setCurrentView('workspace')
+            }}
+          />
+        )
+      case 'settings':
+        return <SettingsView userId={user?.id} />
+      case 'canvas':
+        return (
+          <CanvasView 
+            userId={user?.id} 
+            notes={notes} 
+            onOpenNote={(noteId) => {
+              setActiveNoteId(noteId)
+              setCurrentView('workspace')
+            }}
+            deleteNote={deleteNote}
+            createNote={handleCreateNoteFromAI}
+          />
+        )
+      case 'timeline':
+        return (
+          <TimelineView
+            notes={notes}
+            onOpenNote={(noteId) => {
+              setActiveNoteId(noteId)
+              setCurrentView('workspace')
+            }}
+          />
+        )
+      default:
+        return (
+          <WorkspaceView
+            userId={user?.id}
+            activeNoteId={activeNoteId}
+            onNoteChange={setActiveNoteId}
+            rightSidebarOpen={rightSidebarOpen}
+            notes={notes}
+            updateNote={updateNote}
+            createNote={handleCreateNoteFromAI}
+          />
+        )
+    }
+  }
+
+  return (
+    <div className="flex h-screen flex-col bg-neutral-50 dark:bg-neutral-900 overflow-hidden">
+      <Navigation
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        onToggleLeftSidebar={() => {
+          setLeftSidebarOpen(!leftSidebarOpen)
+          setHasUserToggledSidebar(true)
+        }}
+        onToggleRightSidebar={() => setRightSidebarOpen(!rightSidebarOpen)}
+        leftSidebarOpen={leftSidebarOpen}
+        rightSidebarOpen={rightSidebarOpen}
+        user={user}
+        onShowAuth={() => setShowAuthModal(true)}
+      />
+
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile & Tablet overlay backdrop */}
+        {isMobile && leftSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 laptop-sm:hidden"
+            onClick={() => setLeftSidebarOpen(false)}
+          />
+        )}
+
+        {/* Left Sidebar */}
+        {leftSidebarOpen && (
+          <div className={`${isMobile ? 'fixed left-0 top-[48px] xs:top-[52px] sm:top-[56px] md:top-[60px] bottom-0 z-40 w-[85vw] max-w-[280px] xs:max-w-[300px] sm:max-w-[320px] md:max-w-[340px] animate-slide-in-right shadow-2xl' : 'relative w-[260px] sm:w-[280px] md:w-[300px] laptop-sm:w-[320px] laptop:w-[360px] laptop-lg:w-[400px]'}`}>
+            <Sidebar
+              side="left"
+              userId={user?.id}
+              activeNoteId={activeNoteId}
+              onNoteSelect={(noteId) => {
+                setActiveNoteId(noteId)
+                setCurrentView('workspace')
+                if (isMobile) setLeftSidebarOpen(false)
+              }}
+              notes={notes}
+              trashNotes={trashNotes}
+              createNote={createNote}
+              updateNote={updateNote}
+              deleteNote={deleteNote}
+              restoreNote={restoreNote}
+              permanentlyDeleteNote={permanentlyDeleteNote}
+            />
+          </div>
+        )}
+
+        <main className="flex-1 overflow-hidden min-w-0">{renderView()}</main>
+
+        {currentView === 'workspace' && rightSidebarOpen && (
+          <div className="hidden laptop-sm:block">
+            <Sidebar side="right" userId={user?.id} activeNoteId={activeNoteId} />
+          </div>
+        )}
+      </div>
+
+      <StatusBar 
+        userId={user?.id} 
+        activeNoteId={activeNoteId}
+        syncing={syncing}
+        syncEnabled={syncEnabled}
+        onShowAuth={() => setShowAuthModal(true)}
+        onEnableSync={enableSync}
+        onManualSync={handleManualSync}
+      />
+
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+
+      <CommandPalette
+        open={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        notes={notes}
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        onNoteSelect={(noteId) => {
+          setActiveNoteId(noteId)
+          setCurrentView('workspace')
+        }}
+        onCreateNote={handleCreateNote}
+        onShowAuth={() => setShowAuthModal(true)}
+        user={user}
+        onSignOut={signOut}
+      />
+
+      <InstallPrompt />
+    </div>
+  )
+}
+
+export default App

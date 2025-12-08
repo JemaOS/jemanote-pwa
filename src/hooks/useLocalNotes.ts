@@ -147,7 +147,7 @@ export function useLocalNotes(userId?: string | null) {
     }
   }
 
-  const updateNote = (noteId: string, updates: Partial<Note>) => {
+  const updateNote = async (noteId: string, updates: Partial<Note>): Promise<{ data: Note | null; error: Error | null }> => {
     const existingNote = notes.find((n) => n.id === noteId)
     if (!existingNote) {
       return { data: null, error: new Error('Note not found') }

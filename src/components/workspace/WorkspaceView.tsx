@@ -17,7 +17,7 @@ interface WorkspaceViewProps {
   onNoteChange: (noteId: string | null) => void
   rightSidebarOpen: boolean
   notes: Note[]
-  updateNote: (noteId: string, updates: Partial<Note>) => { data: Note | null; error: Error | null }
+  updateNote: (noteId: string, updates: Partial<Note>) => Promise<{ data: Note | null; error: Error | null }>
   createNote?: (title: string, content: string, folderId?: string) => Promise<Note | null>
 }
 
@@ -76,13 +76,13 @@ export default function WorkspaceView({
     }
   }, [activeNote])
 
-  // Fonction de sauvegarde INSTANTANÉE - pas d'async, pas d'attente
-  const saveNote = useCallback((updates: Partial<Note>) => {
+  // Fonction de sauvegarde - fire-and-forget pour garder l'UX fluide
+  const saveNote = useCallback(async (updates: Partial<Note>) => {
     if (!activeNoteId) return
 
-    // updateNote() met à jour l'état React de façon SYNCHRONE
+    // updateNote() met à jour l'état React de façon SYNCHRONE en interne
     // La persistance localStorage se fait en arrière-plan (fire-and-forget)
-    const result = updateNote(activeNoteId, updates)
+    const result = await updateNote(activeNoteId, updates)
     
     if (result.error) {
       console.error('Erreur de sauvegarde:', result.error)

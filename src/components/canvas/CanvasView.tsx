@@ -305,10 +305,11 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     setIsMultiSelectMode(true)
   }, [canvasNodes])
 
-  // Clear selection
+  // Clear selection and exit multi-select mode
   const clearSelection = useCallback(() => {
     setSelectedNodes(new Set())
     setSelectedNode(null)
+    setIsMultiSelectMode(false)
   }, [])
 
   // Delete selected nodes

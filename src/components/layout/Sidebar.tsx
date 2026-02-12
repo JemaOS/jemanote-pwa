@@ -642,14 +642,14 @@ export default function Sidebar({
           <button
             onClick={(e) => saveEditing(note.id, e)}
             className="flex-shrink-0 p-1 xs:p-1.5 sm:p-1.5 laptop:p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400 min-w-[36px] min-h-[36px] xs:min-w-[40px] xs:min-h-[40px] flex items-center justify-center"
-            title="Sauvegarder"
+            title="Sauvegarder" aria-label="Sauvegarder"
           >
             <Check className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
           </button>
           <button
             onClick={cancelEditing}
             className="flex-shrink-0 p-1 xs:p-1.5 sm:p-1.5 laptop:p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400 min-w-[36px] min-h-[36px] xs:min-w-[40px] xs:min-h-[40px] flex items-center justify-center"
-            title="Annuler"
+            title="Annuler" aria-label="Annuler"
           >
             <X className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
           </button>
@@ -694,7 +694,7 @@ export default function Sidebar({
                 <DropdownMenu.Trigger asChild>
                   <button
                     className="p-1 laptop:p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded text-purple-600 dark:text-purple-400 min-w-[32px] min-h-[32px] laptop:min-w-[36px] laptop:min-h-[36px] flex items-center justify-center transition-colors outline-none"
-                    title="Déplacer vers..."
+                    title="Déplacer vers..." aria-label="Déplacer vers..."
                     onClick={(e) => { e.stopPropagation(); }}
                   >
                     <FolderInput className="h-3.5 w-3.5 laptop:h-4 laptop:w-4" />
@@ -734,14 +734,14 @@ export default function Sidebar({
             <button
               onClick={(e) => { startEditing(note, e); }}
               className="p-1 laptop:p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded text-blue-600 dark:text-blue-400 min-w-[32px] min-h-[32px] laptop:min-w-[36px] laptop:min-h-[36px] flex items-center justify-center transition-colors"
-              title="Renommer"
+              title="Renommer" aria-label="Renommer"
             >
               <Edit2 className="h-3.5 w-3.5 laptop:h-4 laptop:w-4" />
             </button>
             <button
               onClick={(e) => handleDeleteNote(note.id, e)}
               className="p-1 laptop:p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400 min-w-[32px] min-h-[32px] laptop:min-w-[36px] laptop:min-h-[36px] flex items-center justify-center transition-colors"
-              title="Supprimer"
+              title="Supprimer" aria-label="Supprimer"
             >
               <Trash2 className="h-3.5 w-3.5 laptop:h-4 laptop:w-4" />
             </button>
@@ -825,7 +825,7 @@ export default function Sidebar({
                     ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                     : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
                 }`}
-                title={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
+                title={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
               >
                 {folderMultiSelectMode ? (
                   <CheckSquare className="h-4 w-4" />
@@ -845,7 +845,7 @@ export default function Sidebar({
                     }
                   }}
                   className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                  title={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"}
+                  title={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"}
                 >
                   {isAllFoldersSelected() ? (
                     <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
@@ -865,7 +865,7 @@ export default function Sidebar({
                 <button
                   onClick={handleDeleteSelectedFolders}
                   className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                  title="Supprimer les dossiers sélectionnés"
+                  title="Supprimer les dossiers sélectionnés" aria-label="Supprimer les dossiers sélectionnés"
                 >
                   Supprimer ({selectedFolderIds.size})
                 </button>
@@ -957,7 +957,7 @@ export default function Sidebar({
                           handleCreateNoteInFolder(folder.id)
                         }}
                         className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
-                        title="Créer une note dans ce dossier"
+                        title="Créer une note dans ce dossier" aria-label="Créer une note dans ce dossier"
                       >
                         <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                       </button>
@@ -994,7 +994,7 @@ export default function Sidebar({
                               ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                               : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
                           }`}
-                          title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
+                          title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
                         >
                           {noteMultiSelectMode ? (
                             <CheckSquare className="h-4 w-4" />
@@ -1014,7 +1014,7 @@ export default function Sidebar({
                               }
                             }}
                             className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                            title={isAllNotesSelectedInFolder(folder.id) ? "Tout désélectionner" : "Tout sélectionner"}
+                            title={isAllNotesSelectedInFolder(folder.id) ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllNotesSelectedInFolder(folder.id) ? "Tout désélectionner" : "Tout sélectionner"}
                           >
                             {isAllNotesSelectedInFolder(folder.id) ? (
                               <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
@@ -1034,7 +1034,7 @@ export default function Sidebar({
                           <button
                             onClick={handleDeleteSelectedNotes}
                             className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                            title="Supprimer la sélection"
+                            title="Supprimer la sélection" aria-label="Supprimer la sélection"
                           >
                             Supprimer ({selectedNoteIds.size})
                           </button>
@@ -1081,7 +1081,7 @@ export default function Sidebar({
                     handleCreateNoteInFolder(undefined)
                   }}
                   className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
-                  title="Créer une note sans dossier"
+                  title="Créer une note sans dossier" aria-label="Créer une note sans dossier"
                 >
                   <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                 </button>
@@ -1102,7 +1102,7 @@ export default function Sidebar({
                         ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                         : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
                     }`}
-                    title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
+                    title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
                   >
                     {noteMultiSelectMode ? (
                       <CheckSquare className="h-4 w-4" />
@@ -1122,7 +1122,7 @@ export default function Sidebar({
                         }
                       }}
                       className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                      title={isAllNotesSelectedInFolder('root') ? "Tout désélectionner" : "Tout sélectionner"}
+                      title={isAllNotesSelectedInFolder('root') ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllNotesSelectedInFolder('root') ? "Tout désélectionner" : "Tout sélectionner"}
                     >
                       {isAllNotesSelectedInFolder('root') ? (
                         <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
@@ -1142,7 +1142,7 @@ export default function Sidebar({
                     <button
                       onClick={handleDeleteSelectedNotes}
                       className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                      title="Supprimer la sélection"
+                      title="Supprimer la sélection" aria-label="Supprimer la sélection"
                     >
                       Supprimer ({selectedNoteIds.size})
                     </button>
@@ -1203,7 +1203,7 @@ export default function Sidebar({
                           setSelectionMode(true)
                         }}
                         className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                        title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
+                        title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
                       >
                         {isAllSelected() ? (
                           <CheckSquare className="h-4 w-4" />
@@ -1219,14 +1219,14 @@ export default function Sidebar({
                           <button
                             onClick={handleRestoreSelected}
                             className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 rounded transition-colors"
-                            title="Restaurer la sélection"
+                            title="Restaurer la sélection" aria-label="Restaurer la sélection"
                           >
                             Restaurer ({selectedTrashItems.size})
                           </button>
                           <button
                             onClick={handleDeleteSelected}
                             className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                            title="Supprimer la sélection"
+                            title="Supprimer la sélection" aria-label="Supprimer la sélection"
                           >
                             Supprimer ({selectedTrashItems.size})
                           </button>
@@ -1239,7 +1239,7 @@ export default function Sidebar({
                         style={{ backgroundColor: '#4850d9' }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a41b0'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4850d9'}
-                        title="Vider la corbeille"
+                        title="Vider la corbeille" aria-label="Vider la corbeille"
                       >
                         Vider tout
                       </button>
@@ -1288,14 +1288,14 @@ export default function Sidebar({
                             <button
                               onClick={(e) => handleRestoreFolder(folder.id, e)}
                               className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400"
-                              title="Restaurer le dossier et ses notes"
+                              title="Restaurer le dossier et ses notes" aria-label="Restaurer le dossier et ses notes"
                             >
                               <RotateCcw className="h-3.5 w-3.5" />
                             </button>
                             <button
                               onClick={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
                               className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400"
-                              title="Supprimer définitivement"
+                              title="Supprimer définitivement" aria-label="Supprimer définitivement"
                             >
                               <Trash className="h-3.5 w-3.5" />
                             </button>
@@ -1343,14 +1343,14 @@ export default function Sidebar({
                               <button
                                 onClick={(e) => handleRestoreNote(note.id, e)}
                                 className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400"
-                                title="Restaurer"
+                                title="Restaurer" aria-label="Restaurer"
                               >
                                 <RotateCcw className="h-3.5 w-3.5" />
                               </button>
                               <button
                                 onClick={(e) => handlePermanentlyDeleteNote(note.id, e)}
                                 className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400"
-                                title="Supprimer définitivement"
+                                title="Supprimer définitivement" aria-label="Supprimer définitivement"
                               >
                                 <Trash className="h-3.5 w-3.5" />
                               </button>

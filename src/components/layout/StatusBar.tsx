@@ -42,6 +42,7 @@ export default function StatusBar({
                 onClick={onManualSync}
                 className="flex items-center gap-0.5 xs:gap-1 hover:text-primary-500 transition-colors p-0.5 xs:p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-800 min-w-[24px] min-h-[24px] xs:min-w-[28px] xs:min-h-[28px] justify-center"
                 title="Synchroniser maintenant"
+                aria-label="Synchroniser maintenant"
               >
                 <RefreshCw className="h-2.5 w-2.5 xs:h-3 xs:w-3" />
               </button>
@@ -61,6 +62,7 @@ export default function StatusBar({
             onClick={onShowAuth}
             className="flex items-center gap-0.5 xs:gap-1 hover:text-primary-500 transition-colors min-w-0 p-0.5 xs:p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-800"
             title="Connectez-vous pour synchroniser vos notes"
+            aria-label="Connectez-vous pour synchroniser vos notes"
           >
             <HardDrive className="h-2.5 w-2.5 xs:h-3 xs:w-3 flex-shrink-0" />
             <span className="hidden md:inline truncate">Mode Local - Cliquez pour activer la synchronisation cloud</span>

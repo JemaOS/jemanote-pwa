@@ -476,10 +476,17 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       }
     }
 
+    // Always remove the node from canvas immediately
     setCanvasNodes((prev) => prev.filter((n) => n.id !== nodeId))
     if (selectedNode === nodeId) {setSelectedNode(null)}
     if (draggedNode === nodeId) {setDraggedNode(null)}
     if (editingNodeId === nodeId) {setEditingNodeId(null)}
+    // Also remove from multi-selection if present
+    setSelectedNodes(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(nodeId)
+      return newSet
+    })
   }
 
   return (

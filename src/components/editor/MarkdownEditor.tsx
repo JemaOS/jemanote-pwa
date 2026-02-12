@@ -103,7 +103,11 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             const newValue = update.state.doc.toString();
-            onChange(newValue);
+            // Only call onChange if the value is actually different
+            // to prevent loops when parent updates the value
+            if (newValue !== value) {
+              onChange(newValue);
+            }
           }
         }),
         EditorView.theme({

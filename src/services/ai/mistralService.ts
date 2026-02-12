@@ -343,7 +343,7 @@ class MistralAIService {
     const systemPrompt = 'Tu es un assistant de rédaction qui améliore la clarté, la structure et le style des textes.'
     const prompt = `Améliore ce texte pour le rendre plus clair, mieux structuré et professionnel:\n\n${text}`
 
-    const response = await this.callAPI(prompt, systemPrompt)
+    const response = await this.callAPI(prompt, systemPrompt, undefined, undefined, true)
     return response.content
   }
 
@@ -364,7 +364,7 @@ class MistralAIService {
     const systemPrompt = `Tu es un assistant de rédaction qui adapte le ton des textes.`
     const prompt = `Réécris ce texte avec un ton ${toneDescriptions[tone]}:\n\n${text}`
 
-    const response = await this.callAPI(prompt, systemPrompt)
+    const response = await this.callAPI(prompt, systemPrompt, undefined, undefined, true)
     return response.content
   }
 
@@ -375,7 +375,7 @@ class MistralAIService {
     const systemPrompt = 'Tu es un traducteur professionnel qui traduit les textes avec précision.'
     const prompt = `Traduis ce texte en ${targetLanguage}:\n\n${text}`
 
-    const response = await this.callAPI(prompt, systemPrompt)
+    const response = await this.callAPI(prompt, systemPrompt, undefined, undefined, true)
     return response.content
   }
 

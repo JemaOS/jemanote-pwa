@@ -2,15 +2,22 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { Eye, Edit3, Columns2, Sparkles, Lightbulb, X, Bot, Mic } from 'lucide-react'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 
-import AIPanel from '@/components/ai/AIPanel'
-import AISummaryModal from '@/components/ai/AISummaryModal'
-import MarkdownEditor from '@/components/editor/MarkdownEditor'
-import MarkdownPreview from '@/components/editor/MarkdownPreview'
-import VoiceRecorder from '@/components/editor/VoiceRecorder'
 import { LocalStorage } from '@/lib/localStorage'
 import { Note, Attachment } from '@/types'
+
+// Lazy-load heavy editor and AI components to reduce initial bundle size
+const AIPanel = React.lazy(() => import('@/components/ai/AIPanel'))
+const AISummaryModal = React.lazy(() => import('@/components/ai/AISummaryModal'))
+const MarkdownEditor = React.lazy(() => import('@/components/editor/MarkdownEditor'))
+const MarkdownPreview = React.lazy(() => import('@/components/editor/MarkdownPreview'))
+const VoiceRecorder = React.lazy(() => import('@/components/editor/VoiceRecorder'))
+
+// Lightweight fallback for lazy-loaded editor components
+const EditorFallback = () => (
+  <div className="flex-1 bg-gray-900 animate-pulse" style={{ minHeight: '200px' }} />
+)
 
 interface WorkspaceViewProps {
   userId?: string | null
@@ -474,14 +481,16 @@ export default function WorkspaceView({
       {/* Panel Note Vocale */}
       {showVoiceRecorder && (
         <div className="border-b border-neutral-200 dark:border-neutral-800 p-3 laptop:p-4 bg-neutral-50 dark:bg-neutral-900">
-          <VoiceRecorder
-            initialTranscript={content}
-            onTranscriptChange={(newTranscript) => {
-              setContent(newTranscript)
-              handleContentChange(newTranscript)
-            }}
-            onSave={handleSaveVoiceMemo}
-          />
+          <Suspense fallback={<EditorFallback />}>
+            <VoiceRecorder
+              initialTranscript={content}
+              onTranscriptChange={(newTranscript) => {
+                setContent(newTranscript)
+                handleContentChange(newTranscript)
+              }}
+              onSave={handleSaveVoiceMemo}
+            />
+          </Suspense>
         </div>
       )}
 
@@ -489,39 +498,46 @@ export default function WorkspaceView({
         {/* Éditeur */}
         {(viewMode === 'edit' || viewMode === 'split') && (
           <div className={viewMode === 'split' ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'}>
-            <MarkdownEditor 
-              value={content} 
-              onChange={handleContentChange}
-              onWikiLinkClick={handleWikiLinkClick}
-            />
+            <Suspense fallback={<EditorFallback />}>
+              <MarkdownEditor 
+                value={content} 
+                onChange={handleContentChange}
+                onWikiLinkClick={handleWikiLinkClick}
+              />
+            </Suspense>
           </div>
         )}
 
         {/* Prévisualisation */}
         {(viewMode === 'preview' || viewMode === 'split') && (
           <div className={viewMode === 'split' ? 'w-1/2' : 'w-full'}>
-            <MarkdownPreview
-              content={content}
-              onWikiLinkClick={handleWikiLinkClick}
-            />
+            <Suspense fallback={<EditorFallback />}>
+              <MarkdownPreview
+                content={content}
+                onWikiLinkClick={handleWikiLinkClick}
+              />
+            </Suspense>
           </div>
         )}
       </div>
 
       {/* Modal de résumé IA */}
       {showAISummary && (
-        <AISummaryModal
-          content={content}
-          noteId={activeNoteId || undefined}
-          noteTitle={title || undefined}
-          onClose={() => { setShowAISummary(false); }}
-          onApply={handleApplySummary}
-          onCreateNote={createNote ? handleCreateNoteFromSummary : undefined}
-        />
+        <Suspense fallback={null}>
+          <AISummaryModal
+            content={content}
+            noteId={activeNoteId || undefined}
+            noteTitle={title || undefined}
+            onClose={() => { setShowAISummary(false); }}
+            onApply={handleApplySummary}
+            onCreateNote={createNote ? handleCreateNoteFromSummary : undefined}
+          />
+        </Suspense>
       )}
 
       {/* Panel IA - Sidebar dédiée */}
       {showAIPanel && (
+        <Suspense fallback={<EditorFallback />}>
         <AIPanel
           currentNote={activeNote}
           notes={notes}
@@ -547,6 +563,7 @@ export default function WorkspaceView({
             handleNoteChange(noteId)
           }}
         />
+        </Suspense>
       )}
     </div>
   )

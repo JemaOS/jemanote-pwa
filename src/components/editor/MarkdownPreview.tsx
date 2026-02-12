@@ -1,7 +1,6 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import mermaid from 'mermaid'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -41,24 +40,32 @@ const AudioPlayer = ({ attachmentId }: { attachmentId: string }) => {
   return <WaveformPlayer blob={blob} />
 }
 
-// Initialiser Mermaid avec le thème sombre
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  fontFamily: 'Inter, system-ui, sans-serif',
-})
+// Mermaid is dynamically imported only when diagrams are detected
+let mermaidInitialized = false
 
 export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
 
-  // Rendu des diagrammes Mermaid après le rendu du Markdown
+  // Rendu des diagrammes Mermaid après le rendu du Markdown (lazy-loaded)
   useEffect(() => {
     if (!previewRef.current) {return}
 
     const renderMermaid = async () => {
       const mermaidElements = previewRef.current?.querySelectorAll('.language-mermaid')
       if (!mermaidElements || mermaidElements.length === 0) {return}
+
+      // Dynamically import mermaid only when diagrams exist
+      const { default: mermaid } = await import('mermaid')
+
+      if (!mermaidInitialized) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+          fontFamily: 'Inter, system-ui, sans-serif',
+        })
+        mermaidInitialized = true
+      }
 
       // Nettoyer les anciens SVG
       mermaidElements.forEach((element) => {

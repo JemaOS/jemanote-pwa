@@ -51,32 +51,41 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   const lastTap = useRef<number>(0)
   const justCreatedIds = useRef<Set<string>>(new Set()) // Track locally created notes to prevent sync race conditions
 
+  // Helper: check if a canvas node is valid (exists in active notes)
+  const isValidNode = useCallback((node: CanvasNode) =>
+    node.type !== 'note' || notes.some(n => n.id === node.id), [notes])
+
+  // Helper: create initial canvas nodes from notes
+  const createInitialNodes = useCallback((notesList: Note[]): CanvasNode[] =>
+    notesList.slice(0, 5).map((note, index) => ({
+      id: note.id,
+      type: 'note' as const,
+      x: 100 + (index % 3) * 300,
+      y: 100 + Math.floor(index / 3) * 250,
+      width: 250,
+      height: 200,
+      content: note.content,
+      title: note.title,
+      color: '#5a63e9',
+    })), [])
+
+  // Helper: process saved or initial canvas data
+  const processCanvasData = useCallback(async (savedNodes: CanvasNode[] | null) => {
+    if (savedNodes && savedNodes.length > 0) {
+      setCanvasNodes(savedNodes.filter(isValidNode))
+    } else if (notes.length > 0) {
+      const initialNodes = createInitialNodes(notes)
+      setCanvasNodes(initialNodes)
+      await LocalStorage.setItem('canvas-nodes', initialNodes)
+    }
+  }, [isValidNode, notes, createInitialNodes])
+
   // Initialize canvas with some example nodes
   useEffect(() => {
     const loadCanvasData = async () => {
       try {
         const savedNodes = await LocalStorage.getItem<CanvasNode[]>('canvas-nodes')
-        if (savedNodes && savedNodes.length > 0) {
-          // Filter out notes that don't exist in active notes
-          const isValidNode = (node: CanvasNode) =>
-            node.type !== 'note' || notes.some(n => n.id === node.id)
-          setCanvasNodes(savedNodes.filter(isValidNode))
-        } else if (notes.length > 0) {
-          // Only create initial nodes if no saved data exists
-          const initialNodes: CanvasNode[] = notes.slice(0, 5).map((note, index) => ({
-            id: note.id,
-            type: 'note' as const,
-            x: 100 + (index % 3) * 300,
-            y: 100 + Math.floor(index / 3) * 250,
-            width: 250,
-            height: 200,
-            content: note.content,
-            title: note.title,
-            color: '#5a63e9',
-          }))
-          setCanvasNodes(initialNodes)
-          await LocalStorage.setItem('canvas-nodes', initialNodes)
-        }
+        await processCanvasData(savedNodes)
       } catch (error) {
         console.error('Error loading canvas data:', error)
       }

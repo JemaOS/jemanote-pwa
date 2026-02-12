@@ -3,11 +3,111 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { File, Folder as FolderIcon, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, FolderInput, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { LocalStorage } from '@/lib/localStorage'
 import { Note, Folder } from '@/types'
 
+// --- Sub-components extracted to reduce cognitive complexity ---
+
+/** Trash folder item in the trash section */
+function TrashFolderItem({ folder, notesInFolder, isSelected, onToggleSelection, onRestore, onPermanentlyDelete }: {
+  folder: Folder; notesInFolder: Note[]; isSelected: boolean;
+  onToggleSelection: () => void; onRestore: (e: React.MouseEvent) => void; onPermanentlyDelete: (e: React.MouseEvent) => void;
+}) {
+  return (
+    <div className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}>
+      <button onClick={onToggleSelection} className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded">
+        {isSelected ? <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : <Square className="h-4 w-4 text-neutral-400" />}
+      </button>
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <FolderIcon className="h-4 w-4 flex-shrink-0 text-neutral-400" />
+        <span className="text-sm text-neutral-500 dark:text-neutral-400 truncate line-through">{folder.name}</span>
+        {notesInFolder.length > 0 && (
+          <span className="text-xs text-neutral-400 dark:text-neutral-500">({notesInFolder.length} note{notesInFolder.length > 1 ? 's' : ''})</span>
+        )}
+      </div>
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={onRestore} className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400" title="Restaurer le dossier et ses notes" aria-label="Restaurer le dossier et ses notes">
+          <RotateCcw className="h-3.5 w-3.5" />
+        </button>
+        <button onClick={onPermanentlyDelete} className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400" title="Supprimer définitivement" aria-label="Supprimer définitivement">
+          <Trash className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** Trash note item in the trash section */
+function TrashNoteItem({ note, isSelected, onToggleSelection, onRestore, onPermanentlyDelete }: {
+  note: Note; isSelected: boolean;
+  onToggleSelection: () => void; onRestore: (e: React.MouseEvent) => void; onPermanentlyDelete: (e: React.MouseEvent) => void;
+}) {
+  return (
+    <div className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}>
+      <button onClick={onToggleSelection} className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded">
+        {isSelected ? <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : <Square className="h-4 w-4 text-neutral-400" />}
+      </button>
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <File className="h-4 w-4 flex-shrink-0 text-neutral-400" />
+        <span className="text-sm text-neutral-500 dark:text-neutral-400 truncate line-through">{note.title}</span>
+      </div>
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={onRestore} className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400" title="Restaurer" aria-label="Restaurer">
+          <RotateCcw className="h-3.5 w-3.5" />
+        </button>
+        <button onClick={onPermanentlyDelete} className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400" title="Supprimer définitivement" aria-label="Supprimer définitivement">
+          <Trash className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** Multi-select header bar for notes within a folder or unfiled */
+function NoteMultiSelectHeader({ folderId, noteMultiSelectMode, toggleNoteMultiSelectMode, isAllSelected, isSomeSelected, onSelectAll, onDeselectAll, selectedCount, hasSelectedInView, onDeleteSelected }: {
+  folderId: string | undefined; noteMultiSelectMode: boolean; toggleNoteMultiSelectMode: () => void;
+  isAllSelected: boolean; isSomeSelected: boolean; onSelectAll: () => void; onDeselectAll: () => void;
+  selectedCount: number; hasSelectedInView: boolean; onDeleteSelected: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
+      <button onClick={toggleNoteMultiSelectMode}
+        className={`p-1 rounded transition-colors ${noteMultiSelectMode ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'}`}
+        title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
+      >
+        {noteMultiSelectMode ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+      </button>
+      {noteMultiSelectMode && (
+        <button onClick={isAllSelected ? onDeselectAll : onSelectAll}
+          className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
+          title={isAllSelected ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected ? "Tout désélectionner" : "Tout sélectionner"}
+        >
+          {isAllSelected ? <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : isSomeSelected ? <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : <Square className="h-4 w-4" />}
+        </button>
+      )}
+      <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">Notes</span>
+      {selectedCount > 0 && hasSelectedInView && (
+        <button onClick={onDeleteSelected}
+          className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
+          title="Supprimer la sélection" aria-label="Supprimer la sélection"
+        >
+          Supprimer ({selectedCount})
+        </button>
+      )}
+    </div>
+  )
+}
+
+/** Three-state checkbox icon helper */
+function ThreeStateCheckbox({ allSelected, someSelected }: { allSelected: boolean; someSelected: boolean }) {
+  if (allSelected) return <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  if (someSelected) return <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  return <Square className="h-4 w-4" />
+}
+
+// --- End sub-components ---
 
 interface SidebarProps {
   side: 'left' | 'right'
@@ -837,23 +937,11 @@ export default function Sidebar({
               {/* Select all folders checkbox - only visible in selection mode */}
               {folderMultiSelectMode && (
                 <button
-                  onClick={() => {
-                    if (isAllFoldersSelected()) {
-                      deselectAllFolders()
-                    } else {
-                      selectAllFolders()
-                    }
-                  }}
+                  onClick={() => { isAllFoldersSelected() ? deselectAllFolders() : selectAllFolders() }}
                   className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
                   title={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"}
                 >
-                  {isAllFoldersSelected() ? (
-                    <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                  ) : isSomeFoldersSelected() ? (
-                    <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                  ) : (
-                    <Square className="h-4 w-4" />
-                  )}
+                  <ThreeStateCheckbox allSelected={isAllFoldersSelected()} someSelected={isSomeFoldersSelected()} />
                 </button>
               )}
               
@@ -985,61 +1073,13 @@ export default function Sidebar({
                   <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1 mt-0.5 xs:mt-1">
                     {/* Multi-select header for folder notes */}
                     {folderNotes.length > 0 && (
-                      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
-                        {/* Toggle selection mode button */}
-                        <button
-                          onClick={toggleNoteMultiSelectMode}
-                          className={`p-1 rounded transition-colors ${
-                            noteMultiSelectMode
-                              ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                              : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                          }`}
-                          title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
-                        >
-                          {noteMultiSelectMode ? (
-                            <CheckSquare className="h-4 w-4" />
-                          ) : (
-                            <Square className="h-4 w-4" />
-                          )}
-                        </button>
-                        
-                        {/* Select all checkbox - only visible in selection mode */}
-                        {noteMultiSelectMode && (
-                          <button
-                            onClick={() => {
-                              if (isAllNotesSelectedInFolder(folder.id)) {
-                                deselectAllNotesInFolder()
-                              } else {
-                                selectAllNotesInFolder(folder.id)
-                              }
-                            }}
-                            className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                            title={isAllNotesSelectedInFolder(folder.id) ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllNotesSelectedInFolder(folder.id) ? "Tout désélectionner" : "Tout sélectionner"}
-                          >
-                            {isAllNotesSelectedInFolder(folder.id) ? (
-                              <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                            ) : isSomeNotesSelectedInFolder(folder.id) ? (
-                              <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                            ) : (
-                              <Square className="h-4 w-4" />
-                            )}
-                          </button>
-                        )}
-                        
-                        <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
-                          Notes
-                        </span>
-                        
-                        {selectedNoteIds.size > 0 && folderNotes.some(n => selectedNoteIds.has(n.id)) && (
-                          <button
-                            onClick={handleDeleteSelectedNotes}
-                            className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                            title="Supprimer la sélection" aria-label="Supprimer la sélection"
-                          >
-                            Supprimer ({selectedNoteIds.size})
-                          </button>
-                        )}
-                      </div>
+                      <NoteMultiSelectHeader folderId={folder.id} noteMultiSelectMode={noteMultiSelectMode}
+                        toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
+                        isAllSelected={isAllNotesSelectedInFolder(folder.id)} isSomeSelected={isSomeNotesSelectedInFolder(folder.id)}
+                        onSelectAll={() => selectAllNotesInFolder(folder.id)} onDeselectAll={deselectAllNotesInFolder}
+                        selectedCount={selectedNoteIds.size} hasSelectedInView={folderNotes.some(n => selectedNoteIds.has(n.id))}
+                        onDeleteSelected={handleDeleteSelectedNotes}
+                      />
                     )}
                     {folderNotes.map((note) => renderNote(note, true, noteMultiSelectMode))}
                   </div>
@@ -1093,61 +1133,13 @@ export default function Sidebar({
             <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1">
               {/* Multi-select header for unfiled notes */}
               {notes.filter(n => !n.folder_id).length > 0 && (
-                <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
-                  {/* Toggle selection mode button */}
-                  <button
-                    onClick={toggleNoteMultiSelectMode}
-                    className={`p-1 rounded transition-colors ${
-                      noteMultiSelectMode
-                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                        : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                    }`}
-                    title={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={noteMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
-                  >
-                    {noteMultiSelectMode ? (
-                      <CheckSquare className="h-4 w-4" />
-                    ) : (
-                      <Square className="h-4 w-4" />
-                    )}
-                  </button>
-                  
-                  {/* Select all checkbox - only visible in selection mode */}
-                  {noteMultiSelectMode && (
-                    <button
-                      onClick={() => {
-                        if (isAllNotesSelectedInFolder('root')) {
-                          deselectAllNotesInFolder()
-                        } else {
-                          selectAllNotesInFolder('root')
-                        }
-                      }}
-                      className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                      title={isAllNotesSelectedInFolder('root') ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllNotesSelectedInFolder('root') ? "Tout désélectionner" : "Tout sélectionner"}
-                    >
-                      {isAllNotesSelectedInFolder('root') ? (
-                        <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                      ) : isSomeNotesSelectedInFolder('root') ? (
-                        <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                      ) : (
-                        <Square className="h-4 w-4" />
-                      )}
-                    </button>
-                  )}
-                  
-                  <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
-                    Notes
-                  </span>
-                  
-                  {selectedNoteIds.size > 0 && notes.filter(n => !n.folder_id).some(n => selectedNoteIds.has(n.id)) && (
-                    <button
-                      onClick={handleDeleteSelectedNotes}
-                      className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                      title="Supprimer la sélection" aria-label="Supprimer la sélection"
-                    >
-                      Supprimer ({selectedNoteIds.size})
-                    </button>
-                  )}
-                </div>
+                <NoteMultiSelectHeader folderId="root" noteMultiSelectMode={noteMultiSelectMode}
+                  toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
+                  isAllSelected={isAllNotesSelectedInFolder('root')} isSomeSelected={isSomeNotesSelectedInFolder('root')}
+                  onSelectAll={() => selectAllNotesInFolder('root')} onDeselectAll={deselectAllNotesInFolder}
+                  selectedCount={selectedNoteIds.size} hasSelectedInView={notes.filter(n => !n.folder_id).some(n => selectedNoteIds.has(n.id))}
+                  onDeleteSelected={handleDeleteSelectedNotes}
+                />
               )}
               {notes.filter(n => !n.folder_id).map((note) => renderNote(note, true, noteMultiSelectMode))}
             </div>
@@ -1195,23 +1187,13 @@ export default function Sidebar({
                       {/* Select all checkbox */}
                       <button
                         onClick={() => {
-                          if (isAllSelected()) {
-                            deselectAllTrashItems()
-                          } else {
-                            selectAllTrashItems()
-                          }
+                          if (isAllSelected()) { deselectAllTrashItems() } else { selectAllTrashItems() }
                           setSelectionMode(true)
                         }}
                         className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
                         title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
                       >
-                        {isAllSelected() ? (
-                          <CheckSquare className="h-4 w-4" />
-                        ) : isSomeSelected() ? (
-                          <MinusSquare className="h-4 w-4" />
-                        ) : (
-                          <Square className="h-4 w-4" />
-                        )}
+                        <ThreeStateCheckbox allSelected={isAllSelected()} someSelected={isSomeSelected()} />
                       </button>
                       
                       {selectedTrashItems.size > 0 && (
@@ -1249,58 +1231,13 @@ export default function Sidebar({
                     {trashFolders.map((folder) => {
                       const notesInFolder = trashNotes.filter(n => n.folder_id === folder.id)
                       const itemId = `folder-${folder.id}`
-                      const isSelected = selectedTrashItems.has(itemId)
                       return (
-                        <div
-                          key={folder.id}
-                          className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${
-                            isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                          }`}
-                        >
-                          {/* Checkbox */}
-                          <button
-                            onClick={() => {
-                              toggleTrashItemSelection(itemId)
-                              setSelectionMode(true)
-                            }}
-                            className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded"
-                          >
-                            {isSelected ? (
-                              <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                            ) : (
-                              <Square className="h-4 w-4 text-neutral-400" />
-                            )}
-                          </button>
-                          
-                          <div className="flex-1 min-w-0 flex items-center gap-2">
-                            <FolderIcon className="h-4 w-4 flex-shrink-0 text-neutral-400" />
-                            <span className="text-sm text-neutral-500 dark:text-neutral-400 truncate line-through">
-                              {folder.name}
-                            </span>
-                            {notesInFolder.length > 0 && (
-                              <span className="text-xs text-neutral-400 dark:text-neutral-500">
-                                ({notesInFolder.length} note{notesInFolder.length > 1 ? 's' : ''})
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={(e) => handleRestoreFolder(folder.id, e)}
-                              className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400"
-                              title="Restaurer le dossier et ses notes" aria-label="Restaurer le dossier et ses notes"
-                            >
-                              <RotateCcw className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
-                              className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400"
-                              title="Supprimer définitivement" aria-label="Supprimer définitivement"
-                            >
-                              <Trash className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </div>
+                        <TrashFolderItem key={folder.id} folder={folder} notesInFolder={notesInFolder}
+                          isSelected={selectedTrashItems.has(itemId)}
+                          onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                          onRestore={(e) => handleRestoreFolder(folder.id, e)}
+                          onPermanentlyDelete={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
+                        />
                       )
                     })}
                     
@@ -1309,53 +1246,13 @@ export default function Sidebar({
                       .filter(note => !trashFolders.some(f => f.id === note.folder_id))
                       .map((note) => {
                         const itemId = `note-${note.id}`
-                        const isSelected = selectedTrashItems.has(itemId)
                         return (
-                          <div
-                            key={note.id}
-                            className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${
-                              isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                            }`}
-                          >
-                            {/* Checkbox */}
-                            <button
-                              onClick={() => {
-                                toggleTrashItemSelection(itemId)
-                                setSelectionMode(true)
-                              }}
-                              className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded"
-                            >
-                              {isSelected ? (
-                                <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                              ) : (
-                                <Square className="h-4 w-4 text-neutral-400" />
-                              )}
-                            </button>
-                            
-                            <div className="flex-1 min-w-0 flex items-center gap-2">
-                              <File className="h-4 w-4 flex-shrink-0 text-neutral-400" />
-                              <span className="text-sm text-neutral-500 dark:text-neutral-400 truncate line-through">
-                                {note.title}
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button
-                                onClick={(e) => handleRestoreNote(note.id, e)}
-                                className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400"
-                                title="Restaurer" aria-label="Restaurer"
-                              >
-                                <RotateCcw className="h-3.5 w-3.5" />
-                              </button>
-                              <button
-                                onClick={(e) => handlePermanentlyDeleteNote(note.id, e)}
-                                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600 dark:text-red-400"
-                                title="Supprimer définitivement" aria-label="Supprimer définitivement"
-                              >
-                                <Trash className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                          </div>
+                          <TrashNoteItem key={note.id} note={note}
+                            isSelected={selectedTrashItems.has(itemId)}
+                            onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                            onRestore={(e) => handleRestoreNote(note.id, e)}
+                            onPermanentlyDelete={(e) => handlePermanentlyDeleteNote(note.id, e)}
+                          />
                         )
                       })}
                   </>

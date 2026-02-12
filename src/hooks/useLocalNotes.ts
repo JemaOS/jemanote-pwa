@@ -8,6 +8,11 @@ import { supabase } from '@/lib/supabase'
 import { extractWikiLinks } from '@/lib/wikiLinks'
 import { Note, Folder } from '@/types'
 
+// Helper: find items that exist locally but not in cloud
+function findLocalOnlyItems<T extends { id: string }>(localItems: T[], cloudItems: T[] | null): T[] {
+  return localItems.filter(local => !cloudItems?.some(cloud => cloud.id === local.id))
+}
+
 // Helper functions extracted to reduce nesting depth
 async function uploadLocalNotes(localOnlyNotes: Note[], userId: string) {
   for (const note of localOnlyNotes) {
@@ -133,10 +138,7 @@ export function useLocalNotes(userId?: string | null) {
         }
         
         // Upload local notes that don't exist in cloud
-        const localOnlyNotes = localNotes.filter(
-          (ln) => !cloudNotes?.some((cn) => cn.id === ln.id)
-        )
-        
+        const localOnlyNotes = findLocalOnlyItems(localNotes, cloudNotes)
         await uploadLocalNotes(localOnlyNotes, userId)
 
         // Merge local and cloud folders (cloud takes precedence for conflicts)
@@ -151,10 +153,7 @@ export function useLocalNotes(userId?: string | null) {
         }
         
         // Upload local folders that don't exist in cloud
-        const localOnlyFolders = localFolders.filter(
-          (lf) => !cloudFolders?.some((cf) => cf.id === lf.id)
-        )
-        
+        const localOnlyFolders = findLocalOnlyItems(localFolders, cloudFolders)
         await uploadLocalFolders(localOnlyFolders, userId)
       } catch (error) {
         console.error('Sync error:', error)

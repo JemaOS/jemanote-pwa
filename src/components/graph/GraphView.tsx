@@ -552,37 +552,49 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
     return { graphics, text, data: nodeData }
   }, [])
 
+  // Compute edge style based on selection/hover state
+  const computeEdgeStyle = useCallback((edge: EdgeData) => {
+    const isConnectedToSelected = selectedNode === edge.source || selectedNode === edge.target
+    const isConnectedToHovered = hoveredNode === edge.source || hoveredNode === edge.target
+    const baseAlpha = isConnectedToSelected ? 0.8 : isConnectedToHovered ? 0.6 : 0.5
+    const baseWidth = isConnectedToSelected ? 2.5 : isConnectedToHovered ? 2 : 1.5
+    return {
+      width: baseWidth * graphSettings.linkThickness,
+      color: (isConnectedToSelected || isConnectedToHovered) ? 0x5a63e9 : 0x9CA3AF,
+      alpha: baseAlpha,
+    }
+  }, [selectedNode, hoveredNode, graphSettings.linkThickness])
+
+  // Draw a single edge line between two positions
+  const drawSingleEdge = useCallback((
+    graphics: NonNullable<typeof edgesRef.current>,
+    sourcePos: { x: number; y: number },
+    targetPos: { x: number; y: number },
+    style: { width: number; color: number; alpha: number }
+  ) => {
+    graphics.moveTo(sourcePos.x, sourcePos.y)
+    graphics.lineTo(targetPos.x, targetPos.y)
+    graphics.stroke({ width: style.width, color: style.color, alpha: style.alpha })
+    if (showArrows) {
+      drawArrow(graphics, sourcePos, targetPos, graphSettings, style.color, style.alpha)
+    }
+  }, [showArrows, graphSettings])
+
   // Dessiner les arêtes avec style Obsidian
   const drawEdges = useCallback((edges: EdgeData[], nodePositions: Map<string, { x: number, y: number }>) => {
     if (!edgesRef.current) {return}
     
     edgesRef.current.clear()
     
-    edges.forEach((edge) => {
+    for (const edge of edges) {
       const sourcePos = nodePositions.get(edge.source)
       const targetPos = nodePositions.get(edge.target)
+      if (!sourcePos || !targetPos) {continue}
       
-      if (sourcePos && targetPos) {
-        const isConnectedToSelected = selectedNode === edge.source || selectedNode === edge.target
-        const isConnectedToHovered = hoveredNode === edge.source || hoveredNode === edge.target
-        
-        const baseAlpha = isConnectedToSelected ? 0.8 : isConnectedToHovered ? 0.6 : 0.5
-        const baseWidth = isConnectedToSelected ? 2.5 : isConnectedToHovered ? 2 : 1.5
-        
-        const width = baseWidth * graphSettings.linkThickness
-        const color = isConnectedToSelected || isConnectedToHovered ? 0x5a63e9 : 0x9CA3AF
-        
-        edgesRef.current?.moveTo(sourcePos.x, sourcePos.y)
-        edgesRef.current?.lineTo(targetPos.x, targetPos.y)
-        edgesRef.current?.stroke({ width, color, alpha: baseAlpha })
-
-        // Dessiner les flèches si activé
-        if (showArrows && edgesRef.current) {
-          drawArrow(edgesRef.current, sourcePos, targetPos, graphSettings, color, baseAlpha)
-        }
-      }
-    })
-  }, [selectedNode, hoveredNode, graphSettings.linkThickness, showArrows, graphSettings.nodeSize])
+      const style = computeEdgeStyle(edge)
+      drawSingleEdge(edgesRef.current, sourcePos, targetPos, style)
+    }
+  }, [computeEdgeStyle, drawSingleEdge])
 
   // Charger et initialiser le graphe avec système d'indexation Obsidian
   useEffect(() => {
@@ -672,17 +684,14 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
         workerRef.current = worker
 
         // Recevoir les positions du worker
-        worker.onmessage = (e) => {
+        const handleWorkerMessage = (e: MessageEvent) => {
           if (e.data.type !== 'positions') {return}
           const positions: { id: string, x: number, y: number }[] = e.data.data
-          
           updateNodePositions(positions, nodesRef.current)
-          
-          const nodePositions = new Map(
-            positions.map(pos => [pos.id, { x: pos.x, y: pos.y }])
-          )
+          const nodePositions = new Map(positions.map(pos => [pos.id, { x: pos.x, y: pos.y }]))
           drawEdges(edgeDataArray, nodePositions)
         }
+        worker.onmessage = handleWorkerMessage
 
         // Initialiser la simulation
         worker.postMessage({

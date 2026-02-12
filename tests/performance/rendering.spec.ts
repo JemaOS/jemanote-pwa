@@ -33,6 +33,43 @@ const RENDERING_BUDGETS = {
 };
 
 /**
+ * Frame performance measurement function (passed to page.evaluate to reduce nesting)
+ */
+function measureFramePerformance(measureDuration: number): Promise<RenderingMetrics> {
+  const frames: number[] = [];
+  let lastTime = performance.now();
+  let frameDrops = 0;
+  let longFrames = 0;
+
+  const measureFrame = () => {
+    const now = performance.now();
+    const frameTime = now - lastTime;
+    frames.push(frameTime);
+    if (frameTime > 33.33) { frameDrops++; }
+    if (frameTime > 50) { longFrames++; }
+    lastTime = now;
+  };
+
+  const computeResults = (): RenderingMetrics => ({
+    fps: 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length),
+    frameDrops,
+    longFrames,
+    avgFrameTime: frames.reduce((a, b) => a + b, 0) / frames.length,
+    maxFrameTime: Math.max(...frames),
+  });
+
+  const startTime = performance.now();
+  return new Promise<RenderingMetrics>((resolve) => {
+    const rafLoop = () => {
+      measureFrame();
+      const elapsed = performance.now() - startTime >= measureDuration;
+      elapsed ? resolve(computeResults()) : requestAnimationFrame(rafLoop);
+    };
+    requestAnimationFrame(rafLoop);
+  });
+}
+
+/**
  * Mesure les métriques de rendu via Chrome DevTools
  */
 async function measureRenderingMetrics(page: Page, duration: number = 5000): Promise<RenderingMetrics> {
@@ -42,48 +79,7 @@ async function measureRenderingMetrics(page: Page, duration: number = 5000): Pro
   await client.send('Runtime.enable');
   
   // Injecter un script de mesure
-  const metrics = await page.evaluate(async (measureDuration) => {
-    return new Promise<RenderingMetrics>((resolve) => {
-      const frames: number[] = [];
-      let lastTime = performance.now();
-      let frameDrops = 0;
-      let longFrames = 0;
-      
-      const measureFrame = () => {
-        const now = performance.now();
-        const frameTime = now - lastTime;
-        
-        frames.push(frameTime);
-        
-        if (frameTime > 33.33) { // Moins de 30fps
-          frameDrops++;
-        }
-        
-        if (frameTime > 50) { // Frame longue
-          longFrames++;
-        }
-        
-        lastTime = now;
-      };
-      
-      // Mesurer pendant la durée spécifiée
-      const startTime = performance.now();
-      const computeResults = () => ({
-        fps: 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length),
-        frameDrops,
-        longFrames,
-        avgFrameTime: frames.reduce((a, b) => a + b, 0) / frames.length,
-        maxFrameTime: Math.max(...frames),
-      });
-      const rafLoop = () => {
-        measureFrame();
-        const elapsed = performance.now() - startTime >= measureDuration;
-        elapsed ? resolve(computeResults()) : requestAnimationFrame(rafLoop);
-      };
-      
-      requestAnimationFrame(rafLoop);
-    });
-  }, duration);
+  const metrics = await page.evaluate(measureFramePerformance, duration) as RenderingMetrics;
   
   await client.detach();
   

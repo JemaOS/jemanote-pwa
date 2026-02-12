@@ -15,6 +15,7 @@ export default defineConfig({
     react(), 
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: false, // Don't auto-inject SW registration script - we register manually after page load
       workbox: {
         maximumFileSizeToCacheInBytes: 5000000,
       },
@@ -84,6 +85,9 @@ export default defineConfig({
   ],
   build: {
     sourcemap: 'hidden',
+    modulePreload: {
+      polyfill: true,
+    },
     rollupOptions: {
       output: {
         manualChunks: {

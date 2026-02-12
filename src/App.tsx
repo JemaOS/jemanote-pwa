@@ -7,18 +7,20 @@ import AuthModal from '@/components/auth/AuthModal'
 import CommandPalette from '@/components/command/CommandPalette'
 import InstallPrompt from '@/components/InstallPrompt'
 import Navigation from '@/components/layout/Navigation'
-import Sidebar from '@/components/layout/Sidebar'
 import StatusBar from '@/components/layout/StatusBar'
+import WorkspaceView from '@/components/workspace/WorkspaceView'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocalNotes } from '@/hooks/useLocalNotes'
 import { ViewMode } from '@/types'
 
 // Lazy load heavy view components for better code splitting
+// WorkspaceView is the default view - imported directly to avoid lazy-load delay
+// Sidebar is lazy-loaded since it starts closed on mobile (most users)
 const CanvasView = React.lazy(() => import('@/components/canvas/CanvasView'))
 const SearchView = React.lazy(() => import('@/components/search/SearchView'))
 const SettingsView = React.lazy(() => import('@/components/settings/SettingsView'))
 const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView'))
-const WorkspaceView = React.lazy(() => import('@/components/workspace/WorkspaceView'))
+const Sidebar = React.lazy(() => import('@/components/layout/Sidebar'))
 
 function App() {
   const { user, loading, signOut } = useAuth()
@@ -248,9 +250,10 @@ function App() {
           />
         )}
 
-        {/* Left Sidebar */}
+        {/* Left Sidebar - lazy-loaded since it starts closed on mobile */}
         {leftSidebarOpen && (
           <div className={isMobile ? 'fixed left-0 top-[48px] xs:top-[52px] sm:top-[56px] md:top-[60px] bottom-0 z-40 w-[85vw] max-w-[280px] xs:max-w-[300px] sm:max-w-[320px] md:max-w-[340px] animate-slide-in-right shadow-2xl' : 'relative w-[260px] sm:w-[280px] md:w-[300px] laptop-sm:w-[320px] laptop:w-[360px] laptop-lg:w-[400px]'}>
+            <Suspense fallback={<div className="h-full bg-neutral-50 dark:bg-neutral-900 animate-pulse" />}>
             <Sidebar
               side="left"
               userId={user?.id ?? null}
@@ -274,6 +277,7 @@ function App() {
               permanentlyDeleteFolder={permanentlyDeleteFolder}
               reloadFolders={reloadFolders}
             />
+            </Suspense>
           </div>
         )}
 
@@ -285,7 +289,9 @@ function App() {
 
         {currentView === 'workspace' && rightSidebarOpen && (
           <div className="hidden laptop-sm:block">
-            <Sidebar side="right" userId={user?.id ?? null} activeNoteId={activeNoteId} />
+            <Suspense fallback={<div className="h-full bg-neutral-50 dark:bg-neutral-900 animate-pulse" />}>
+              <Sidebar side="right" userId={user?.id ?? null} activeNoteId={activeNoteId} />
+            </Suspense>
           </div>
         )}
       </div>

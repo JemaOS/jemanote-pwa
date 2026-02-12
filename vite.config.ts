@@ -87,7 +87,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-react': ['react', 'react-dom'],
           'vendor-codemirror': [
             '@codemirror/view',
             '@codemirror/state',
@@ -99,8 +99,10 @@ export default defineConfig({
             '@codemirror/lint',
             '@codemirror/theme-one-dark',
           ],
-          'vendor-ui': ['lucide-react', 'date-fns', 'localforage'],
-          'vendor-markdown': ['marked', 'highlight.js', 'katex', 'dompurify'],
+          'vendor-ui': ['lucide-react', 'date-fns'],
+          'vendor-markdown': ['react-markdown', 'rehype-katex', 'rehype-raw', 'remark-gfm', 'remark-math', 'katex'],
+          'vendor-mermaid': ['mermaid'],
+          'vendor-pixi': ['pixi.js'],
         },
       },
     },

@@ -253,6 +253,427 @@ interface SidebarProps {
   reloadFolders?: () => Promise<void>
 }
 
+/** Props passed to LeftSidebarContent */
+interface LeftSidebarContentProps {
+  handleCreateNote: () => void
+  creatingFolder: boolean
+  setCreatingFolder: (v: boolean) => void
+  newFolderName: string
+  setNewFolderName: (v: string) => void
+  handleCreateFolder: () => void
+  folders: Folder[]
+  notes: Note[]
+  folderMultiSelectMode: boolean
+  toggleFolderMultiSelectMode: () => void
+  isAllFoldersSelected: () => boolean
+  isSomeFoldersSelected: () => boolean
+  selectAllFolders: () => void
+  deselectAllFolders: () => void
+  selectedFolderIds: Set<string>
+  handleDeleteSelectedFolders: () => void
+  toggleFolderSelection: (id: string) => void
+  expandedFolders: Set<string>
+  dropTargetFolderId: string | null
+  handleDragOver: (e: React.DragEvent) => void
+  handleDrop: (folderId: string | undefined, e: React.DragEvent) => void
+  handleDragEnter: (folderId: string | undefined, e: React.DragEvent) => void
+  handleDragLeave: (e: React.DragEvent) => void
+  toggleFolder: (id: string) => void
+  editingFolderId: string | null
+  editingFolderName: string
+  setEditingFolderName: (v: string) => void
+  setEditingFolderId: (v: string | null) => void
+  handleRenameFolder: (id: string) => void
+  handleCreateNoteInFolder: (folderId: string | undefined) => void
+  handleDeleteFolder: (id: string, e: React.MouseEvent) => void
+  noteMultiSelectMode: boolean
+  toggleNoteMultiSelectMode: () => void
+  isAllNotesSelectedInFolder: (folderId: string | undefined) => boolean
+  isSomeNotesSelectedInFolder: (folderId: string | undefined) => boolean
+  selectAllNotesInFolder: (folderId: string | undefined) => void
+  deselectAllNotesInFolder: () => void
+  selectedNoteIds: Set<string>
+  handleDeleteSelectedNotes: () => void
+  renderNote: (note: Note, showCheckbox?: boolean, isInSelectionMode?: boolean) => React.ReactNode
+  trashOpen: boolean
+  setTrashOpen: (v: boolean) => void
+  trashNotes: Note[]
+  trashFolders: Folder[]
+  isAllSelected: () => boolean
+  isSomeSelected: () => boolean
+  deselectAllTrashItems: () => void
+  selectAllTrashItems: () => void
+  setSelectionMode: (v: boolean) => void
+  selectedTrashItems: Set<string>
+  handleRestoreSelected: () => void
+  handleDeleteSelected: () => void
+  handleEmptyTrash: () => void
+  toggleTrashItemSelection: (id: string) => void
+  handleRestoreFolder: (id: string, e: React.MouseEvent) => void
+  handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void
+  handleRestoreNote: (id: string, e: React.MouseEvent) => void
+  handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void
+}
+
+/** Left sidebar content — notes list, folders, create note button, trash */
+function LeftSidebarContent(props: LeftSidebarContentProps) {
+  const {
+    handleCreateNote, creatingFolder, setCreatingFolder, newFolderName, setNewFolderName,
+    handleCreateFolder, folders, notes, folderMultiSelectMode, toggleFolderMultiSelectMode,
+    isAllFoldersSelected, isSomeFoldersSelected, selectAllFolders, deselectAllFolders,
+    selectedFolderIds, handleDeleteSelectedFolders, toggleFolderSelection,
+    expandedFolders, dropTargetFolderId, handleDragOver, handleDrop, handleDragEnter, handleDragLeave,
+    toggleFolder, editingFolderId, editingFolderName, setEditingFolderName, setEditingFolderId,
+    handleRenameFolder, handleCreateNoteInFolder, handleDeleteFolder,
+    noteMultiSelectMode, toggleNoteMultiSelectMode, isAllNotesSelectedInFolder, isSomeNotesSelectedInFolder,
+    selectAllNotesInFolder, deselectAllNotesInFolder, selectedNoteIds, handleDeleteSelectedNotes,
+    renderNote, trashOpen, setTrashOpen, trashNotes, trashFolders,
+    isAllSelected, isSomeSelected, deselectAllTrashItems, selectAllTrashItems,
+    setSelectionMode, selectedTrashItems, handleRestoreSelected, handleDeleteSelected,
+    handleEmptyTrash, toggleTrashItemSelection, handleRestoreFolder, handlePermanentlyDeleteFolder,
+    handleRestoreNote, handlePermanentlyDeleteNote,
+  } = props
+
+  return (
+    <div className="w-full h-full bg-neutral-100 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden">
+      {/* Header with "New Note" button */}
+      <div className="p-2 xs:p-2.5 sm:p-3 md:p-4 laptop-sm:p-4 laptop:p-5 laptop-lg:p-6 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
+        <button
+          onClick={handleCreateNote}
+          className="w-full min-h-[44px] bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors flex items-center justify-center gap-1.5 xs:gap-2 font-semibold text-sm xs:text-sm sm:text-base py-2 xs:py-2.5 sm:py-2.5 laptop:py-3 laptop-lg:py-3.5"
+        >
+          <Plus className="h-4 w-4 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5 laptop:h-5 laptop:w-5" />
+          <span>Nouvelle note</span>
+        </button>
+      </div>
+
+      {/* Notes list with folders */}
+      <div className="flex-1 overflow-y-auto p-1.5 xs:p-2 sm:p-2.5 md:p-3 laptop-sm:p-3 laptop:p-4">
+        {/* Bouton créer un dossier */}
+        <div className="mb-2 xs:mb-2.5 sm:mb-3">
+          {!creatingFolder ? (
+            <button
+              onClick={() => { setCreatingFolder(true); }}
+              className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
+            >
+              <FolderPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
+              <span>Nouveau dossier</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 py-1 xs:py-1.5">
+              <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 text-neutral-500" />
+              <input
+                type="text"
+                value={newFolderName}
+                onChange={(e) => { setNewFolderName(e.target.value); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {handleCreateFolder()}
+                  if (e.key === 'Escape') {
+                    setCreatingFolder(false)
+                    setNewFolderName('')
+                  }
+                }}
+                placeholder="Nom du dossier..."
+                className="flex-1 text-xs xs:text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-primary-500 rounded px-1.5 xs:px-2 py-0.5 xs:py-1 outline-none focus:ring-2 focus:ring-primary-500"
+                autoFocus
+              />
+              <button
+                onClick={handleCreateFolder}
+                className="p-1 xs:p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
+              >
+                <Check className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setCreatingFolder(false)
+                  setNewFolderName('')
+                }}
+                className="p-1 xs:p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
+              >
+                <X className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Liste des dossiers */}
+        {folders.length > 0 && (
+          <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-2">
+            {/* Toggle selection mode button */}
+            <button
+              onClick={toggleFolderMultiSelectMode}
+              className={`p-1 rounded transition-colors ${
+                folderMultiSelectMode
+                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                  : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
+              }`}
+              title={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
+            >
+              {folderMultiSelectMode ? (
+                <CheckSquare className="h-4 w-4" />
+              ) : (
+                <Square className="h-4 w-4" />
+              )}
+            </button>
+            
+            {/* Select all folders checkbox - only visible in selection mode */}
+            {folderMultiSelectMode && (
+              <button
+                onClick={() => { isAllFoldersSelected() ? deselectAllFolders() : selectAllFolders() }}
+                className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
+                title={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"}
+              >
+                <ThreeStateCheckbox allSelected={isAllFoldersSelected()} someSelected={isSomeFoldersSelected()} />
+              </button>
+            )}
+            
+            <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+              Dossiers
+            </span>
+            
+            {selectedFolderIds.size > 0 && (
+              <button
+                onClick={handleDeleteSelectedFolders}
+                className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
+                title="Supprimer les dossiers sélectionnés" aria-label="Supprimer les dossiers sélectionnés"
+              >
+                Supprimer ({selectedFolderIds.size})
+              </button>
+            )}
+          </div>
+        )}
+        
+        {folders.map((folder) => {
+          const folderNotes = notes.filter(n => n.folder_id === folder.id)
+          const isExpanded = expandedFolders.has(folder.id)
+          const isDropTarget = dropTargetFolderId === folder.id
+          
+          return (
+            <div key={folder.id} className="mb-1.5 xs:mb-2">
+              <div
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(folder.id, e)}
+                onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
+                onDragLeave={handleDragLeave}
+                className={`rounded-md transition-colors ${
+                  isDropTarget ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
+                }`}
+              >
+                <div
+                  className={`w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer ${
+                    selectedFolderIds.has(folder.id) ? 'bg-primary-50 dark:bg-primary-900/20' : ''
+                  }`}
+                >
+                {/* Folder checkbox - only visible in selection mode */}
+                {folderMultiSelectMode && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleFolderSelection(folder.id)
+                    }}
+                    className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded flex-shrink-0"
+                  >
+                    {selectedFolderIds.has(folder.id) ? (
+                      <CheckSquare className="h-3.5 w-3.5 xs:h-4 xs:w-4 text-primary-600 dark:text-primary-400" />
+                    ) : (
+                      <Square className="h-3.5 w-3.5 xs:h-4 xs:w-4 text-neutral-400" />
+                    )}
+                  </button>
+                )}
+                
+                <div
+                  onClick={() => { toggleFolder(folder.id); }}
+                  className="flex-1 flex items-center gap-1.5 xs:gap-2 min-w-0"
+                >
+                <ChevronRight
+                  className={`h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 transition-transform ${
+                    isExpanded ? 'rotate-90' : ''
+                  }`}
+                />
+                <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0" />
+                
+                {editingFolderId === folder.id ? (
+                  <input
+                    type="text"
+                    value={editingFolderName}
+                    onChange={(e) => { setEditingFolderName(e.target.value); }}
+                    onKeyDown={(e) => {
+                      e.stopPropagation()
+                      if (e.key === 'Enter') {handleRenameFolder(folder.id)}
+                      if (e.key === 'Escape') {
+                        setEditingFolderId(null)
+                        setEditingFolderName('')
+                      }
+                    }}
+                    onClick={(e) => { e.stopPropagation(); }}
+                    className="flex-1 text-xs xs:text-sm bg-white dark:bg-neutral-800 border border-primary-500 rounded px-1.5 xs:px-2 py-0.5 outline-none"
+                    autoFocus
+                  />
+                ) : (
+                  <span className="flex-1 text-left truncate">{folder.name}</span>
+                )}
+                
+              </div>
+              
+                <span className="text-neutral-500 dark:text-neutral-400 text-xs flex-shrink-0">
+                  {folderNotes.length}
+                </span>
+
+                {editingFolderId !== folder.id && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCreateNoteInFolder(folder.id)
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
+                      title="Créer une note dans ce dossier" aria-label="Créer une note dans ce dossier"
+                    >
+                      <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingFolderId(folder.id)
+                        setEditingFolderName(folder.name)
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded text-blue-600"
+                    >
+                      <Edit2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteFolder(folder.id, e)}
+                      className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
+                    >
+                      <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {isExpanded && (
+                <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1 mt-0.5 xs:mt-1">
+                  {/* Multi-select header for folder notes */}
+                  {folderNotes.length > 0 && (
+                    <NoteMultiSelectHeader folderId={folder.id} noteMultiSelectMode={noteMultiSelectMode}
+                      toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
+                      isAllSelected={isAllNotesSelectedInFolder(folder.id)} isSomeSelected={isSomeNotesSelectedInFolder(folder.id)}
+                      onSelectAll={() => selectAllNotesInFolder(folder.id)} onDeselectAll={deselectAllNotesInFolder}
+                      selectedCount={selectedNoteIds.size} hasSelectedInView={folderNotes.some(n => selectedNoteIds.has(n.id))}
+                      onDeleteSelected={handleDeleteSelectedNotes}
+                    />
+                  )}
+                  {folderNotes.map((note) => renderNote(note, true, noteMultiSelectMode))}
+                </div>
+              )}
+            </div>
+          </div>
+          )
+        })}
+
+        {/* Notes sans dossier */}
+        <div className="mb-1.5 xs:mb-2">
+          <div
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(undefined, e)}
+            onDragEnter={(e) => { handleDragEnter(undefined, e); }}
+            onDragLeave={handleDragLeave}
+            className={`rounded-md transition-colors ${
+              dropTargetFolderId === 'root' ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
+            }`}
+          >
+            <div
+              onClick={() => { toggleFolder('root'); }}
+              className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer"
+            >
+              <ChevronRight
+                className={`h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 transition-transform ${
+                  expandedFolders.has('root') ? 'rotate-90' : ''
+                }`}
+              />
+              <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0" />
+              <span>Sans dossier</span>
+              <span className="ml-auto text-neutral-500 dark:text-neutral-400 text-xs">
+                {notes.filter(n => !n.folder_id).length}
+              </span>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleCreateNoteInFolder(undefined)
+                }}
+                className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
+                title="Créer une note sans dossier" aria-label="Créer une note sans dossier"
+              >
+                <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {expandedFolders.has('root') && (
+          <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1">
+            {/* Multi-select header for unfiled notes */}
+            {notes.filter(n => !n.folder_id).length > 0 && (
+              <NoteMultiSelectHeader folderId="root" noteMultiSelectMode={noteMultiSelectMode}
+                toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
+                isAllSelected={isAllNotesSelectedInFolder('root')} isSomeSelected={isSomeNotesSelectedInFolder('root')}
+                onSelectAll={() => selectAllNotesInFolder('root')} onDeselectAll={deselectAllNotesInFolder}
+                selectedCount={selectedNoteIds.size} hasSelectedInView={notes.filter(n => !n.folder_id).some(n => selectedNoteIds.has(n.id))}
+                onDeleteSelected={handleDeleteSelectedNotes}
+              />
+            )}
+            {notes.filter(n => !n.folder_id).map((note) => renderNote(note, true, noteMultiSelectMode))}
+          </div>
+        )}
+
+        {notes.length === 0 && (
+          <div className="text-center py-6 xs:py-8 sm:py-10 px-3 xs:px-4 sm:px-6">
+            <p className="text-xs xs:text-sm sm:text-base text-neutral-500 dark:text-neutral-400">
+              Aucune note.
+            </p>
+            <p className="text-xs sm:text-sm text-neutral-400 dark:text-neutral-500 mt-1">
+              Créez-en une pour commencer.
+            </p>
+          </div>
+        )}
+
+        {/* Corbeille */}
+        <TrashSection
+          trashOpen={trashOpen} setTrashOpen={setTrashOpen}
+          trashNotes={trashNotes} trashFolders={trashFolders}
+          isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
+          deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
+          setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
+          handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
+          handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
+          handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}
+          handleRestoreNote={handleRestoreNote} handlePermanentlyDeleteNote={handlePermanentlyDeleteNote}
+        />
+      </div>
+    </div>
+  )
+}
+
+/** Right sidebar content — metadata inspector */
+function RightSidebarContent({ activeNoteId }: { activeNoteId?: string | null }) {
+  return (
+    <div className="hidden laptop-sm:block w-64 laptop:w-72 laptop-lg:w-80 desktop:w-96 bg-neutral-100 dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 p-4 laptop:p-5 laptop-lg:p-6 overflow-y-auto">
+      <h3 className="text-base laptop:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4 laptop:mb-5">Métadonnées</h3>
+      {activeNoteId ? (
+        <div className="space-y-3 laptop:space-y-4 text-sm laptop:text-base text-neutral-700 dark:text-neutral-300">
+          <div>
+            <div className="font-semibold mb-1 laptop:mb-1.5">ID de la note</div>
+            <div className="text-neutral-500 dark:text-neutral-400 font-mono text-xs laptop:text-sm break-all">{activeNoteId}</div>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm laptop:text-base text-neutral-500 dark:text-neutral-400">Sélectionnez une note pour voir les détails</p>
+      )}
+    </div>
+  )
+}
+
 export default function Sidebar({
   side,
   userId,
@@ -969,340 +1390,44 @@ export default function Sidebar({
 
   if (side === 'left') {
     return (
-      <div className="w-full h-full bg-neutral-100 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden">
-        {/* Header with "New Note" button */}
-        <div className="p-2 xs:p-2.5 sm:p-3 md:p-4 laptop-sm:p-4 laptop:p-5 laptop-lg:p-6 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
-          <button
-            onClick={handleCreateNote}
-            className="w-full min-h-[44px] bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors flex items-center justify-center gap-1.5 xs:gap-2 font-semibold text-sm xs:text-sm sm:text-base py-2 xs:py-2.5 sm:py-2.5 laptop:py-3 laptop-lg:py-3.5"
-          >
-            <Plus className="h-4 w-4 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5 laptop:h-5 laptop:w-5" />
-            <span>Nouvelle note</span>
-          </button>
-        </div>
-
-        {/* Notes list with folders */}
-        <div className="flex-1 overflow-y-auto p-1.5 xs:p-2 sm:p-2.5 md:p-3 laptop-sm:p-3 laptop:p-4">
-          {/* Bouton créer un dossier */}
-          <div className="mb-2 xs:mb-2.5 sm:mb-3">
-            {!creatingFolder ? (
-              <button
-                onClick={() => { setCreatingFolder(true); }}
-                className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
-              >
-                <FolderPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
-                <span>Nouveau dossier</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 py-1 xs:py-1.5">
-                <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 text-neutral-500" />
-                <input
-                  type="text"
-                  value={newFolderName}
-                  onChange={(e) => { setNewFolderName(e.target.value); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {handleCreateFolder()}
-                    if (e.key === 'Escape') {
-                      setCreatingFolder(false)
-                      setNewFolderName('')
-                    }
-                  }}
-                  placeholder="Nom du dossier..."
-                  className="flex-1 text-xs xs:text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-primary-500 rounded px-1.5 xs:px-2 py-0.5 xs:py-1 outline-none focus:ring-2 focus:ring-primary-500"
-                  autoFocus
-                />
-                <button
-                  onClick={handleCreateFolder}
-                  className="p-1 xs:p-1.5 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
-                >
-                  <Check className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setCreatingFolder(false)
-                    setNewFolderName('')
-                  }}
-                  className="p-1 xs:p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
-                >
-                  <X className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Liste des dossiers */}
-          {folders.length > 0 && (
-            <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-2">
-              {/* Toggle selection mode button */}
-              <button
-                onClick={toggleFolderMultiSelectMode}
-                className={`p-1 rounded transition-colors ${
-                  folderMultiSelectMode
-                    ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                    : 'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                }`}
-                title={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"} aria-label={folderMultiSelectMode ? "Quitter le mode sélection" : "Mode sélection"}
-              >
-                {folderMultiSelectMode ? (
-                  <CheckSquare className="h-4 w-4" />
-                ) : (
-                  <Square className="h-4 w-4" />
-                )}
-              </button>
-              
-              {/* Select all folders checkbox - only visible in selection mode */}
-              {folderMultiSelectMode && (
-                <button
-                  onClick={() => { isAllFoldersSelected() ? deselectAllFolders() : selectAllFolders() }}
-                  className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                  title={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllFoldersSelected() ? "Tout désélectionner" : "Tout sélectionner"}
-                >
-                  <ThreeStateCheckbox allSelected={isAllFoldersSelected()} someSelected={isSomeFoldersSelected()} />
-                </button>
-              )}
-              
-              <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
-                Dossiers
-              </span>
-              
-              {selectedFolderIds.size > 0 && (
-                <button
-                  onClick={handleDeleteSelectedFolders}
-                  className="ml-auto px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                  title="Supprimer les dossiers sélectionnés" aria-label="Supprimer les dossiers sélectionnés"
-                >
-                  Supprimer ({selectedFolderIds.size})
-                </button>
-              )}
-            </div>
-          )}
-          
-          {folders.map((folder) => {
-            const folderNotes = notes.filter(n => n.folder_id === folder.id)
-            const isExpanded = expandedFolders.has(folder.id)
-            const isDropTarget = dropTargetFolderId === folder.id
-            
-            return (
-              <div key={folder.id} className="mb-1.5 xs:mb-2">
-                <div
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(folder.id, e)}
-                  onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
-                  onDragLeave={handleDragLeave}
-                  className={`rounded-md transition-colors ${
-                    isDropTarget ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
-                  }`}
-                >
-                  <div
-                    className={`w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer ${
-                      selectedFolderIds.has(folder.id) ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                    }`}
-                  >
-                  {/* Folder checkbox - only visible in selection mode */}
-                  {folderMultiSelectMode && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleFolderSelection(folder.id)
-                      }}
-                      className="p-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600 rounded flex-shrink-0"
-                    >
-                      {selectedFolderIds.has(folder.id) ? (
-                        <CheckSquare className="h-3.5 w-3.5 xs:h-4 xs:w-4 text-primary-600 dark:text-primary-400" />
-                      ) : (
-                        <Square className="h-3.5 w-3.5 xs:h-4 xs:w-4 text-neutral-400" />
-                      )}
-                    </button>
-                  )}
-                  
-                  <div
-                    onClick={() => { toggleFolder(folder.id); }}
-                    className="flex-1 flex items-center gap-1.5 xs:gap-2 min-w-0"
-                  >
-                  <ChevronRight
-                    className={`h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 transition-transform ${
-                      isExpanded ? 'rotate-90' : ''
-                    }`}
-                  />
-                  <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0" />
-                  
-                  {editingFolderId === folder.id ? (
-                    <input
-                      type="text"
-                      value={editingFolderName}
-                      onChange={(e) => { setEditingFolderName(e.target.value); }}
-                      onKeyDown={(e) => {
-                        e.stopPropagation()
-                        if (e.key === 'Enter') {handleRenameFolder(folder.id)}
-                        if (e.key === 'Escape') {
-                          setEditingFolderId(null)
-                          setEditingFolderName('')
-                        }
-                      }}
-                      onClick={(e) => { e.stopPropagation(); }}
-                      className="flex-1 text-xs xs:text-sm bg-white dark:bg-neutral-800 border border-primary-500 rounded px-1.5 xs:px-2 py-0.5 outline-none"
-                      autoFocus
-                    />
-                  ) : (
-                    <span className="flex-1 text-left truncate">{folder.name}</span>
-                  )}
-                  
-                </div>
-                
-                  <span className="text-neutral-500 dark:text-neutral-400 text-xs flex-shrink-0">
-                    {folderNotes.length}
-                  </span>
-
-                  {editingFolderId !== folder.id && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleCreateNoteInFolder(folder.id)
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
-                        title="Créer une note dans ce dossier" aria-label="Créer une note dans ce dossier"
-                      >
-                        <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setEditingFolderId(folder.id)
-                          setEditingFolderName(folder.name)
-                        }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded text-blue-600"
-                      >
-                        <Edit2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
-                      </button>
-                      <button
-                        onClick={(e) => handleDeleteFolder(folder.id, e)}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
-                      >
-                        <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {isExpanded && (
-                  <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1 mt-0.5 xs:mt-1">
-                    {/* Multi-select header for folder notes */}
-                    {folderNotes.length > 0 && (
-                      <NoteMultiSelectHeader folderId={folder.id} noteMultiSelectMode={noteMultiSelectMode}
-                        toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
-                        isAllSelected={isAllNotesSelectedInFolder(folder.id)} isSomeSelected={isSomeNotesSelectedInFolder(folder.id)}
-                        onSelectAll={() => selectAllNotesInFolder(folder.id)} onDeselectAll={deselectAllNotesInFolder}
-                        selectedCount={selectedNoteIds.size} hasSelectedInView={folderNotes.some(n => selectedNoteIds.has(n.id))}
-                        onDeleteSelected={handleDeleteSelectedNotes}
-                      />
-                    )}
-                    {folderNotes.map((note) => renderNote(note, true, noteMultiSelectMode))}
-                  </div>
-                )}
-              </div>
-            </div>
-            )
-          })}
-
-          {/* Notes sans dossier */}
-          <div className="mb-1.5 xs:mb-2">
-            <div
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(undefined, e)}
-              onDragEnter={(e) => { handleDragEnter(undefined, e); }}
-              onDragLeave={handleDragLeave}
-              className={`rounded-md transition-colors ${
-                dropTargetFolderId === 'root' ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
-              }`}
-            >
-              <div
-                onClick={() => { toggleFolder('root'); }}
-                className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer"
-              >
-                <ChevronRight
-                  className={`h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 transition-transform ${
-                    expandedFolders.has('root') ? 'rotate-90' : ''
-                  }`}
-                />
-                <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0" />
-                <span>Sans dossier</span>
-                <span className="ml-auto text-neutral-500 dark:text-neutral-400 text-xs">
-                  {notes.filter(n => !n.folder_id).length}
-                </span>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleCreateNoteInFolder(undefined)
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-green-100 dark:hover:bg-green-900/30 rounded text-green-600"
-                  title="Créer une note sans dossier" aria-label="Créer une note sans dossier"
-                >
-                  <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {expandedFolders.has('root') && (
-            <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1">
-              {/* Multi-select header for unfiled notes */}
-              {notes.filter(n => !n.folder_id).length > 0 && (
-                <NoteMultiSelectHeader folderId="root" noteMultiSelectMode={noteMultiSelectMode}
-                  toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
-                  isAllSelected={isAllNotesSelectedInFolder('root')} isSomeSelected={isSomeNotesSelectedInFolder('root')}
-                  onSelectAll={() => selectAllNotesInFolder('root')} onDeselectAll={deselectAllNotesInFolder}
-                  selectedCount={selectedNoteIds.size} hasSelectedInView={notes.filter(n => !n.folder_id).some(n => selectedNoteIds.has(n.id))}
-                  onDeleteSelected={handleDeleteSelectedNotes}
-                />
-              )}
-              {notes.filter(n => !n.folder_id).map((note) => renderNote(note, true, noteMultiSelectMode))}
-            </div>
-          )}
-
-          {notes.length === 0 && (
-            <div className="text-center py-6 xs:py-8 sm:py-10 px-3 xs:px-4 sm:px-6">
-              <p className="text-xs xs:text-sm sm:text-base text-neutral-500 dark:text-neutral-400">
-                Aucune note.
-              </p>
-              <p className="text-xs sm:text-sm text-neutral-400 dark:text-neutral-500 mt-1">
-                Créez-en une pour commencer.
-              </p>
-            </div>
-          )}
-
-          {/* Corbeille */}
-          <TrashSection
-            trashOpen={trashOpen} setTrashOpen={setTrashOpen}
-            trashNotes={trashNotes} trashFolders={trashFolders}
-            isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
-            deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
-            setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
-            handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
-            handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
-            handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}
-            handleRestoreNote={handleRestoreNote} handlePermanentlyDeleteNote={handlePermanentlyDeleteNote}
-          />
-        </div>
-      </div>
+      <LeftSidebarContent
+        handleCreateNote={handleCreateNote}
+        creatingFolder={creatingFolder} setCreatingFolder={setCreatingFolder}
+        newFolderName={newFolderName} setNewFolderName={setNewFolderName}
+        handleCreateFolder={handleCreateFolder}
+        folders={folders} notes={notes}
+        folderMultiSelectMode={folderMultiSelectMode} toggleFolderMultiSelectMode={toggleFolderMultiSelectMode}
+        isAllFoldersSelected={isAllFoldersSelected} isSomeFoldersSelected={isSomeFoldersSelected}
+        selectAllFolders={selectAllFolders} deselectAllFolders={deselectAllFolders}
+        selectedFolderIds={selectedFolderIds} handleDeleteSelectedFolders={handleDeleteSelectedFolders}
+        toggleFolderSelection={toggleFolderSelection}
+        expandedFolders={expandedFolders} dropTargetFolderId={dropTargetFolderId}
+        handleDragOver={handleDragOver} handleDrop={handleDrop}
+        handleDragEnter={handleDragEnter} handleDragLeave={handleDragLeave}
+        toggleFolder={toggleFolder}
+        editingFolderId={editingFolderId} editingFolderName={editingFolderName}
+        setEditingFolderName={setEditingFolderName} setEditingFolderId={setEditingFolderId}
+        handleRenameFolder={handleRenameFolder}
+        handleCreateNoteInFolder={handleCreateNoteInFolder}
+        handleDeleteFolder={handleDeleteFolder}
+        noteMultiSelectMode={noteMultiSelectMode} toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
+        isAllNotesSelectedInFolder={isAllNotesSelectedInFolder} isSomeNotesSelectedInFolder={isSomeNotesSelectedInFolder}
+        selectAllNotesInFolder={selectAllNotesInFolder} deselectAllNotesInFolder={deselectAllNotesInFolder}
+        selectedNoteIds={selectedNoteIds} handleDeleteSelectedNotes={handleDeleteSelectedNotes}
+        renderNote={renderNote}
+        trashOpen={trashOpen} setTrashOpen={setTrashOpen}
+        trashNotes={trashNotes} trashFolders={trashFolders}
+        isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
+        deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
+        setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
+        handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
+        handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
+        handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}
+        handleRestoreNote={handleRestoreNote} handlePermanentlyDeleteNote={handlePermanentlyDeleteNote}
+      />
     )
   }
 
   // Right sidebar (metadata inspector)
-  return (
-    <div className="hidden laptop-sm:block w-64 laptop:w-72 laptop-lg:w-80 desktop:w-96 bg-neutral-100 dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 p-4 laptop:p-5 laptop-lg:p-6 overflow-y-auto">
-      <h3 className="text-base laptop:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4 laptop:mb-5">Métadonnées</h3>
-      {activeNoteId ? (
-        <div className="space-y-3 laptop:space-y-4 text-sm laptop:text-base text-neutral-700 dark:text-neutral-300">
-          <div>
-            <div className="font-semibold mb-1 laptop:mb-1.5">ID de la note</div>
-            <div className="text-neutral-500 dark:text-neutral-400 font-mono text-xs laptop:text-sm break-all">{activeNoteId}</div>
-          </div>
-        </div>
-      ) : (
-        <p className="text-sm laptop:text-base text-neutral-500 dark:text-neutral-400">Sélectionnez une note pour voir les détails</p>
-      )}
-    </div>
-  )
+  return <RightSidebarContent activeNoteId={activeNoteId} />
 }

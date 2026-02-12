@@ -72,7 +72,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   // Helper: process saved or initial canvas data
   const processCanvasData = useCallback(async (savedNodes: CanvasNode[] | null) => {
     if (savedNodes && savedNodes.length > 0) {
-      setCanvasNodes(savedNodes.filter(isValidNode))
+      setCanvasNodes(savedNodes.filter(node => isValidNode(node)))
     } else if (notes.length > 0) {
       const initialNodes = createInitialNodes(notes)
       setCanvasNodes(initialNodes)

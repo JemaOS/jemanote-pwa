@@ -596,6 +596,17 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
     }
   }, [computeEdgeStyle, drawSingleEdge])
 
+  // Factory for worker message handler (extracted to reduce nesting depth)
+  const createWorkerMessageHandler = useCallback((edgeDataArray: EdgeData[]) => {
+    return (e: MessageEvent) => {
+      if (e.data.type !== 'positions') {return}
+      const positions: { id: string, x: number, y: number }[] = e.data.data
+      updateNodePositions(positions, nodesRef.current)
+      const nodePositions = new Map(positions.map(pos => [pos.id, { x: pos.x, y: pos.y }]))
+      drawEdges(edgeDataArray, nodePositions)
+    }
+  }, [drawEdges])
+
   // Charger et initialiser le graphe avec système d'indexation Obsidian
   useEffect(() => {
     const loadGraph = async () => {
@@ -684,14 +695,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
         workerRef.current = worker
 
         // Recevoir les positions du worker
-        const handleWorkerMessage = (e: MessageEvent) => {
-          if (e.data.type !== 'positions') {return}
-          const positions: { id: string, x: number, y: number }[] = e.data.data
-          updateNodePositions(positions, nodesRef.current)
-          const nodePositions = new Map(positions.map(pos => [pos.id, { x: pos.x, y: pos.y }]))
-          drawEdges(edgeDataArray, nodePositions)
-        }
-        worker.onmessage = handleWorkerMessage
+        worker.onmessage = createWorkerMessageHandler(edgeDataArray)
 
         // Initialiser la simulation
         worker.postMessage({

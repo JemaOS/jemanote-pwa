@@ -107,6 +107,130 @@ function ThreeStateCheckbox({ allSelected, someSelected }: { allSelected: boolea
   return <Square className="h-4 w-4" />
 }
 
+/** Trash section in the left sidebar */
+function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAllSelected, isSomeSelected,
+  deselectAllTrashItems, selectAllTrashItems, setSelectionMode, selectedTrashItems,
+  handleRestoreSelected, handleDeleteSelected, handleEmptyTrash, toggleTrashItemSelection,
+  handleRestoreFolder, handlePermanentlyDeleteFolder, handleRestoreNote, handlePermanentlyDeleteNote,
+}: {
+  trashOpen: boolean; setTrashOpen: (v: boolean) => void;
+  trashNotes: Note[]; trashFolders: Folder[];
+  isAllSelected: () => boolean; isSomeSelected: () => boolean;
+  deselectAllTrashItems: () => void; selectAllTrashItems: () => void;
+  setSelectionMode: (v: boolean) => void; selectedTrashItems: Set<string>;
+  handleRestoreSelected: () => void; handleDeleteSelected: () => void; handleEmptyTrash: () => void;
+  toggleTrashItemSelection: (id: string) => void;
+  handleRestoreFolder: (id: string, e: React.MouseEvent) => void;
+  handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void;
+  handleRestoreNote: (id: string, e: React.MouseEvent) => void;
+  handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void;
+}) {
+  const totalTrashItems = trashNotes.length + trashFolders.length
+
+  return (
+    <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+      <button
+        onClick={() => { setTrashOpen(!trashOpen); }}
+        className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
+      >
+        <ChevronRight
+          className={`h-4 w-4 flex-shrink-0 transition-transform ${trashOpen ? 'rotate-90' : ''}`}
+        />
+        <Trash2 className="h-4 w-4 flex-shrink-0" />
+        <span>Corbeille</span>
+        <span className="ml-auto text-neutral-500 dark:text-neutral-400 text-xs">
+          {totalTrashItems}
+        </span>
+      </button>
+
+      {trashOpen && (
+        <div className="ml-4 mt-1 space-y-1">
+          {totalTrashItems === 0 ? (
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 px-3 py-2">
+              Corbeille vide
+            </p>
+          ) : (
+            <>
+              {/* Trash action buttons */}
+              <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
+                <button
+                  onClick={() => {
+                    if (isAllSelected()) { deselectAllTrashItems() } else { selectAllTrashItems() }
+                    setSelectionMode(true)
+                  }}
+                  className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
+                  title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
+                >
+                  <ThreeStateCheckbox allSelected={isAllSelected()} someSelected={isSomeSelected()} />
+                </button>
+                
+                {selectedTrashItems.size > 0 && (
+                  <>
+                    <button
+                      onClick={handleRestoreSelected}
+                      className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 rounded transition-colors"
+                      title="Restaurer la sélection" aria-label="Restaurer la sélection"
+                    >
+                      Restaurer ({selectedTrashItems.size})
+                    </button>
+                    <button
+                      onClick={handleDeleteSelected}
+                      className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
+                      title="Supprimer la sélection" aria-label="Supprimer la sélection"
+                    >
+                      Supprimer ({selectedTrashItems.size})
+                    </button>
+                  </>
+                )}
+                
+                <button
+                  onClick={handleEmptyTrash}
+                  className="ml-auto px-2 py-1 text-xs text-white rounded transition-colors"
+                  style={{ backgroundColor: '#4850d9' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a41b0'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4850d9'}
+                  title="Vider la corbeille" aria-label="Vider la corbeille"
+                >
+                  Vider tout
+                </button>
+              </div>
+
+              {/* Deleted Folders */}
+              {trashFolders.map((folder) => {
+                const notesInFolder = trashNotes.filter(n => n.folder_id === folder.id)
+                const itemId = `folder-${folder.id}`
+                return (
+                  <TrashFolderItem key={folder.id} folder={folder} notesInFolder={notesInFolder}
+                    isSelected={selectedTrashItems.has(itemId)}
+                    onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                    onRestore={(e) => handleRestoreFolder(folder.id, e)}
+                    onPermanentlyDelete={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
+                  />
+                )
+              })}
+              
+              {/* Deleted Notes (not in deleted folders) */}
+              {trashNotes
+                .filter(note => !trashFolders.some(f => f.id === note.folder_id))
+                .map((note) => {
+                  const itemId = `note-${note.id}`
+                  return (
+                    <TrashNoteItem key={note.id} note={note}
+                      isSelected={selectedTrashItems.has(itemId)}
+                      onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                      onRestore={(e) => handleRestoreNote(note.id, e)}
+                      onPermanentlyDelete={(e) => handlePermanentlyDeleteNote(note.id, e)}
+                    />
+                  )
+                })}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // --- End sub-components ---
 
 interface SidebarProps {
@@ -248,13 +372,11 @@ export default function Sidebar({
       ? `Cette action est irréversible. Le dossier "${folder?.name}" et ses ${notesInFolder.length} note(s) seront supprimés définitivement.`
       : `Cette action est irréversible. Supprimer définitivement le dossier "${folder?.name}" ?`
     
-    const confirmed = window.confirm(message)
-    if (confirmed) {
-      try {
-        await permanentlyDeleteFolder(folderId)
-      } catch (error) {
-        console.error('Erreur lors de la suppression définitive du dossier:', error)
-      }
+    if (!window.confirm(message)) {return}
+    try {
+      await permanentlyDeleteFolder(folderId)
+    } catch (error) {
+      console.error('Erreur lors de la suppression définitive du dossier:', error)
     }
   }
 
@@ -472,11 +594,10 @@ export default function Sidebar({
   }
 
   const permanentlyDeleteTrashItem = async (itemId: string) => {
-    if (itemId.startsWith('folder-') && permanentlyDeleteFolder) {
-      await permanentlyDeleteFolder(itemId.replace('folder-', ''))
-    } else if (itemId.startsWith('note-') && permanentlyDeleteNote) {
-      await permanentlyDeleteNote(itemId.replace('note-', ''))
-    }
+    const isFolder = itemId.startsWith('folder-')
+    const id = isFolder ? itemId.replace('folder-', '') : itemId.replace('note-', '')
+    if (isFolder && permanentlyDeleteFolder) {return permanentlyDeleteFolder(id)}
+    if (!isFolder && permanentlyDeleteNote) {return permanentlyDeleteNote(id)}
   }
 
   const handleDeleteSelected = async () => {
@@ -495,11 +616,10 @@ export default function Sidebar({
   }
 
   const restoreTrashItem = async (itemId: string) => {
-    if (itemId.startsWith('folder-') && restoreFolder) {
-      await restoreFolder(itemId.replace('folder-', ''))
-    } else if (itemId.startsWith('note-') && restoreNote) {
-      await restoreNote(itemId.replace('note-', ''))
-    }
+    const isFolder = itemId.startsWith('folder-')
+    const id = isFolder ? itemId.replace('folder-', '') : itemId.replace('note-', '')
+    if (isFolder && restoreFolder) {return restoreFolder(id)}
+    if (!isFolder && restoreNote) {return restoreNote(id)}
   }
 
   const handleRestoreSelected = async () => {
@@ -649,23 +769,23 @@ export default function Sidebar({
   }
 
   const handleKeyDown = async (e: React.KeyboardEvent, noteId: string) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      if (!updateNote || !editingTitle.trim()) {
-        setEditingNoteId(null)
-        return
-      }
-
-      try {
-        await updateNote(noteId, { title: editingTitle.trim() })
-        setEditingNoteId(null)
-        setEditingTitle('')
-      } catch (error) {
-        console.error('Erreur lors du renommage:', error)
-      }
-    } else if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       setEditingNoteId(null)
       setEditingTitle('')
+      return
+    }
+    if (e.key !== 'Enter') {return}
+    e.preventDefault()
+    if (!updateNote || !editingTitle.trim()) {
+      setEditingNoteId(null)
+      return
+    }
+    try {
+      await updateNote(noteId, { title: editingTitle.trim() })
+      setEditingNoteId(null)
+      setEditingTitle('')
+    } catch (error) {
+      console.error('Erreur lors du renommage:', error)
     }
   }
 
@@ -673,13 +793,11 @@ export default function Sidebar({
     e.stopPropagation()
     if (!deleteNote) {return}
 
-    const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')
-    if (confirmed) {
-      try {
-        await deleteNote(noteId)
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error)
-      }
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {return}
+    try {
+      await deleteNote(noteId)
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
     }
   }
 
@@ -697,13 +815,11 @@ export default function Sidebar({
     e.stopPropagation()
     if (!permanentlyDeleteNote) {return}
     
-    const confirmed = window.confirm('Cette action est irréversible. Supprimer définitivement ?')
-    if (confirmed) {
-      try {
-        await permanentlyDeleteNote(noteId)
-      } catch (error) {
-        console.error('Erreur lors de la suppression définitive:', error)
-      }
+    if (!window.confirm('Cette action est irréversible. Supprimer définitivement ?')) {return}
+    try {
+      await permanentlyDeleteNote(noteId)
+    } catch (error) {
+      console.error('Erreur lors de la suppression définitive:', error)
     }
   }
 
@@ -1157,109 +1273,17 @@ export default function Sidebar({
           )}
 
           {/* Corbeille */}
-          <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
-            <button
-              onClick={() => { setTrashOpen(!trashOpen); }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
-            >
-              <ChevronRight
-                className={`h-4 w-4 flex-shrink-0 transition-transform ${
-                  trashOpen ? 'rotate-90' : ''
-                }`}
-              />
-              <Trash2 className="h-4 w-4 flex-shrink-0" />
-              <span>Corbeille</span>
-              <span className="ml-auto text-neutral-500 dark:text-neutral-400 text-xs">
-                {trashNotes.length + trashFolders.length}
-              </span>
-            </button>
-
-            {trashOpen && (
-              <div className="ml-4 mt-1 space-y-1">
-                {trashNotes.length === 0 && trashFolders.length === 0 ? (
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 px-3 py-2">
-                    Corbeille vide
-                  </p>
-                ) : (
-                  <>
-                    {/* Trash action buttons */}
-                    <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
-                      {/* Select all checkbox */}
-                      <button
-                        onClick={() => {
-                          if (isAllSelected()) { deselectAllTrashItems() } else { selectAllTrashItems() }
-                          setSelectionMode(true)
-                        }}
-                        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
-                        title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
-                      >
-                        <ThreeStateCheckbox allSelected={isAllSelected()} someSelected={isSomeSelected()} />
-                      </button>
-                      
-                      {selectedTrashItems.size > 0 && (
-                        <>
-                          <button
-                            onClick={handleRestoreSelected}
-                            className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 rounded transition-colors"
-                            title="Restaurer la sélection" aria-label="Restaurer la sélection"
-                          >
-                            Restaurer ({selectedTrashItems.size})
-                          </button>
-                          <button
-                            onClick={handleDeleteSelected}
-                            className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded transition-colors"
-                            title="Supprimer la sélection" aria-label="Supprimer la sélection"
-                          >
-                            Supprimer ({selectedTrashItems.size})
-                          </button>
-                        </>
-                      )}
-                      
-                      <button
-                        onClick={handleEmptyTrash}
-                        className="ml-auto px-2 py-1 text-xs text-white rounded transition-colors"
-                        style={{ backgroundColor: '#4850d9' }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a41b0'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4850d9'}
-                        title="Vider la corbeille" aria-label="Vider la corbeille"
-                      >
-                        Vider tout
-                      </button>
-                    </div>
-
-                    {/* Deleted Folders */}
-                    {trashFolders.map((folder) => {
-                      const notesInFolder = trashNotes.filter(n => n.folder_id === folder.id)
-                      const itemId = `folder-${folder.id}`
-                      return (
-                        <TrashFolderItem key={folder.id} folder={folder} notesInFolder={notesInFolder}
-                          isSelected={selectedTrashItems.has(itemId)}
-                          onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
-                          onRestore={(e) => handleRestoreFolder(folder.id, e)}
-                          onPermanentlyDelete={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
-                        />
-                      )
-                    })}
-                    
-                    {/* Deleted Notes (not in deleted folders) */}
-                    {trashNotes
-                      .filter(note => !trashFolders.some(f => f.id === note.folder_id))
-                      .map((note) => {
-                        const itemId = `note-${note.id}`
-                        return (
-                          <TrashNoteItem key={note.id} note={note}
-                            isSelected={selectedTrashItems.has(itemId)}
-                            onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
-                            onRestore={(e) => handleRestoreNote(note.id, e)}
-                            onPermanentlyDelete={(e) => handlePermanentlyDeleteNote(note.id, e)}
-                          />
-                        )
-                      })}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          <TrashSection
+            trashOpen={trashOpen} setTrashOpen={setTrashOpen}
+            trashNotes={trashNotes} trashFolders={trashFolders}
+            isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
+            deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
+            setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
+            handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
+            handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
+            handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}
+            handleRestoreNote={handleRestoreNote} handlePermanentlyDeleteNote={handlePermanentlyDeleteNote}
+          />
         </div>
       </div>
     )

@@ -82,6 +82,29 @@ export default defineConfig({
       brotliSize: true,
     })
   ],
+  build: {
+    sourcemap: 'hidden',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-codemirror': [
+            '@codemirror/view',
+            '@codemirror/state',
+            '@codemirror/commands',
+            '@codemirror/lang-markdown',
+            '@codemirror/language',
+            '@codemirror/autocomplete',
+            '@codemirror/search',
+            '@codemirror/lint',
+            '@codemirror/theme-one-dark',
+          ],
+          'vendor-ui': ['lucide-react', 'date-fns', 'localforage'],
+          'vendor-markdown': ['marked', 'highlight.js', 'katex', 'dompurify'],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

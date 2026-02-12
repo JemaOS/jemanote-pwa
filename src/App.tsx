@@ -1,22 +1,24 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 
 import AuthModal from '@/components/auth/AuthModal'
-import CanvasView from '@/components/canvas/CanvasView'
 import CommandPalette from '@/components/command/CommandPalette'
 import InstallPrompt from '@/components/InstallPrompt'
 import Navigation from '@/components/layout/Navigation'
 import Sidebar from '@/components/layout/Sidebar'
 import StatusBar from '@/components/layout/StatusBar'
-import SearchView from '@/components/search/SearchView'
-import SettingsView from '@/components/settings/SettingsView'
-import TimelineView from '@/components/timeline/TimelineView'
-import WorkspaceView from '@/components/workspace/WorkspaceView'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocalNotes } from '@/hooks/useLocalNotes'
 import { ViewMode } from '@/types'
+
+// Lazy load heavy view components for better code splitting
+const CanvasView = React.lazy(() => import('@/components/canvas/CanvasView'))
+const SearchView = React.lazy(() => import('@/components/search/SearchView'))
+const SettingsView = React.lazy(() => import('@/components/settings/SettingsView'))
+const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView'))
+const WorkspaceView = React.lazy(() => import('@/components/workspace/WorkspaceView'))
 
 function App() {
   const { user, loading, signOut } = useAuth()
@@ -275,7 +277,11 @@ function App() {
           </div>
         )}
 
-        <main className="flex-1 overflow-hidden min-w-0">{renderView()}</main>
+        <main className="flex-1 overflow-hidden min-w-0">
+          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 border-t-transparent"></div></div>}>
+            {renderView()}
+          </Suspense>
+        </main>
 
         {currentView === 'workspace' && rightSidebarOpen && (
           <div className="hidden laptop-sm:block">

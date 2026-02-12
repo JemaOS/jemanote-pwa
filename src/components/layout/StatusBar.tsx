@@ -77,7 +77,7 @@ export default function StatusBar({
       </div>
 
       <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 md:gap-4">
-        <span className="hidden lg:inline text-[10px] xs:text-xs text-neutral-500 dark:text-neutral-400">
+        <span className="hidden lg:inline text-[10px] xs:text-xs text-neutral-700 dark:text-neutral-300">
           Développé par{' '}
           <a
             href="https://www.jematechnology.fr/"
@@ -89,7 +89,7 @@ export default function StatusBar({
           </a>
           {' '}© 2025 • Open Source & sous licence AGPL
         </span>
-        <span className="hidden sm:inline lg:hidden text-[10px] xs:text-xs text-neutral-500 dark:text-neutral-400">
+        <span className="hidden sm:inline lg:hidden text-[10px] xs:text-xs text-neutral-700 dark:text-neutral-300">
           <a
             href="https://www.jematechnology.fr/"
             target="_blank"
@@ -101,7 +101,7 @@ export default function StatusBar({
           {' '}© 2025
         </span>
         <span className="hidden sm:inline">Mode: Édition</span>
-        <span className="sm:hidden text-[10px] xs:text-xs text-neutral-500">Édit</span>
+        <span className="sm:hidden text-[10px] xs:text-xs text-neutral-700 dark:text-neutral-300">Édit</span>
       </div>
     </div>
   )

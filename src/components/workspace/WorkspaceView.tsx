@@ -102,6 +102,28 @@ export default function WorkspaceView({
     }
   }, [activeNoteId, updateNote])
 
+  // Wrapper pour onNoteChange qui sauvegarde avant de changer de note
+  const handleNoteChange = useCallback((noteId: string | null) => {
+    // Sauvegarder les modifications en cours avant de changer de note
+    if (activeNoteId && noteId !== activeNoteId) {
+      const hasChanges = content !== lastSavedContent.current || title !== lastSavedTitle.current
+
+      if (hasChanges && activeNote) {
+        const updatedNote = {
+          ...activeNote,
+          content,
+          title,
+          updated_at: new Date().toISOString(),
+        }
+        // Sauvegarde synchrone immédiate
+        LocalStorage.saveNoteSync(updatedNote)
+      }
+    }
+
+    // Appeler le onNoteChange original
+    onNoteChange(noteId)
+  }, [activeNoteId, activeNote, content, title, onNoteChange])
+
   // Gestion du changement de contenu - INSTANT pour synchronisation canvas
   const handleContentChange = (newContent: string) => {
     setContent(newContent)
@@ -162,6 +184,29 @@ export default function WorkspaceView({
     }
   }
 
+  // Ref pour stocker les valeurs actuelles dans le cleanup
+  const contentRef = useRef(content)
+  const titleRef = useRef(title)
+  const activeNoteIdRef = useRef(activeNoteId)
+  const notesRef = useRef(notes)
+
+  // Mettre à jour les refs quand les valeurs changent
+  useEffect(() => {
+    contentRef.current = content
+  }, [content])
+
+  useEffect(() => {
+    titleRef.current = title
+  }, [title])
+
+  useEffect(() => {
+    activeNoteIdRef.current = activeNoteId
+  }, [activeNoteId])
+
+  useEffect(() => {
+    notesRef.current = notes
+  }, [notes])
+
   // Cleanup des timers avant navigation
   useEffect(() => {
     return () => {
@@ -170,6 +215,36 @@ export default function WorkspaceView({
       }
     }
   }, [])
+
+  // Sauvegarder avant de changer de note (quand le composant est démonté ou quand activeNoteId change)
+  useEffect(() => {
+    return () => {
+      // Sauvegarde de secours quand on quitte la note
+      const currentActiveNoteId = activeNoteIdRef.current
+      const currentContent = contentRef.current
+      const currentTitle = titleRef.current
+      const currentNotes = notesRef.current
+
+      if (currentActiveNoteId) {
+        const hasChanges = currentContent !== lastSavedContent.current || currentTitle !== lastSavedTitle.current
+
+        if (hasChanges) {
+          // Sauvegarde synchrone immédiate pour ne pas perdre les données
+          const activeNote = currentNotes.find((note) => note.id === currentActiveNoteId)
+          if (activeNote) {
+            const updatedNote = {
+              ...activeNote,
+              content: currentContent,
+              title: currentTitle,
+              updated_at: new Date().toISOString(),
+            }
+            // Utiliser la sauvegarde synchrone pour garantir la persistance
+            LocalStorage.saveNoteSync(updatedNote)
+          }
+        }
+      }
+    }
+  }, [activeNoteId])
 
   // Navigation par wiki link
   const handleWikiLinkClick = (noteTitle: string) => {
@@ -181,7 +256,7 @@ export default function WorkspaceView({
     // Trouver la note par titre
     const targetNote = notes.find((note) => note.title === noteTitle)
     if (targetNote) {
-      onNoteChange(targetNote.id)
+      handleNoteChange(targetNote.id)
     }
   }
 
@@ -469,7 +544,7 @@ export default function WorkspaceView({
             setContent(newContent) // Mettre à jour l'état local pour refléter le changement immédiatement
           }}
           onNavigateToNote={(noteId) => {
-            onNoteChange(noteId)
+            handleNoteChange(noteId)
           }}
         />
       )}

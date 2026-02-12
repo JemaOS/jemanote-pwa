@@ -432,6 +432,8 @@ export function useLocalNotes(userId?: string | null) {
   return {
     notes: notes.filter(n => !n.deleted_at),
     folders: folders.filter(f => !f.deleted_at),
+    allNotes: notes, // Inclut les notes supprimées pour la synchronisation Canvas/Timeline
+    allFolders: folders, // Inclut les dossiers supprimés
     loading,
     syncing,
     syncEnabled,

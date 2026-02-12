@@ -23,6 +23,7 @@ function App() {
   const {
     notes,
     folders,
+    allNotes,
     syncing,
     syncEnabled,
     createNote,
@@ -98,6 +99,25 @@ function App() {
     return () => { window.removeEventListener('keydown', handleKeyDown); }
   }, [])
 
+  // Sauvegarder avant de fermer l'application (F5, fermeture onglet, etc.)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Le navigateur va fermer/recharger la page
+      // On ne peut pas faire d'async ici, mais on peut déclencher une sauvegarde synchrone
+      // Cependant, comme nous utilisons LocalStorage.saveNoteSync dans WorkspaceView,
+      // les données devraient déjà être sauvegardées quand on quitte une note
+      // On laisse quand même un message de confirmation si nécessaire
+      const hasUnsavedChanges = document.querySelector('[data-save-status="unsaved"]')
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => { window.removeEventListener('beforeunload', handleBeforeUnload); }
+  }, [])
+
   // Manual sync function - just toggle sync to trigger a refresh
   const handleManualSync = () => {
     if (user?.id && syncEnabled) {
@@ -165,7 +185,7 @@ function App() {
         return (
           <CanvasView 
             userId={user?.id ?? null} 
-            notes={notes} 
+            notes={allNotes} 
             onOpenNote={(noteId) => {
               setActiveNoteId(noteId)
               setCurrentView('workspace')
@@ -177,7 +197,7 @@ function App() {
       case 'timeline':
         return (
           <TimelineView
-            notes={notes}
+            notes={allNotes}
             onOpenNote={(noteId) => {
               setActiveNoteId(noteId)
               setCurrentView('workspace')

@@ -183,20 +183,24 @@ class MistralAIService {
     prompt: string,
     systemPrompt?: string,
     options?: Partial<AIConfig>,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
+    skipCache?: boolean
   ): Promise<AIResponse> {
     if (!this.isConfigured()) {
       throw new Error('Clé API Mistral non configurée. Veuillez configurer la clé dans les paramètres.')
     }
 
     const cacheKey = this.getCacheKey(prompt, options)
-    const cached = await this.getFromCache(cacheKey)
     
-    if (cached) {
-      onProgress?.(100)
-      return {
-        content: cached,
-        cached: true,
+    if (!skipCache) {
+      const cached = await this.getFromCache(cacheKey)
+      
+      if (cached) {
+        onProgress?.(100)
+        return {
+          content: cached,
+          cached: true,
+        }
       }
     }
 
@@ -324,15 +328,11 @@ class MistralAIService {
   async continueText(text: string, context?: string): Promise<string> {
     const systemPrompt = 'Tu es un assistant de rédaction qui aide à continuer et développer des idées de manière cohérente et naturelle.'
     
-    // Ajouter un identifiant unique basé sur le timestamp pour éviter le cache
-    // quand on change de note
-    const uniqueId = Date.now().toString(36).substring(0, 4)
-    
     const prompt = context
-      ? `Contexte: ${context}\n\nTexte à continuer: ${text}\n\nContinue ce texte de manière naturelle et cohérente. [${uniqueId}]`
-      : `Continue ce texte de manière naturelle et cohérente:\n\n${text}\n\n[${uniqueId}]`
+      ? `Contexte: ${context}\n\nTexte à continuer: ${text}\n\nContinue ce texte de manière naturelle et cohérente.`
+      : `Continue ce texte de manière naturelle et cohérente:\n\n${text}`
 
-    const response = await this.callAPI(prompt, systemPrompt)
+    const response = await this.callAPI(prompt, systemPrompt, undefined, undefined, true)
     return response.content
   }
 

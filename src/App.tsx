@@ -185,7 +185,7 @@ function App() {
         return (
           <CanvasView 
             userId={user?.id ?? null} 
-            notes={allNotes} 
+            notes={notes} 
             onOpenNote={(noteId) => {
               setActiveNoteId(noteId)
               setCurrentView('workspace')
@@ -197,7 +197,7 @@ function App() {
       case 'timeline':
         return (
           <TimelineView
-            notes={allNotes}
+            notes={notes}
             onOpenNote={(noteId) => {
               setActiveNoteId(noteId)
               setCurrentView('workspace')

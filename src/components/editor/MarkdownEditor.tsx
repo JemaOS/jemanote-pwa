@@ -33,7 +33,7 @@ import {
   lineNumbers,
   highlightActiveLineGutter,
 } from '@codemirror/view';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 
 import AIContextMenu from '@/components/ai/AIContextMenu';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -52,19 +52,31 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const themeCompartment = useRef(new Compartment());
+  const onChangeRef = useRef(onChange);
+  const onWikiLinkClickRef = useRef(onWikiLinkClick);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
     selectedText: string;
   } | null>(null);
 
+  // Keep refs up to date with latest callbacks
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    onWikiLinkClickRef.current = onWikiLinkClick;
+  }, [onWikiLinkClick]);
+
+  // Create editor once on mount
   useEffect(() => {
     if (!editorRef.current) {
       return;
     }
 
     const startState = EditorState.create({
-      doc: value,
+      doc: '',
       extensions: [
         themeCompartment.current.of(theme === 'dark' ? oneDark : []),
         lineNumbers(),
@@ -103,11 +115,7 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             const newValue = update.state.doc.toString();
-            // Only call onChange if the value is actually different
-            // to prevent loops when parent updates the value
-            if (newValue !== value) {
-              onChange(newValue);
-            }
+            onChangeRef.current(newValue);
           }
         }),
         EditorView.theme({
@@ -153,10 +161,10 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         EditorView.domEventHandlers({
           click: (event, _view) => {
             const target = event.target as HTMLElement;
-            if (target.classList.contains('wiki-link') && onWikiLinkClick) {
+            if (target.classList.contains('wiki-link') && onWikiLinkClickRef.current) {
               event.preventDefault();
               const noteTitle = target.textContent ?? '';
-              onWikiLinkClick(noteTitle);
+              onWikiLinkClickRef.current(noteTitle);
               return true;
             }
             return false;
@@ -175,7 +183,7 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
     return () => {
       view.destroy();
     };
-  }, [onChange, onWikiLinkClick, theme, value]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (viewRef.current) {

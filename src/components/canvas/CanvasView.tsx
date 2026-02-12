@@ -128,8 +128,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
               }
               hasChanges = true
             }
-          } else {
-            // Not in notes -> delete it immediately (note was deleted)
+          } else if (!justCreatedIds.current.has(node.id)) {
+            // Not in notes and not just created -> delete it (note was deleted)
             nextNodes.splice(i, 1)
             hasChanges = true
           }

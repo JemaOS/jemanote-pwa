@@ -40,5 +40,5 @@
     "useUnknownInCatchVariables": true,
     "noErrorTruncation": true
   },
-  "include": ["src", "tests"]
+  "include": ["src"]
 }

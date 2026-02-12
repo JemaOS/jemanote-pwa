@@ -243,7 +243,7 @@ test.describe('Visual Regression Tests - States', () => {
     // Simuler une erreur
     await page.evaluate(() => {
       const errorElement = document.createElement('div')
-      errorElement.setAttribute('data-testid', 'error-boundary')
+      errorElement.dataset.testid = 'error-boundary'
       errorElement.innerHTML = '<div class="error">Une erreur est survenue</div>'
       document.body.appendChild(errorElement)
     })

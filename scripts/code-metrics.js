@@ -76,6 +76,18 @@ function getSourceFiles() {
 /**
  * Count lines of code
  */
+function classifyLine(trimmed, inBlockComment) {
+  if (trimmed === '') return { type: 'blank', inBlockComment };
+  if (inBlockComment) {
+    return { type: 'comment', inBlockComment: !trimmed.includes('*/') };
+  }
+  if (trimmed.startsWith('/*')) {
+    return { type: 'comment', inBlockComment: !trimmed.includes('*/') };
+  }
+  if (trimmed.startsWith('//')) return { type: 'comment', inBlockComment };
+  return { type: 'code', inBlockComment };
+}
+
 function countLines(content) {
   const lines = content.split('\n');
   const totalLines = lines.length;
@@ -85,35 +97,11 @@ function countLines(content) {
   let inBlockComment = false;
   
   for (const line of lines) {
-    const trimmed = line.trim();
-    
-    if (trimmed === '') {
-      blankLines++;
-      continue;
-    }
-    
-    if (inBlockComment) {
-      commentLines++;
-      if (trimmed.includes('*/')) {
-        inBlockComment = false;
-      }
-      continue;
-    }
-    
-    if (trimmed.startsWith('/*')) {
-      commentLines++;
-      if (!trimmed.includes('*/')) {
-        inBlockComment = true;
-      }
-      continue;
-    }
-    
-    if (trimmed.startsWith('//')) {
-      commentLines++;
-      continue;
-    }
-    
-    codeLines++;
+    const result = classifyLine(line.trim(), inBlockComment);
+    inBlockComment = result.inBlockComment;
+    if (result.type === 'blank') blankLines++;
+    else if (result.type === 'comment') commentLines++;
+    else codeLines++;
   }
   
   return {
@@ -159,6 +147,13 @@ function calculateCyclomaticComplexity(content) {
 /**
  * Calculate cognitive complexity
  */
+function matchesKeyword(trimmed, keywords) {
+  for (const keyword of keywords) {
+    if (new RegExp(`\\b${keyword}\\b`).test(trimmed)) return true;
+  }
+  return false;
+}
+
 function calculateCognitiveComplexity(content) {
   let complexity = 0;
   const lines = content.split('\n');
@@ -170,36 +165,23 @@ function calculateCognitiveComplexity(content) {
   for (const line of lines) {
     const trimmed = line.trim();
     
-    // Check for nesting increase
-    for (const keyword of nestingKeywords) {
-      const regex = new RegExp(`\\b${keyword}\\b`);
-      if (regex.test(trimmed) && trimmed.endsWith('{')) {
-        nestingLevel++;
-        complexity += nestingLevel;
-        break;
-      }
+    // Nesting increase
+    if (matchesKeyword(trimmed, nestingKeywords) && trimmed.endsWith('{')) {
+      nestingLevel++;
+      complexity += nestingLevel;
     }
     
-    // Check for nesting decrease
-    if (trimmed === '}' && nestingLevel > 0) {
-      nestingLevel--;
-    }
+    // Nesting decrease
+    if (trimmed === '}' && nestingLevel > 0) nestingLevel--;
     
-    // Check for increments without nesting
-    for (const keyword of incrementKeywords) {
-      const regex = new RegExp(`\\b${keyword}\\b`);
-      if (regex.test(trimmed) && !trimmed.endsWith('{')) {
-        complexity++;
-      }
-    }
+    // Increments without nesting
+    if (matchesKeyword(trimmed, incrementKeywords) && !trimmed.endsWith('{')) complexity++;
     
     // Ternary operators
-    if (/\?\s*[^:]*:/.test(trimmed)) {
-      complexity++;
-    }
+    if (/\?\s*[^:]*:/.test(trimmed)) complexity++;
     
     // Logical operators
-    complexity += (trimmed.match(/\&\&/g) || []).length;
+    complexity += (trimmed.match(/&&/g) || []).length;
     complexity += (trimmed.match(/\|\|/g) || []).length;
   }
   

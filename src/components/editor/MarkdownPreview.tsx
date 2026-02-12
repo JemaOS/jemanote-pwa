@@ -105,7 +105,7 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
       const target = e.target as HTMLElement
       if (target.classList.contains('wiki-link')) {
         e.preventDefault()
-        const noteTitle = target.getAttribute('data-note')
+        const noteTitle = target.dataset.note
         if (noteTitle) {
           onWikiLinkClick(noteTitle)
         }

@@ -186,45 +186,33 @@ test.describe('AI Features', () => {
       
       await createNoteWithContent(page, title, content)
       
+      const isVisible = async (locator: any) => locator.isVisible().catch(() => false)
+      
       const aiButton = page.getByRole('button', { name: /ia|ai/i }).first()
-      if (await aiButton.isVisible().catch(() => false)) {
-        await aiButton.click()
-        
-        const tagsTab = page.getByRole('tab', { name: /tags|étiquettes/i })
-        if (await tagsTab.isVisible().catch(() => false)) {
-          await tagsTab.click()
-          
-          const suggestButton = page.getByRole('button', { name: /suggérer|suggest/i }).first()
-          if (await suggestButton.isVisible().catch(() => false)) {
-            await suggestButton.click()
-            await page.waitForTimeout(3000)
-            
-            // Click on a suggested tag to select it
-            const firstTag = page.locator('.suggested-tag, .ai-tag').first()
-            if (await firstTag.isVisible().catch(() => false)) {
-              await firstTag.click()
-              
-              // Apply tags
-              const applyButton = page.getByRole('button', { name: /appliquer|apply|ajouter tags/i }).first()
-              if (await applyButton.isVisible().catch(() => false)) {
-                await applyButton.click()
-                
-                // Verify tag was added to note
-                await page.waitForTimeout(1000)
-                const editor = page.locator('.cm-editor .cm-content').first()
-                const content = await editor.textContent()
-                expect(content).toContain('#')
-              }
-            }
-          } else {
-            test.skip()
-          }
-        } else {
-          test.skip()
-        }
-      } else {
-        test.skip()
-      }
+      if (!await isVisible(aiButton)) { test.skip(); return }
+      await aiButton.click()
+      
+      const tagsTab = page.getByRole('tab', { name: /tags|étiquettes/i })
+      if (!await isVisible(tagsTab)) { test.skip(); return }
+      await tagsTab.click()
+      
+      const suggestButton = page.getByRole('button', { name: /suggérer|suggest/i }).first()
+      if (!await isVisible(suggestButton)) { test.skip(); return }
+      await suggestButton.click()
+      await page.waitForTimeout(3000)
+      
+      const firstTag = page.locator('.suggested-tag, .ai-tag').first()
+      if (!await isVisible(firstTag)) { return }
+      await firstTag.click()
+      
+      const applyButton = page.getByRole('button', { name: /appliquer|apply|ajouter tags/i }).first()
+      if (!await isVisible(applyButton)) { return }
+      await applyButton.click()
+      
+      await page.waitForTimeout(1000)
+      const editor = page.locator('.cm-editor .cm-content').first()
+      const editorContent = await editor.textContent()
+      expect(editorContent).toContain('#')
     })
   })
 

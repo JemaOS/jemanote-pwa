@@ -330,21 +330,22 @@ async function runType(type, options) {
   console.log(color('dim', `${testConfig.description}\n`))
   
   let command = testConfig.command
-  let args = [...testConfig.args]
   
-  // Modifier les arguments selon les options
-  if (options.watch && testConfig.watchArgs) {
-    args = [...testConfig.watchArgs]
-  } else if (options.coverage && testConfig.coverageArgs) {
-    args = [...testConfig.coverageArgs]
-  } else if (options.ui && testConfig.uiArgs) {
-    args = [...testConfig.uiArgs]
-  } else if (options.debug && testConfig.debugArgs) {
-    args = [...testConfig.debugArgs]
-  } else if (options.update && testConfig.updateArgs) {
-    args = [...testConfig.updateArgs]
-  } else if (options.fix && testConfig.fixArgs) {
-    args = [...testConfig.fixArgs]
+  // Resolve args based on options
+  const optionToArgs = {
+    watch: 'watchArgs',
+    coverage: 'coverageArgs',
+    ui: 'uiArgs',
+    debug: 'debugArgs',
+    update: 'updateArgs',
+    fix: 'fixArgs',
+  }
+  let args = [...testConfig.args]
+  for (const [opt, argsKey] of Object.entries(optionToArgs)) {
+    if (options[opt] && testConfig[argsKey]) {
+      args = [...testConfig[argsKey]]
+      break
+    }
   }
   
   // Utiliser npx pour les commandes npm

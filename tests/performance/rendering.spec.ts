@@ -68,24 +68,17 @@ async function measureRenderingMetrics(page: Page, duration: number = 5000): Pro
       
       // Mesurer pendant la durée spécifiée
       const startTime = performance.now();
+      const computeResults = () => ({
+        fps: 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length),
+        frameDrops,
+        longFrames,
+        avgFrameTime: frames.reduce((a, b) => a + b, 0) / frames.length,
+        maxFrameTime: Math.max(...frames),
+      });
       const rafLoop = () => {
         measureFrame();
-        
-        if (performance.now() - startTime < measureDuration) {
-          requestAnimationFrame(rafLoop);
-        } else {
-          const avgFrameTime = frames.reduce((a, b) => a + b, 0) / frames.length;
-          const maxFrameTime = Math.max(...frames);
-          const fps = 1000 / avgFrameTime;
-          
-          resolve({
-            fps,
-            frameDrops,
-            longFrames,
-            avgFrameTime,
-            maxFrameTime,
-          });
-        }
+        const elapsed = performance.now() - startTime >= measureDuration;
+        elapsed ? resolve(computeResults()) : requestAnimationFrame(rafLoop);
       };
       
       requestAnimationFrame(rafLoop);

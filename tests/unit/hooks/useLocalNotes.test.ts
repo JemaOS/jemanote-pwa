@@ -91,9 +91,6 @@ describe('useLocalNotes', () => {
     update: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    then: vi.fn().mockImplementation((callback: any) => 
-      Promise.resolve({ data: returnData, error }).then(callback)
-    ),
   })
 
   beforeEach(() => {

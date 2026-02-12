@@ -84,6 +84,103 @@ function HSLToHex(h: number, s: number, l: number): string {
   return `${f(0)}${f(8)}${f(4)}`
 }
 
+// Helper: update node positions from worker data
+function updateNodePositions(
+  positions: { id: string; x: number; y: number }[],
+  nodesMap: Map<string, { graphics: PIXI.Graphics; text: PIXI.Text; data: NodeData }>
+) {
+  for (const pos of positions) {
+    const node = nodesMap.get(pos.id)
+    if (!node) {continue}
+    node.graphics.position.set(pos.x, pos.y)
+    node.data.x = pos.x
+    node.data.y = pos.y
+  }
+}
+
+// Helper: find neighbor nodes up to maxDepth
+function findNeighborNodes(
+  startNodeId: string,
+  edges: GraphEdge[],
+  maxDepth: number
+): Set<string> {
+  const neighbors = new Set<string>([startNodeId])
+  const findNeighbors = (nodeId: string, depth: number) => {
+    if (depth >= maxDepth) {return}
+    for (const edge of edges) {
+      if (edge.from === nodeId && !neighbors.has(edge.to)) {
+        neighbors.add(edge.to)
+        findNeighbors(edge.to, depth + 1)
+      }
+      if (edge.to === nodeId && !neighbors.has(edge.from)) {
+        neighbors.add(edge.from)
+        findNeighbors(edge.from, depth + 1)
+      }
+    }
+  }
+  findNeighbors(startNodeId, 0)
+  return neighbors
+}
+
+// Helper: resolve node color based on color scheme and groups
+function resolveNodeColor(
+  baseColor: number,
+  nodeData: NodeData,
+  settings: GraphSettings,
+  groups: { query: string; color: string }[]
+): number {
+  let color = baseColor
+  const hasTags = nodeData.tags && nodeData.tags.length > 0
+  
+  if (settings.colorScheme === 'tags' && hasTags) {
+    const tagHash = nodeData.tags![0].split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    const hue = (tagHash * 137.508) % 360
+    color = parseInt(`0x${HSLToHex(hue, 70, 60)}`, 16)
+  } else if (settings.colorScheme === 'centrality' && nodeData.centrality !== undefined) {
+    const lightness = 40 + Math.min(nodeData.centrality / 10, 1) * 30
+    color = parseInt(`0x${HSLToHex(240, 80, lightness)}`, 16)
+  }
+
+  for (const group of groups) {
+    const matchesLabel = group.query && nodeData.label.toLowerCase().includes(group.query.toLowerCase())
+    const matchesTag = group.query && nodeData.tags?.some(t => t.toLowerCase().includes(group.query.toLowerCase()))
+    if (matchesLabel || matchesTag) {
+      return parseInt(group.color.replace('#', '0x'), 16)
+    }
+  }
+  return color
+}
+
+// Helper: draw arrow for edge
+function drawArrow(
+  edgesGraphics: PIXI.Graphics,
+  sourcePos: { x: number; y: number },
+  targetPos: { x: number; y: number },
+  settings: GraphSettings,
+  color: number,
+  alpha: number
+) {
+  const dx = targetPos.x - sourcePos.x
+  const dy = targetPos.y - sourcePos.y
+  const angle = Math.atan2(dy, dx)
+  const arrowSize = 4 * settings.linkThickness
+  const targetRadius = 10 * settings.nodeSize + 2
+  const arrowX = targetPos.x - Math.cos(angle) * targetRadius
+  const arrowY = targetPos.y - Math.sin(angle) * targetRadius
+  
+  edgesGraphics.moveTo(arrowX, arrowY)
+  edgesGraphics.lineTo(
+    arrowX - Math.cos(angle - Math.PI / 6) * arrowSize,
+    arrowY - Math.sin(angle - Math.PI / 6) * arrowSize
+  )
+  edgesGraphics.lineTo(
+    arrowX - Math.cos(angle + Math.PI / 6) * arrowSize,
+    arrowY - Math.sin(angle + Math.PI / 6) * arrowSize
+  )
+  edgesGraphics.lineTo(arrowX, arrowY)
+  edgesGraphics.fill({ color, alpha })
+}
+
 export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const appRef = useRef<PIXI.Application | null>(null)
@@ -370,28 +467,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
     let color = NODE_COLORS[nodeData.type]
     
     // Appliquer la colorisation selon le schéma choisi
-    if (graphSettings.colorScheme === 'tags' && nodeData.tags && nodeData.tags.length > 0) {
-      // Générer une couleur basée sur le premier tag
-      const tagHash = nodeData.tags[0].split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-      const hue = (tagHash * 137.508) % 360 // Golden angle pour distribution uniforme
-      color = parseInt(`0x${HSLToHex(hue, 70, 60)}`, 16)
-    } else if (graphSettings.colorScheme === 'centrality' && nodeData.centrality !== undefined) {
-      // Couleur basée sur la centralité (bleu foncé -> bleu clair)
-      const normalizedCentrality = Math.min(nodeData.centrality / 10, 1) // Normaliser
-      const lightness = 40 + normalizedCentrality * 30
-      color = parseInt(`0x${HSLToHex(240, 80, lightness)}`, 16)
-    }
-
-    // Appliquer les groupes de couleurs personnalisés (prioritaire)
-    for (const group of groups) {
-      if (group.query && (
-        nodeData.label.toLowerCase().includes(group.query.toLowerCase()) || 
-        nodeData.tags?.some(t => t.toLowerCase().includes(group.query.toLowerCase()))
-      )) {
-        color = parseInt(group.color.replace('#', '0x'), 16)
-        break // Premier match gagne
-      }
-    }
+    color = resolveNodeColor(color, nodeData, graphSettings, groups)
     
     // Halo pour les nœuds importants
     if (nodeData.type === 'main') {
@@ -501,29 +577,8 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
         edgesRef.current?.stroke({ width, color, alpha: baseAlpha })
 
         // Dessiner les flèches si activé
-        if (showArrows) {
-          const dx = targetPos.x - sourcePos.x
-          const dy = targetPos.y - sourcePos.y
-          const angle = Math.atan2(dy, dx)
-          const arrowSize = 4 * graphSettings.linkThickness
-          
-          // Position de la flèche (un peu avant la cible pour ne pas être cachée par le nœud)
-          // On suppose une taille moyenne de nœud de 10
-          const targetRadius = 10 * graphSettings.nodeSize + 2
-          const arrowX = targetPos.x - Math.cos(angle) * targetRadius
-          const arrowY = targetPos.y - Math.sin(angle) * targetRadius
-          
-          edgesRef.current?.moveTo(arrowX, arrowY)
-          edgesRef.current?.lineTo(
-            arrowX - Math.cos(angle - Math.PI / 6) * arrowSize,
-            arrowY - Math.sin(angle - Math.PI / 6) * arrowSize
-          )
-          edgesRef.current?.lineTo(
-            arrowX - Math.cos(angle + Math.PI / 6) * arrowSize,
-            arrowY - Math.sin(angle + Math.PI / 6) * arrowSize
-          )
-          edgesRef.current?.lineTo(arrowX, arrowY)
-          edgesRef.current?.fill({ color, alpha: baseAlpha })
+        if (showArrows && edgesRef.current) {
+          drawArrow(edgesRef.current, sourcePos, targetPos, graphSettings, color, baseAlpha)
         }
       }
     })
@@ -570,25 +625,11 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
         // Mode Local Graph: ne montrer que les voisins du nœud sélectionné
         if (graphSettings.localMode && graphSettings.localNodeId) {
-          const neighbors = new Set<string>([graphSettings.localNodeId])
-          
-          // Fonction récursive pour trouver les voisins jusqu'à maxDepth
-          const findNeighbors = (nodeId: string, depth: number) => {
-            if (depth >= graphSettings.maxDepth) {return}
-            
-            graphData.edges.forEach(edge => {
-              if (edge.from === nodeId && !neighbors.has(edge.to)) {
-                neighbors.add(edge.to)
-                findNeighbors(edge.to, depth + 1)
-              }
-              if (edge.to === nodeId && !neighbors.has(edge.from)) {
-                neighbors.add(edge.from)
-                findNeighbors(edge.from, depth + 1)
-              }
-            })
-          }
-          
-          findNeighbors(graphSettings.localNodeId, 0)
+          const neighbors = findNeighborNodes(
+            graphSettings.localNodeId,
+            graphData.edges,
+            graphSettings.maxDepth
+          )
           filteredNodes = filteredNodes.filter(node => neighbors.has(node.id))
         }
         
@@ -632,27 +673,15 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
         // Recevoir les positions du worker
         worker.onmessage = (e) => {
-          const { type, data } = e.data
+          if (e.data.type !== 'positions') {return}
+          const positions: { id: string, x: number, y: number }[] = e.data.data
           
-          if (type === 'positions') {
-            const positions: { id: string, x: number, y: number }[] = data
-            
-            // Mettre à jour les positions des nœuds
-            positions.forEach((pos) => {
-              const node = nodesRef.current.get(pos.id)
-              if (node) {
-                node.graphics.position.set(pos.x, pos.y)
-                node.data.x = pos.x
-                node.data.y = pos.y
-              }
-            })
-            
-            // Redessiner les arêtes
-            const nodePositions = new Map(
-              positions.map(pos => [pos.id, { x: pos.x, y: pos.y }])
-            )
-            drawEdges(edgeDataArray, nodePositions)
-          }
+          updateNodePositions(positions, nodesRef.current)
+          
+          const nodePositions = new Map(
+            positions.map(pos => [pos.id, { x: pos.x, y: pos.y }])
+          )
+          drawEdges(edgeDataArray, nodePositions)
         }
 
         // Initialiser la simulation

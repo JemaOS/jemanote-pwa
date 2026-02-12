@@ -60,15 +60,6 @@ export const mockSupabaseClient = {
     csv: vi.fn().mockReturnThis(),
     match: vi.fn().mockReturnThis(),
     returns: vi.fn().mockReturnThis(),
-    then: vi.fn().mockImplementation((callback) => {
-      return Promise.resolve({
-        data: [],
-        error: null,
-        count: 0,
-        status: 200,
-        statusText: 'OK',
-      }).then(callback)
-    }),
   }),
   storage: {
     from: vi.fn().mockReturnValue({

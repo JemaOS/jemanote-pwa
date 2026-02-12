@@ -143,49 +143,32 @@ function generateSummary(results) {
   let totalCognitive = 0;
   let totalMaintainability = 0;
   
+  const checkMethodViolations = (method, file) => {
+    const cyclomatic = method.cyclomatic || 1;
+    const cognitive = calculateCognitiveComplexity(method);
+    const lines = method.sloc?.logical || 0;
+    const params = method.paramCount || 0;
+    
+    totalCyclomatic += cyclomatic;
+    totalCognitive += cognitive;
+    
+    if (cyclomatic > CONFIG.thresholds.cyclomatic) {
+      summary.violations.cyclomatic++;
+      summary.highComplexityFunctions.push({ file, function: method.name, type: 'cyclomatic', value: cyclomatic, threshold: CONFIG.thresholds.cyclomatic });
+    }
+    if (cognitive > CONFIG.thresholds.cognitive) {
+      summary.violations.cognitive++;
+      summary.highComplexityFunctions.push({ file, function: method.name, type: 'cognitive', value: cognitive, threshold: CONFIG.thresholds.cognitive });
+    }
+    if (lines > CONFIG.thresholds.linesPerFunction) summary.violations.linesPerFunction++;
+    if (params > CONFIG.thresholds.paramsPerFunction) summary.violations.paramsPerFunction++;
+  };
+
   for (const result of results) {
     if (result.methods) {
       summary.totalFunctions += result.methods.length;
-      
       for (const method of result.methods) {
-        const cyclomatic = method.cyclomatic || 1;
-        const cognitive = calculateCognitiveComplexity(method);
-        const lines = method.sloc?.logical || 0;
-        const params = method.paramCount || 0;
-        
-        totalCyclomatic += cyclomatic;
-        totalCognitive += cognitive;
-        
-        // Check violations
-        if (cyclomatic > CONFIG.thresholds.cyclomatic) {
-          summary.violations.cyclomatic++;
-          summary.highComplexityFunctions.push({
-            file: result.file,
-            function: method.name,
-            type: 'cyclomatic',
-            value: cyclomatic,
-            threshold: CONFIG.thresholds.cyclomatic
-          });
-        }
-        
-        if (cognitive > CONFIG.thresholds.cognitive) {
-          summary.violations.cognitive++;
-          summary.highComplexityFunctions.push({
-            file: result.file,
-            function: method.name,
-            type: 'cognitive',
-            value: cognitive,
-            threshold: CONFIG.thresholds.cognitive
-          });
-        }
-        
-        if (lines > CONFIG.thresholds.linesPerFunction) {
-          summary.violations.linesPerFunction++;
-        }
-        
-        if (params > CONFIG.thresholds.paramsPerFunction) {
-          summary.violations.paramsPerFunction++;
-        }
+        checkMethodViolations(method, result.file);
       }
     }
     

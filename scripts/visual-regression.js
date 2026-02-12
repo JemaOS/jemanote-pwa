@@ -353,21 +353,35 @@ const main = async () => {
   const results = []
   let hasFailures = false
   
+  const processNewScreenshot = (relativePath) => {
+    log(`Nouveau screenshot (pas de baseline): ${relativePath}`, 'yellow')
+    return { name: relativePath, passed: false, error: 'Nouveau screenshot - aucune baseline', baselinePath: null, actualPath: relativePath }
+  }
+
+  const processDiffResult = (comparison, relativePath, baselineFile, actualFile) => {
+    log(`Différence détectée: ${relativePath} (${comparison.diffPercentage.toFixed(2)}%)`, 'red')
+    let diffPath = null
+    if (comparison.diffImage) {
+      diffPath = path.join(CONFIG.diffDir, 'diffs', relativePath)
+      ensureDir(path.dirname(diffPath))
+      fs.writeFileSync(diffPath, PNG.sync.write(comparison.diffImage))
+    }
+    return {
+      name: relativePath, passed: false,
+      diffPercentage: comparison.diffPercentage, numDiffPixels: comparison.numDiffPixels,
+      baselinePath: path.relative(CONFIG.diffDir, baselineFile),
+      actualPath: path.relative(CONFIG.diffDir, actualFile),
+      diffPath: diffPath ? path.relative(CONFIG.diffDir, diffPath) : null,
+    }
+  }
+
   // Comparer chaque screenshot avec sa baseline
   for (const actualFile of actualFiles) {
-    const fileName = path.basename(actualFile)
     const relativePath = path.relative(CONFIG.actualDir, actualFile)
     const baselineFile = path.join(CONFIG.baselineDir, relativePath)
     
     if (!fs.existsSync(baselineFile)) {
-      log(`Nouveau screenshot (pas de baseline): ${relativePath}`, 'yellow')
-      results.push({
-        name: relativePath,
-        passed: false,
-        error: 'Nouveau screenshot - aucune baseline',
-        baselinePath: null,
-        actualPath: relativePath,
-      })
+      results.push(processNewScreenshot(relativePath))
       hasFailures = true
       continue
     }
@@ -377,25 +391,7 @@ const main = async () => {
       
       if (!comparison.match) {
         hasFailures = true
-        log(`Différence détectée: ${relativePath} (${comparison.diffPercentage.toFixed(2)}%)`, 'red')
-        
-        // Sauvegarder l'image de différence si disponible
-        let diffPath = null
-        if (comparison.diffImage) {
-          diffPath = path.join(CONFIG.diffDir, 'diffs', relativePath)
-          ensureDir(path.dirname(diffPath))
-          fs.writeFileSync(diffPath, PNG.sync.write(comparison.diffImage))
-        }
-        
-        results.push({
-          name: relativePath,
-          passed: false,
-          diffPercentage: comparison.diffPercentage,
-          numDiffPixels: comparison.numDiffPixels,
-          baselinePath: path.relative(CONFIG.diffDir, baselineFile),
-          actualPath: path.relative(CONFIG.diffDir, actualFile),
-          diffPath: diffPath ? path.relative(CONFIG.diffDir, diffPath) : null,
-        })
+        results.push(processDiffResult(comparison, relativePath, baselineFile, actualFile))
       } else {
         log(`✓ ${relativePath}`, 'green')
         results.push({

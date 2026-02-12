@@ -207,80 +207,69 @@ function getSourceFiles(): string[] {
   return files.filter(file => !file.includes('node_modules'));
 }
 
-function analyzeDuplication(files: string[]): DuplicationReport {
-  const report: DuplicationReport = {
-    totalFiles: files.length,
-    totalLines: 0,
-    duplicatedLines: 0,
-    duplicationPercent: 0,
-    duplicates: []
-  };
-
-  // Read all files and build line index
+function readFileContents(files: string[]): { fileContents: { [key: string]: string[] }; totalLines: number } {
   const fileContents: { [key: string]: string[] } = {};
-  const fileLines: { [key: string]: number } = {};
-
+  let totalLines = 0;
   for (const file of files) {
-    const content = fs.readFileSync(file, 'utf-8');
-    const lines = content.split('\n');
+    const lines = fs.readFileSync(file, 'utf-8').split('\n');
     const relativePath = path.relative(CONFIG.sourceDir, file);
-
     fileContents[relativePath] = lines;
-    fileLines[relativePath] = lines.length;
-    report.totalLines += lines.length;
+    totalLines += lines.length;
   }
+  return { fileContents, totalLines };
+}
 
-  // Find duplicates using a simple sliding window approach
+function findDuplicateWindow(
+  window1: string, file1: string, i: number,
+  file2: string, lines2: string[], windowSize: number,
+  processed: Set<string>, duplicates: DuplicateBlock[]
+) {
+  for (let j = 0; j <= lines2.length - windowSize; j++) {
+    const window2 = lines2.slice(j, j + windowSize).join('\n').trim();
+    if (window1 !== window2 || window1.length <= CONFIG.thresholds.minDuplicateTokens) continue;
+    
+    const similarity = calculateSimilarity(window1, window2);
+    if (similarity <= 0.9) continue;
+    
+    duplicates.push({
+      file1, file2,
+      lines1: { start: i + 1, end: i + windowSize },
+      lines2: { start: j + 1, end: j + windowSize },
+      content: window1.substring(0, 100), similarity
+    });
+    for (let k = 0; k < windowSize; k++) {
+      processed.add(`${file1}:${i + k}`);
+      processed.add(`${file2}:${j + k}`);
+    }
+  }
+}
+
+function analyzeDuplication(files: string[]): DuplicationReport {
+  const { fileContents, totalLines } = readFileContents(files);
   const windowSize = CONFIG.thresholds.minDuplicateLines;
   const duplicates: DuplicateBlock[] = [];
   const processed = new Set<string>();
 
   for (const [file1, lines1] of Object.entries(fileContents)) {
     for (let i = 0; i <= lines1.length - windowSize; i++) {
+      if (processed.has(`${file1}:${i}`)) continue;
       const window1 = lines1.slice(i, i + windowSize).join('\n').trim();
-      const windowKey1 = `${file1}:${i}`;
-
-      if (processed.has(windowKey1)) {continue;}
 
       for (const [file2, lines2] of Object.entries(fileContents)) {
-        if (file1 === file2) {continue;}
-
-        for (let j = 0; j <= lines2.length - windowSize; j++) {
-          const window2 = lines2.slice(j, j + windowSize).join('\n').trim();
-
-          if (window1 === window2 && window1.length > CONFIG.thresholds.minDuplicateTokens) {
-            // Calculate similarity
-            const similarity = calculateSimilarity(window1, window2);
-
-            if (similarity > 0.9) {
-              duplicates.push({
-                file1,
-                file2,
-                lines1: { start: i + 1, end: i + windowSize },
-                lines2: { start: j + 1, end: j + windowSize },
-                content: window1.substring(0, 100),
-                similarity
-              });
-
-              // Mark as processed
-              for (let k = 0; k < windowSize; k++) {
-                processed.add(`${file1}:${i + k}`);
-                processed.add(`${file2}:${j + k}`);
-              }
-            }
-          }
-        }
+        if (file1 === file2) continue;
+        findDuplicateWindow(window1, file1, i, file2, lines2, windowSize, processed, duplicates);
       }
     }
   }
 
-  report.duplicates = duplicates;
-  report.duplicatedLines = processed.size;
-  report.duplicationPercent = report.totalLines > 0
-    ? (report.duplicatedLines / report.totalLines) * 100
-    : 0;
-
-  return report;
+  const duplicatedLines = processed.size;
+  return {
+    totalFiles: files.length,
+    totalLines,
+    duplicatedLines,
+    duplicationPercent: totalLines > 0 ? (duplicatedLines / totalLines) * 100 : 0,
+    duplicates
+  };
 }
 
 function calculateSimilarity(str1: string, str2: string): number {

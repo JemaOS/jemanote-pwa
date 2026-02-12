@@ -100,73 +100,61 @@ function buildCSP(directives) {
 /**
  * Validate CSP directives
  */
-function validateCSP(directives, source = 'custom') {
+function isDangerousValueAllowed(directive, value) {
+  if (directive === 'img-src' && value === 'data:') return true;
+  if (directive === 'worker-src' && value === 'blob:') return true;
+  return false;
+}
+
+function checkRequiredDirectives(directives) {
+  return REQUIRED_DIRECTIVES
+    .filter(required => !directives[required])
+    .map(required => ({ type: 'error', message: `Missing required directive: ${required}` }));
+}
+
+function checkDangerousValues(directives) {
   const issues = [];
-  const warnings = [];
-  
-  // Check required directives
-  for (const required of REQUIRED_DIRECTIVES) {
-    if (!directives[required]) {
-      issues.push({
-        type: 'error',
-        message: `Missing required directive: ${required}`,
-      });
-    }
-  }
-  
-  // Check for dangerous values
   for (const [directive, values] of Object.entries(directives)) {
     for (const value of values) {
-      if (DANGEROUS_VALUES.includes(value)) {
-        // Special case: data: in img-src is OK
-        if (directive === 'img-src' && value === 'data:') continue;
-        // Special case: blob: in worker-src is OK
-        if (directive === 'worker-src' && value === 'blob:') continue;
-        
-        issues.push({
-          type: 'error',
-          message: `Dangerous value "${value}" found in ${directive}`,
-        });
+      if (DANGEROUS_VALUES.includes(value) && !isDangerousValueAllowed(directive, value)) {
+        issues.push({ type: 'error', message: `Dangerous value "${value}" found in ${directive}` });
       }
     }
   }
+  return issues;
+}
+
+function checkCSPWarnings(directives) {
+  const warnings = [];
   
-  // Check script-src for unsafe-inline without nonce/hash
   if (directives['script-src']?.includes("'unsafe-inline'")) {
     const hasNonce = directives['script-src'].some(v => v.includes('nonce-'));
     const hasHash = directives['script-src'].some(v => v.startsWith("'sha256-") || v.startsWith("'sha384-") || v.startsWith("'sha512-"));
-    
     if (!hasNonce && !hasHash) {
-      warnings.push({
-        type: 'warning',
-        message: "script-src uses 'unsafe-inline' without nonce or hash - consider using strict-dynamic",
-      });
+      warnings.push({ type: 'warning', message: "script-src uses 'unsafe-inline' without nonce or hash - consider using strict-dynamic" });
     }
   }
   
-  // Check for object-src: none (should always be set)
-  if (directives['object-src'] && !directives['object-src'].includes("'none'")) {
-    issues.push({
-      type: 'error',
-      message: "object-src should be set to 'none' to prevent plugin-based attacks",
-    });
-  }
-  
-  // Check for frame-ancestors (clickjacking protection)
   if (!directives['frame-ancestors']) {
-    warnings.push({
-      type: 'warning',
-      message: "frame-ancestors not set - application may be vulnerable to clickjacking",
-    });
+    warnings.push({ type: 'warning', message: "frame-ancestors not set - application may be vulnerable to clickjacking" });
+  }
+  if (!directives['upgrade-insecure-requests']) {
+    warnings.push({ type: 'warning', message: "Consider adding 'upgrade-insecure-requests' for HTTPS enforcement" });
+  }
+  return warnings;
+}
+
+function validateCSP(directives, source = 'custom') {
+  const issues = [
+    ...checkRequiredDirectives(directives),
+    ...checkDangerousValues(directives),
+  ];
+  
+  if (directives['object-src'] && !directives['object-src'].includes("'none'")) {
+    issues.push({ type: 'error', message: "object-src should be set to 'none' to prevent plugin-based attacks" });
   }
   
-  // Check for upgrade-insecure-requests in production
-  if (!directives['upgrade-insecure-requests']) {
-    warnings.push({
-      type: 'warning',
-      message: "Consider adding 'upgrade-insecure-requests' for HTTPS enforcement",
-    });
-  }
+  const warnings = checkCSPWarnings(directives);
   
   return { issues, warnings, isValid: issues.length === 0 };
 }

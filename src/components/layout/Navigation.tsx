@@ -64,6 +64,14 @@ export default function Navigation({
     setShowMobileSearch(false)
   }
 
+  const viewButtonClass = (view: ViewMode) =>
+    currentView === view
+      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
+      : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
+
+  const mobileViewButtonClass = (view: ViewMode) =>
+    `w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${viewButtonClass(view)}`
+
   return (
     <nav className="h-12 xs:h-13 sm:h-14 md:h-15 laptop-sm:h-16 laptop:h-[4.5rem] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 flex items-center px-2 xs:px-2.5 sm:px-3 md:px-4 laptop-sm:px-5 laptop:px-6 laptop-lg:px-8 gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 laptop-sm:gap-4 laptop:gap-6 relative z-20">
       {/* Mobile & Tablet: Logo + Search Icon + Menu */}
@@ -148,11 +156,7 @@ export default function Navigation({
         <div className="flex items-center gap-1 laptop:gap-1.5 laptop-lg:gap-2">
           <button
             onClick={() => { onViewChange('workspace'); }}
-            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
-              currentView === 'workspace'
-                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-            }`}
+            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('workspace')}`}
             title="Espace de travail"
           >
             <Layout className="h-5 w-5 laptop:h-5.5 laptop:w-5.5 laptop-lg:h-6 laptop-lg:w-6" />
@@ -160,11 +164,7 @@ export default function Navigation({
 
           <button
             onClick={() => { onViewChange('canvas'); }}
-            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
-              currentView === 'canvas'
-                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-            }`}
+            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('canvas')}`}
             title="Canvas"
           >
             <LayoutTemplate className="h-5 w-5 laptop:h-5.5 laptop:w-5.5 laptop-lg:h-6 laptop-lg:w-6" />
@@ -172,11 +172,7 @@ export default function Navigation({
 
           <button
             onClick={() => { onViewChange('timeline'); }}
-            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
-              currentView === 'timeline'
-                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-            }`}
+            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('timeline')}`}
             title="Chronologie"
           >
             <History className="h-5 w-5 laptop:h-5.5 laptop:w-5.5 laptop-lg:h-6 laptop-lg:w-6" />
@@ -184,11 +180,7 @@ export default function Navigation({
 
           <button
             onClick={() => { onViewChange('settings'); }}
-            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
-              currentView === 'settings'
-                ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-            }`}
+            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('settings')}`}
             title="Paramètres"
           >
             <Settings className="h-5 w-5 laptop:h-5.5 laptop:w-5.5 laptop-lg:h-6 laptop-lg:w-6" />
@@ -235,11 +227,7 @@ export default function Navigation({
           <div className="p-2 xs:p-2.5 sm:p-3 md:p-4 space-y-1.5 xs:space-y-2">
             <button
               onClick={() => { handleViewChange('workspace'); }}
-              className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
-                currentView === 'workspace'
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                  : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-              }`}
+              className={mobileViewButtonClass('workspace')}
             >
               <Layout className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
               <span className="font-medium">Espace de travail</span>
@@ -247,11 +235,7 @@ export default function Navigation({
 
             <button
               onClick={() => { handleViewChange('canvas'); }}
-              className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
-                currentView === 'canvas'
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                  : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-              }`}
+              className={mobileViewButtonClass('canvas')}
             >
               <LayoutTemplate className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
               <span className="font-medium">Canvas</span>
@@ -259,11 +243,7 @@ export default function Navigation({
 
             <button
               onClick={() => { handleViewChange('timeline'); }}
-              className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
-                currentView === 'timeline'
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                  : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-              }`}
+              className={mobileViewButtonClass('timeline')}
             >
               <History className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
               <span className="font-medium">Chronologie</span>
@@ -271,11 +251,7 @@ export default function Navigation({
 
             <button
               onClick={() => { handleViewChange('settings'); }}
-              className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
-                currentView === 'settings'
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
-                  : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
-              }`}
+              className={mobileViewButtonClass('settings')}
             >
               <Settings className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
               <span className="font-medium">Paramètres</span>

@@ -64,9 +64,6 @@ describe('useNotes', () => {
     eq: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({ data: returnData, error }),
-    then: vi.fn().mockImplementation((callback) => 
-      Promise.resolve({ data: returnData, error }).then(callback)
-    ),
   })
 
   beforeEach(() => {

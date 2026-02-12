@@ -147,38 +147,32 @@ describe('Module Cohesion Analysis', () => {
     it('should have hooks that return consistent types', () => {
       const violations: string[] = [];
 
-      for (const analysis of fileAnalyses) {
-        if (analysis.exports.hooks.length > 0) {
-          const content = fs.readFileSync(
-            `${path.join(CONFIG.sourceDir, analysis.path)  }.ts`,
-            'utf-8'
+      const checkHookComplexity = (analysis: any, content: string) => {
+        const hookMatches = content.match(/export\s+function\s+use\w+/g) || [];
+        for (const hook of hookMatches) {
+          const hookName = hook.replace('export function ', '');
+          const hookRegex = new RegExp(
+            `export\\s+function\\s+${hookName}\\s*\\([^)]*\\)\\s*\\{([^}]*\\{[^}]*\\}[^}]*)*[^}]*\\}`,
+            's'
           );
-
-          // Check for hooks that might be doing too much
-          const hookMatches = content.match(/export\s+function\s+use\w+/g) || [];
-
-          for (const hook of hookMatches) {
-            const hookName = hook.replace('export function ', '');
-            const hookRegex = new RegExp(
-              `export\\s+function\\s+${hookName}\\s*\\([^)]*\\)\\s*\\{([^}]*\\{[^}]*\\}[^}]*)*[^}]*\\}`,
-              's'
-            );
-            const hookMatch = content.match(hookRegex);
-
-            if (hookMatch) {
-              const hookBody = hookMatch[0];
-              const useEffectCount = (hookBody.match(/useEffect/g) || []).length;
-              const useStateCount = (hookBody.match(/useState/g) || []).length;
-
-              // If a hook uses many effects and states, it might be doing too much
-              if (useEffectCount > 3 || useStateCount > 5) {
-                violations.push(
-                  `${analysis.path}:${hookName} - effects: ${useEffectCount}, states: ${useStateCount}`
-                );
-              }
-            }
+          const hookMatch = content.match(hookRegex);
+          if (!hookMatch) continue;
+          
+          const useEffectCount = (hookMatch[0].match(/useEffect/g) || []).length;
+          const useStateCount = (hookMatch[0].match(/useState/g) || []).length;
+          if (useEffectCount > 3 || useStateCount > 5) {
+            violations.push(`${analysis.path}:${hookName} - effects: ${useEffectCount}, states: ${useStateCount}`);
           }
         }
+      };
+
+      for (const analysis of fileAnalyses) {
+        if (analysis.exports.hooks.length === 0) continue;
+        const content = fs.readFileSync(
+          `${path.join(CONFIG.sourceDir, analysis.path)  }.ts`,
+          'utf-8'
+        );
+        checkHookComplexity(analysis, content);
       }
 
       if (violations.length > 0) {

@@ -1,12 +1,73 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { LocalStorage } from '@/lib/localStorage'
 import { supabase } from '@/lib/supabase'
 import { extractWikiLinks } from '@/lib/wikiLinks'
 import { Note, Folder } from '@/types'
+
+// Helper functions extracted to reduce nesting depth
+async function uploadLocalNotes(localOnlyNotes: Note[], userId: string) {
+  for (const note of localOnlyNotes) {
+    await supabase.from('notes').insert({
+      ...note,
+      user_id: userId,
+    })
+  }
+}
+
+async function uploadLocalFolders(localOnlyFolders: Folder[], userId: string) {
+  for (const folder of localOnlyFolders) {
+    await supabase.from('folders').insert({
+      ...folder,
+      user_id: userId,
+    })
+  }
+}
+
+async function handleNoteRealtimeEvent(
+  payload: { eventType: string; new: any; old: any },
+  setNotes: React.Dispatch<React.SetStateAction<Note[]>>
+) {
+  if (payload.eventType === 'INSERT') {
+    const newNote = payload.new as Note
+    setNotes((prev) => [newNote, ...prev])
+    await LocalStorage.saveNote(newNote)
+  } else if (payload.eventType === 'UPDATE') {
+    const updatedNote = payload.new as Note
+    setNotes((prev) =>
+      prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+    )
+    await LocalStorage.saveNote(updatedNote)
+  } else if (payload.eventType === 'DELETE') {
+    const deletedId = payload.old.id
+    setNotes((prev) => prev.filter((note) => note.id !== deletedId))
+    await LocalStorage.deleteNote(deletedId)
+  }
+}
+
+async function handleFolderRealtimeEvent(
+  payload: { eventType: string; new: any; old: any },
+  setFolders: React.Dispatch<React.SetStateAction<Folder[]>>
+) {
+  if (payload.eventType === 'INSERT') {
+    const newFolder = payload.new as Folder
+    setFolders((prev) => [newFolder, ...prev])
+    await LocalStorage.saveFolder(newFolder)
+  } else if (payload.eventType === 'UPDATE') {
+    const updatedFolder = payload.new as Folder
+    setFolders((prev) =>
+      prev.map((folder) => (folder.id === updatedFolder.id ? updatedFolder : folder))
+    )
+    await LocalStorage.saveFolder(updatedFolder)
+  } else if (payload.eventType === 'DELETE') {
+    const deletedId = payload.old.id
+    setFolders((prev) => prev.filter((folder) => folder.id !== deletedId))
+    await LocalStorage.deleteFolder(deletedId)
+  }
+}
 
 export function useLocalNotes(userId?: string | null) {
   const [notes, setNotes] = useState<Note[]>([])
@@ -76,12 +137,7 @@ export function useLocalNotes(userId?: string | null) {
           (ln) => !cloudNotes?.some((cn) => cn.id === ln.id)
         )
         
-        for (const note of localOnlyNotes) {
-          await supabase.from('notes').insert({
-            ...note,
-            user_id: userId,
-          })
-        }
+        await uploadLocalNotes(localOnlyNotes, userId)
 
         // Merge local and cloud folders (cloud takes precedence for conflicts)
         const localFolders = await LocalStorage.getFolders()
@@ -99,12 +155,7 @@ export function useLocalNotes(userId?: string | null) {
           (lf) => !cloudFolders?.some((cf) => cf.id === lf.id)
         )
         
-        for (const folder of localOnlyFolders) {
-          await supabase.from('folders').insert({
-            ...folder,
-            user_id: userId,
-          })
-        }
+        await uploadLocalFolders(localOnlyFolders, userId)
       } catch (error) {
         console.error('Sync error:', error)
       } finally {
@@ -125,23 +176,7 @@ export function useLocalNotes(userId?: string | null) {
           table: 'notes',
           filter: `user_id=eq.${userId}`,
         },
-        async (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newNote = payload.new as Note
-            setNotes((prev) => [newNote, ...prev])
-            await LocalStorage.saveNote(newNote)
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedNote = payload.new as Note
-            setNotes((prev) =>
-              prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-            )
-            await LocalStorage.saveNote(updatedNote)
-          } else if (payload.eventType === 'DELETE') {
-            const deletedId = payload.old.id
-            setNotes((prev) => prev.filter((note) => note.id !== deletedId))
-            await LocalStorage.deleteNote(deletedId)
-          }
-        }
+        async (payload) => { await handleNoteRealtimeEvent(payload, setNotes) }
       )
       .subscribe()
 
@@ -156,23 +191,7 @@ export function useLocalNotes(userId?: string | null) {
           table: 'folders',
           filter: `user_id=eq.${userId}`,
         },
-        async (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newFolder = payload.new as Folder
-            setFolders((prev) => [newFolder, ...prev])
-            await LocalStorage.saveFolder(newFolder)
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedFolder = payload.new as Folder
-            setFolders((prev) =>
-              prev.map((folder) => (folder.id === updatedFolder.id ? updatedFolder : folder))
-            )
-            await LocalStorage.saveFolder(updatedFolder)
-          } else if (payload.eventType === 'DELETE') {
-            const deletedId = payload.old.id
-            setFolders((prev) => prev.filter((folder) => folder.id !== deletedId))
-            await LocalStorage.deleteFolder(deletedId)
-          }
-        }
+        async (payload) => { await handleFolderRealtimeEvent(payload, setFolders) }
       )
       .subscribe()
 

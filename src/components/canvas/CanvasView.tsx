@@ -58,13 +58,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         const savedNodes = await LocalStorage.getItem<CanvasNode[]>('canvas-nodes')
         if (savedNodes && savedNodes.length > 0) {
           // Filter out notes that don't exist in active notes
-          const validNodes = savedNodes.filter(node => {
-            if (node.type === 'note') {
-              return notes.some(n => n.id === node.id)
-            }
-            return true
-          })
-          setCanvasNodes(validNodes)
+          const isValidNode = (node: CanvasNode) =>
+            node.type !== 'note' || notes.some(n => n.id === node.id)
+          setCanvasNodes(savedNodes.filter(isValidNode))
         } else if (notes.length > 0) {
           // Only create initial nodes if no saved data exists
           const initialNodes: CanvasNode[] = notes.slice(0, 5).map((note, index) => ({
@@ -88,6 +84,56 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     loadCanvasData()
   }, []) // Run only on mount
 
+  // Helper: sync existing canvas nodes with notes (update/remove)
+  const syncExistingNodes = useCallback((
+    nextNodes: CanvasNode[],
+    currentNoteIds: Set<string>
+  ): boolean => {
+    let hasChanges = false
+    for (let i = nextNodes.length - 1; i >= 0; i--) {
+      const node = nextNodes[i]
+      if (!node || node.type !== 'note') {continue}
+      
+      const inNotes = currentNoteIds.has(node.id)
+      if (inNotes) {
+        justCreatedIds.current.delete(node.id)
+        const sourceNote = notes.find(n => n.id === node.id)
+        const contentChanged = sourceNote && (node.content !== sourceNote.content || node.title !== sourceNote.title)
+        if (contentChanged) {
+          nextNodes[i] = { ...node, content: sourceNote.content, title: sourceNote.title, color: node.color ?? '#5a63e9' }
+          hasChanges = true
+        }
+      } else if (!justCreatedIds.current.has(node.id)) {
+        nextNodes.splice(i, 1)
+        hasChanges = true
+      }
+    }
+    return hasChanges
+  }, [notes])
+
+  // Helper: add missing notes to canvas
+  const addMissingNotes = useCallback((
+    nextNodes: CanvasNode[],
+    existingNodeIds: Set<string>
+  ): boolean => {
+    const NODE_WIDTH = 250, NODE_HEIGHT = 200, GAP_X = 50, GAP_Y = 50, COLS = 3
+    let hasChanges = false
+    for (const note of notes) {
+      if (existingNodeIds.has(note.id)) {continue}
+      const existingNoteNodes = nextNodes.filter(n => n.type === 'note')
+      const col = existingNoteNodes.length % COLS
+      const row = Math.floor(existingNoteNodes.length / COLS)
+      nextNodes.push({
+        id: note.id, type: 'note',
+        x: 100 + col * (NODE_WIDTH + GAP_X), y: 100 + row * (NODE_HEIGHT + GAP_Y),
+        width: NODE_WIDTH, height: NODE_HEIGHT,
+        content: note.content, title: note.title, color: '#5a63e9',
+      })
+      hasChanges = true
+    }
+    return hasChanges
+  }, [notes])
+
   // Sync canvas nodes with active notes (handle additions, deletions, AND content updates)
   useEffect(() => {
     const currentNoteIds = new Set(notes.map(n => n.id))
@@ -95,82 +141,13 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     setCanvasNodes((prev) => {
       const nextNodes = [...prev]
       const existingNodeIds = new Set(prev.map(n => n.id))
-      let hasChanges = false
       
-      // 1. Remove nodes that are no longer in notes (deleted notes should be removed immediately)
-      // AND update content/title for existing notes
-      for (let i = nextNodes.length - 1; i >= 0; i--) {
-        const node = nextNodes[i]
-        if (!node) {continue}
-        if (node.type === 'note') {
-          const inNotes = currentNoteIds.has(node.id)
-          
-          if (inNotes) {
-            // It's in notes, so we can stop tracking it as "just created"
-            if (justCreatedIds.current.has(node.id)) {
-              justCreatedIds.current.delete(node.id)
-            }
-            
-            // Update content and title if they have changed
-            const sourceNote = notes.find(n => n.id === node.id)
-            if (sourceNote && (node.content !== sourceNote.content || node.title !== sourceNote.title)) {
-              nextNodes[i] = {
-                ...node,
-                id: node.id,
-                type: node.type,
-                x: node.x,
-                y: node.y,
-                width: node.width,
-                height: node.height,
-                content: sourceNote.content,
-                title: sourceNote.title,
-                color: node.color ?? '#5a63e9',
-              }
-              hasChanges = true
-            }
-          } else if (!justCreatedIds.current.has(node.id)) {
-            // Not in notes and not just created -> delete it (note was deleted)
-            nextNodes.splice(i, 1)
-            hasChanges = true
-          }
-        }
-      }
+      const removedOrUpdated = syncExistingNodes(nextNodes, currentNoteIds)
+      const added = addMissingNotes(nextNodes, existingNodeIds)
       
-      // 2. Add notes that exist in props but not in canvas nodes
-      // This is the key fix: we check against existing canvas nodes, not previous notes
-      // Calculate position based on existing nodes for grid-like arrangement
-      const NODE_WIDTH = 250
-      const NODE_HEIGHT = 200
-      const GAP_X = 50
-      const GAP_Y = 50
-      const COLS = 3
-      
-      notes.forEach(note => {
-        if (!existingNodeIds.has(note.id)) {
-          // Find the next available position in a grid layout
-          const existingNoteNodes = nextNodes.filter(n => n.type === 'note')
-          const nodeIndex = existingNoteNodes.length
-          const col = nodeIndex % COLS
-          const row = Math.floor(nodeIndex / COLS)
-          
-          nextNodes.push({
-            id: note.id,
-            type: 'note',
-            x: 100 + col * (NODE_WIDTH + GAP_X),
-            y: 100 + row * (NODE_HEIGHT + GAP_Y),
-            width: NODE_WIDTH,
-            height: NODE_HEIGHT,
-            content: note.content,
-            title: note.title,
-            color: '#5a63e9',
-          })
-          hasChanges = true
-        }
-      })
-      
-      return hasChanges ? nextNodes : prev
+      return (removedOrUpdated || added) ? nextNodes : prev
     })
-  }, [notes, pan.x, pan.y, zoom])
+  }, [notes, pan.x, pan.y, zoom, syncExistingNodes, addMissingNotes])
 
   // Save canvas nodes whenever they change
   useEffect(() => {
@@ -378,47 +355,46 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     }
   }
 
-  const handleNodeTouchStart = (e: React.TouchEvent, nodeId: string) => {
-    // Allow pinch zoom to bubble up
-    if (e.touches.length > 1) {return}
+  const updateNodeContent = (nodeId: string, newContent: string) => {
+    setCanvasNodes((prev) =>
+      prev.map((n) => (n.id === nodeId ? { ...n, content: newContent } : n))
+    )
+  }
 
+  const handleDoubleTap = (nodeId: string) => {
+    const node = canvasNodes.find(n => n.id === nodeId)
+    if (!node) {return}
+    if (node.type === 'text') {setEditingNodeId(nodeId)}
+    else if (node.type === 'note' && onOpenNote) {onOpenNote(node.id)}
+  }
+
+  const handleSingleTap = (e: React.TouchEvent, nodeId: string) => {
+    if (isMultiSelectMode) {
+      toggleNodeSelection(nodeId, true)
+      return
+    }
+    const node = canvasNodes.find((n) => n.id === nodeId)
+    const touch = e.touches[0]
+    if (node && touch) {
+      const mouseX = (touch.clientX - pan.x) / zoom
+      const mouseY = (touch.clientY - pan.y) / zoom
+      setDragOffset({ x: mouseX - node.x, y: mouseY - node.y })
+    }
+    setDraggedNode(nodeId)
+    setSelectedNode(nodeId)
+    setSelectedNodes(new Set([nodeId]))
+  }
+
+  const handleNodeTouchStart = (e: React.TouchEvent, nodeId: string) => {
+    if (e.touches.length > 1) {return}
     e.stopPropagation()
     const now = Date.now()
-    const DOUBLE_TAP_DELAY = 300
+    const isDoubleTap = now - lastTap.current < 300
     
-    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
-      // Double tap detected
-      const node = canvasNodes.find(n => n.id === nodeId)
-      if (node) {
-        if (node.type === 'text') {
-          setEditingNodeId(nodeId)
-        } else if (node.type === 'note' && onOpenNote) {
-          onOpenNote(node.id)
-        }
-      }
+    if (isDoubleTap) {
+      handleDoubleTap(nodeId)
     } else {
-      // In multi-select mode, toggle selection on tap
-      if (isMultiSelectMode) {
-        toggleNodeSelection(nodeId, true)
-        lastTap.current = now
-        return
-      }
-      
-      const node = canvasNodes.find((n) => n.id === nodeId)
-      if (node) {
-        const touch = e.touches[0]
-        if (touch) {
-          const mouseX = (touch.clientX - pan.x) / zoom
-          const mouseY = (touch.clientY - pan.y) / zoom
-          setDragOffset({
-            x: mouseX - node.x,
-            y: mouseY - node.y
-          })
-        }
-      }
-      setDraggedNode(nodeId)
-      setSelectedNode(nodeId)
-      setSelectedNodes(new Set([nodeId]))
+      handleSingleTap(e, nodeId)
     }
     lastTap.current = now
   }
@@ -727,12 +703,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                       className="w-full h-full resize-none bg-transparent border-none outline-none text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-sans"
                       value={node.content}
                       autoFocus
-                      onChange={(e) => {
-                        const newContent = e.target.value
-                        setCanvasNodes((prev) =>
-                          prev.map((n) => (n.id === node.id ? { ...n, content: newContent } : n))
-                        )
-                      }}
+                      onChange={(e) => { updateNodeContent(node.id, e.target.value) }}
                       onBlur={() => { setEditingNodeId(null); }}
                       onMouseDown={(e) => { e.stopPropagation(); }}
                       onTouchStart={(e) => { e.stopPropagation(); }}

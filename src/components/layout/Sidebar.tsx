@@ -118,31 +118,11 @@ export default function Sidebar({
       ? `Supprimer ce dossier ? Les ${notesInFolder.length} note(s) seront déplacées vers la corbeille.`
       : 'Supprimer ce dossier vide ?'
     
-    const confirmed = window.confirm(message)
-    if (!confirmed) {return}
+    if (!window.confirm(message)) {return}
 
     try {
-      // Use the soft-delete function if provided
-      if (deleteFolder) {
-        const result = await deleteFolder(folderId)
-        if (result?.error) {
-          console.error('Erreur lors de la suppression du dossier:', result.error)
-        }
-      } else {
-        // Fallback: soft delete notes and permanently delete folder (legacy behavior)
-        for (const note of notesInFolder) {
-          if (deleteNote) {
-            await deleteNote(note.id)
-          }
-        }
-        await LocalStorage.deleteFolder(folderId)
-      }
-      // Always reload folders to ensure UI is in sync
-      if (reloadFolders) {
-        await reloadFolders()
-      } else {
-        await loadFolders()
-      }
+      await deleteFolderById(folderId)
+      if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
     } catch (error) {
       console.error('Erreur lors de la suppression du dossier:', error)
     }
@@ -214,10 +194,23 @@ export default function Sidebar({
     return selectedCount > 0 && selectedCount < folders.length
   }
 
+  const deleteFolderById = async (folderId: string) => {
+    if (deleteFolder) {
+      const result = await deleteFolder(folderId)
+      if (result?.error) {console.error('Erreur lors de la suppression du dossier:', result.error)}
+      return
+    }
+    // Fallback: soft delete notes and permanently delete folder
+    const notesInFolder = notes.filter(n => n.folder_id === folderId)
+    for (const note of notesInFolder) {
+      if (deleteNote) {await deleteNote(note.id)}
+    }
+    await LocalStorage.deleteFolder(folderId)
+  }
+
   const handleDeleteSelectedFolders = async () => {
     if (selectedFolderIds.size === 0) {return}
     
-    // Count total notes in selected folders
     const totalNotes = folders
       .filter(f => selectedFolderIds.has(f.id))
       .reduce((count, folder) => count + notes.filter(n => n.folder_id === folder.id).length, 0)
@@ -226,33 +219,13 @@ export default function Sidebar({
       ? `Supprimer ${selectedFolderIds.size} dossier(s) sélectionné(s) ? Les ${totalNotes} note(s) seront déplacées vers la corbeille.`
       : `Supprimer ${selectedFolderIds.size} dossier(s) vide(s) sélectionné(s) ?`
     
-    const confirmed = window.confirm(message)
-    if (!confirmed) {return}
+    if (!window.confirm(message)) {return}
 
     try {
       for (const folderId of selectedFolderIds) {
-        if (deleteFolder) {
-          const result = await deleteFolder(folderId)
-          if (result?.error) {
-            console.error('Erreur lors de la suppression du dossier:', result.error)
-          }
-        } else {
-          // Fallback: soft delete notes and permanently delete folder (legacy behavior)
-          const notesInFolder = notes.filter(n => n.folder_id === folderId)
-          for (const note of notesInFolder) {
-            if (deleteNote) {
-              await deleteNote(note.id)
-            }
-          }
-          await LocalStorage.deleteFolder(folderId)
-        }
+        await deleteFolderById(folderId)
       }
-      // Always reload folders to ensure UI is in sync
-      if (reloadFolders) {
-        await reloadFolders()
-      } else {
-        await loadFolders()
-      }
+      if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
       setSelectedFolderIds(new Set())
       setFolderMultiSelectMode(false)
     } catch (error) {
@@ -381,25 +354,15 @@ export default function Sidebar({
 
   const handleEmptyTrash = async () => {
     const totalItems = trashNotes.length + trashFolders.length
-    const confirmed = window.confirm(
-      `Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`
-    )
-    if (!confirmed) {return}
+    if (!window.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {return}
 
     try {
-      // Delete all folders first (this will also delete notes in those folders)
       for (const folder of trashFolders) {
-        if (permanentlyDeleteFolder) {
-          await permanentlyDeleteFolder(folder.id)
-        }
+        if (permanentlyDeleteFolder) {await permanentlyDeleteFolder(folder.id)}
       }
-      // Delete remaining notes (those not in deleted folders)
-      for (const note of trashNotes) {
-        if (!trashFolders.some(f => f.id === note.folder_id)) {
-          if (permanentlyDeleteNote) {
-            await permanentlyDeleteNote(note.id)
-          }
-        }
+      const orphanNotes = trashNotes.filter(n => !trashFolders.some(f => f.id === n.folder_id))
+      for (const note of orphanNotes) {
+        if (permanentlyDeleteNote) {await permanentlyDeleteNote(note.id)}
       }
       setSelectedTrashItems(new Set())
       setSelectionMode(false)
@@ -408,27 +371,21 @@ export default function Sidebar({
     }
   }
 
+  const permanentlyDeleteTrashItem = async (itemId: string) => {
+    if (itemId.startsWith('folder-') && permanentlyDeleteFolder) {
+      await permanentlyDeleteFolder(itemId.replace('folder-', ''))
+    } else if (itemId.startsWith('note-') && permanentlyDeleteNote) {
+      await permanentlyDeleteNote(itemId.replace('note-', ''))
+    }
+  }
+
   const handleDeleteSelected = async () => {
     if (selectedTrashItems.size === 0) {return}
-
-    const confirmed = window.confirm(
-      `Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`
-    )
-    if (!confirmed) {return}
+    if (!window.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {return}
 
     try {
       for (const itemId of selectedTrashItems) {
-        if (itemId.startsWith('folder-')) {
-          const folderId = itemId.replace('folder-', '')
-          if (permanentlyDeleteFolder) {
-            await permanentlyDeleteFolder(folderId)
-          }
-        } else if (itemId.startsWith('note-')) {
-          const noteId = itemId.replace('note-', '')
-          if (permanentlyDeleteNote) {
-            await permanentlyDeleteNote(noteId)
-          }
-        }
+        await permanentlyDeleteTrashItem(itemId)
       }
       setSelectedTrashItems(new Set())
       setSelectionMode(false)
@@ -437,22 +394,19 @@ export default function Sidebar({
     }
   }
 
+  const restoreTrashItem = async (itemId: string) => {
+    if (itemId.startsWith('folder-') && restoreFolder) {
+      await restoreFolder(itemId.replace('folder-', ''))
+    } else if (itemId.startsWith('note-') && restoreNote) {
+      await restoreNote(itemId.replace('note-', ''))
+    }
+  }
+
   const handleRestoreSelected = async () => {
     if (selectedTrashItems.size === 0) {return}
-
     try {
       for (const itemId of selectedTrashItems) {
-        if (itemId.startsWith('folder-')) {
-          const folderId = itemId.replace('folder-', '')
-          if (restoreFolder) {
-            await restoreFolder(folderId)
-          }
-        } else if (itemId.startsWith('note-')) {
-          const noteId = itemId.replace('note-', '')
-          if (restoreNote) {
-            await restoreNote(noteId)
-          }
-        }
+        await restoreTrashItem(itemId)
       }
       setSelectedTrashItems(new Set())
       setSelectionMode(false)

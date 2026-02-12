@@ -9,6 +9,21 @@ import { Note } from '@/types'
 
 const NOTES_STORAGE_KEY = 'obsidian_pwa_notes'
 
+function handleNoteRealtimePayload(
+  payload: { eventType: string; new: any; old: any },
+  setNotes: React.Dispatch<React.SetStateAction<Note[]>>
+) {
+  if (payload.eventType === 'INSERT') {
+    setNotes((prev) => [payload.new as Note, ...prev])
+  } else if (payload.eventType === 'UPDATE') {
+    setNotes((prev) =>
+      prev.map((note) => (note.id === payload.new.id ? (payload.new as Note) : note))
+    )
+  } else if (payload.eventType === 'DELETE') {
+    setNotes((prev) => prev.filter((note) => note.id !== payload.old.id))
+  }
+}
+
 export function useNotes(userId?: string) {
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
@@ -71,17 +86,7 @@ export function useNotes(userId?: string) {
           table: 'notes',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setNotes((prev) => [payload.new as Note, ...prev])
-          } else if (payload.eventType === 'UPDATE') {
-            setNotes((prev) =>
-              prev.map((note) => (note.id === payload.new.id ? (payload.new as Note) : note))
-            )
-          } else if (payload.eventType === 'DELETE') {
-            setNotes((prev) => prev.filter((note) => note.id !== payload.old.id))
-          }
-        }
+        (payload) => { handleNoteRealtimePayload(payload, setNotes) }
       )
       .subscribe()
 

@@ -1,12 +1,13 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { EditorView, WidgetType, Decoration, ViewPlugin, ViewUpdate, DecorationSet } from '@codemirror/view'
 import { RangeSetBuilder } from '@codemirror/state'
-import { LocalStorage } from '@/lib/localStorage'
-import { createRoot, Root } from 'react-dom/client'
+import { EditorView, WidgetType, Decoration, ViewPlugin, ViewUpdate, DecorationSet } from '@codemirror/view'
 import React from 'react'
+import { createRoot, Root } from 'react-dom/client'
+
 import WaveformPlayer from '@/components/ui/WaveformPlayer'
+import { LocalStorage } from '@/lib/localStorage'
 
 interface AudioWidgetDOM extends HTMLElement {
   _reactRoot?: Root
@@ -46,18 +47,18 @@ class AudioWidget extends WidgetType {
     return container
   }
 
-  destroy(dom: HTMLElement) {
+  override destroy(dom: HTMLElement) {
     const container = dom as AudioWidgetDOM
     if (container._reactRoot) {
       container._reactRoot.unmount()
     }
   }
 
-  eq(other: AudioWidget) {
+  override eq(other: AudioWidget) {
     return other.attachmentId === this.attachmentId
   }
 
-  ignoreEvent() { return true }
+  override ignoreEvent() { return true }
 }
 
 function audioWidgets(view: EditorView) {

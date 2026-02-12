@@ -1,11 +1,13 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState, useEffect } from 'react'
-import { Note, Folder } from '@/types'
-import { File, Folder as FolderIcon, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, FolderInput, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
-import { LocalStorage } from '@/lib/localStorage'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { File, Folder as FolderIcon, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, FolderInput, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { LocalStorage } from '@/lib/localStorage'
+import { Note, Folder } from '@/types'
+
 
 interface SidebarProps {
   side: 'left' | 'right'
@@ -86,7 +88,7 @@ export default function Sidebar({
   }
 
   const handleCreateFolder = async () => {
-    if (!newFolderName.trim()) return
+    if (!newFolderName.trim()) {return}
 
     try {
       const folder: Folder = {
@@ -117,7 +119,7 @@ export default function Sidebar({
       : 'Supprimer ce dossier vide ?'
     
     const confirmed = window.confirm(message)
-    if (!confirmed) return
+    if (!confirmed) {return}
 
     try {
       // Use the soft-delete function if provided
@@ -148,7 +150,7 @@ export default function Sidebar({
 
   const handleRestoreFolder = async (folderId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!restoreFolder) return
+    if (!restoreFolder) {return}
     try {
       await restoreFolder(folderId)
     } catch (error) {
@@ -158,7 +160,7 @@ export default function Sidebar({
 
   const handlePermanentlyDeleteFolder = async (folderId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!permanentlyDeleteFolder) return
+    if (!permanentlyDeleteFolder) {return}
     
     const folder = trashFolders.find(f => f.id === folderId)
     const notesInFolder = trashNotes.filter(n => n.folder_id === folderId)
@@ -213,7 +215,7 @@ export default function Sidebar({
   }
 
   const handleDeleteSelectedFolders = async () => {
-    if (selectedFolderIds.size === 0) return
+    if (selectedFolderIds.size === 0) {return}
     
     // Count total notes in selected folders
     const totalNotes = folders
@@ -225,7 +227,7 @@ export default function Sidebar({
       : `Supprimer ${selectedFolderIds.size} dossier(s) vide(s) sélectionné(s) ?`
     
     const confirmed = window.confirm(message)
-    if (!confirmed) return
+    if (!confirmed) {return}
 
     try {
       for (const folderId of selectedFolderIds) {
@@ -309,12 +311,12 @@ export default function Sidebar({
   }
 
   const handleDeleteSelectedNotes = async () => {
-    if (selectedNoteIds.size === 0) return
+    if (selectedNoteIds.size === 0) {return}
     
     const confirmed = window.confirm(
       `Supprimer ${selectedNoteIds.size} note(s) sélectionnée(s) ?`
     )
-    if (!confirmed) return
+    if (!confirmed) {return}
 
     try {
       for (const noteId of selectedNoteIds) {
@@ -382,7 +384,7 @@ export default function Sidebar({
     const confirmed = window.confirm(
       `Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`
     )
-    if (!confirmed) return
+    if (!confirmed) {return}
 
     try {
       // Delete all folders first (this will also delete notes in those folders)
@@ -407,12 +409,12 @@ export default function Sidebar({
   }
 
   const handleDeleteSelected = async () => {
-    if (selectedTrashItems.size === 0) return
+    if (selectedTrashItems.size === 0) {return}
 
     const confirmed = window.confirm(
       `Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`
     )
-    if (!confirmed) return
+    if (!confirmed) {return}
 
     try {
       for (const itemId of selectedTrashItems) {
@@ -436,7 +438,7 @@ export default function Sidebar({
   }
 
   const handleRestoreSelected = async () => {
-    if (selectedTrashItems.size === 0) return
+    if (selectedTrashItems.size === 0) {return}
 
     try {
       for (const itemId of selectedTrashItems) {
@@ -497,7 +499,7 @@ export default function Sidebar({
   }
 
   const moveNoteToFolder = async (noteId: string, folderId: string | undefined) => {
-    if (!updateNote) return
+    if (!updateNote) {return}
     try {
       await updateNote(noteId, { folder_id: folderId })
     } catch (error) {
@@ -506,7 +508,7 @@ export default function Sidebar({
   }
 
   const handleCreateNoteInFolder = async (folderId: string | undefined) => {
-    if (!createNote) return
+    if (!createNote) {return}
     const title = `Note ${new Date().toLocaleDateString('fr-FR')}`
     const { data } = await createNote(title, '', folderId)
     if (data && onNoteSelect) {
@@ -556,7 +558,7 @@ export default function Sidebar({
   }
 
   const handleCreateNote = async () => {
-    if (!createNote) return
+    if (!createNote) {return}
     const title = `Note ${new Date().toLocaleDateString('fr-FR')}`
     const { data } = await createNote(title, '')
     if (data && onNoteSelect) {
@@ -615,7 +617,7 @@ export default function Sidebar({
 
   const handleDeleteNote = async (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!deleteNote) return
+    if (!deleteNote) {return}
 
     const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')
     if (confirmed) {
@@ -629,7 +631,7 @@ export default function Sidebar({
 
   const handleRestoreNote = async (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!restoreNote) return
+    if (!restoreNote) {return}
     try {
       await restoreNote(noteId)
     } catch (error) {
@@ -639,7 +641,7 @@ export default function Sidebar({
 
   const handlePermanentlyDeleteNote = async (noteId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!permanentlyDeleteNote) return
+    if (!permanentlyDeleteNote) {return}
     
     const confirmed = window.confirm('Cette action est irréversible. Supprimer définitivement ?')
     if (confirmed) {
@@ -656,7 +658,7 @@ export default function Sidebar({
     <div
       key={note.id}
       draggable
-      onDragStart={(e) => handleDragStart(note.id, e)}
+      onDragStart={(e) => { handleDragStart(note.id, e); }}
       onDragEnd={handleDragEnd}
       className={`group relative flex items-center rounded-lg transition-all ${
         draggedNoteId === note.id
@@ -672,16 +674,16 @@ export default function Sidebar({
     >
       {editingNoteId === note.id ? (
         // Edit mode
-        <div className="flex items-center gap-1 xs:gap-1.5 w-full px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1.5 xs:py-2 sm:py-2 laptop:py-2.5 min-h-[44px]" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1 xs:gap-1.5 w-full px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1.5 xs:py-2 sm:py-2 laptop:py-2.5 min-h-[44px]" onClick={(e) => { e.stopPropagation(); }}>
           <File className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
           <input
             type="text"
             value={editingTitle}
-            onChange={(e) => setEditingTitle(e.target.value)}
+            onChange={(e) => { setEditingTitle(e.target.value); }}
             onKeyDown={(e) => handleKeyDown(e, note.id)}
             className="flex-1 min-w-0 text-xs xs:text-sm sm:text-sm laptop:text-base bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-primary-500 rounded px-1.5 xs:px-2 sm:px-2 laptop:px-2.5 py-1 xs:py-1.5 outline-none focus:ring-2 focus:ring-primary-500"
             autoFocus
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); }}
           />
           <button
             onClick={(e) => saveEditing(note.id, e)}
@@ -739,7 +741,7 @@ export default function Sidebar({
                   <button
                     className="p-1 laptop:p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded text-purple-600 dark:text-purple-400 min-w-[32px] min-h-[32px] laptop:min-w-[36px] laptop:min-h-[36px] flex items-center justify-center transition-colors outline-none"
                     title="Déplacer vers..."
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); }}
                   >
                     <FolderInput className="h-3.5 w-3.5 laptop:h-4 laptop:w-4" />
                   </button>
@@ -750,7 +752,7 @@ export default function Sidebar({
                     className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 min-w-[160px] xs:min-w-[180px] py-1"
                     sideOffset={5}
                     align="end"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); }}
                   >
                     <DropdownMenu.Item 
                       className="w-full px-2.5 xs:px-3 py-1.5 xs:py-2 text-left text-xs xs:text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-1.5 xs:gap-2 outline-none cursor-pointer text-neutral-700 dark:text-neutral-300"
@@ -776,7 +778,7 @@ export default function Sidebar({
             </div>
             
             <button
-              onClick={(e) => startEditing(note, e)}
+              onClick={(e) => { startEditing(note, e); }}
               className="p-1 laptop:p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded text-blue-600 dark:text-blue-400 min-w-[32px] min-h-[32px] laptop:min-w-[36px] laptop:min-h-[36px] flex items-center justify-center transition-colors"
               title="Renommer"
             >
@@ -815,7 +817,7 @@ export default function Sidebar({
           <div className="mb-2 xs:mb-2.5 sm:mb-3">
             {!creatingFolder ? (
               <button
-                onClick={() => setCreatingFolder(true)}
+                onClick={() => { setCreatingFolder(true); }}
                 className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
               >
                 <FolderPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
@@ -827,9 +829,9 @@ export default function Sidebar({
                 <input
                   type="text"
                   value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onChange={(e) => { setNewFolderName(e.target.value); }}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleCreateFolder()
+                    if (e.key === 'Enter') {handleCreateFolder()}
                     if (e.key === 'Escape') {
                       setCreatingFolder(false)
                       setNewFolderName('')
@@ -927,7 +929,7 @@ export default function Sidebar({
                 <div
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(folder.id, e)}
-                  onDragEnter={(e) => handleDragEnter(folder.id, e)}
+                  onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
                   onDragLeave={handleDragLeave}
                   className={`rounded-md transition-colors ${
                     isDropTarget ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
@@ -956,7 +958,7 @@ export default function Sidebar({
                   )}
                   
                   <div
-                    onClick={() => toggleFolder(folder.id)}
+                    onClick={() => { toggleFolder(folder.id); }}
                     className="flex-1 flex items-center gap-1.5 xs:gap-2 min-w-0"
                   >
                   <ChevronRight
@@ -970,16 +972,16 @@ export default function Sidebar({
                     <input
                       type="text"
                       value={editingFolderName}
-                      onChange={(e) => setEditingFolderName(e.target.value)}
+                      onChange={(e) => { setEditingFolderName(e.target.value); }}
                       onKeyDown={(e) => {
                         e.stopPropagation()
-                        if (e.key === 'Enter') handleRenameFolder(folder.id)
+                        if (e.key === 'Enter') {handleRenameFolder(folder.id)}
                         if (e.key === 'Escape') {
                           setEditingFolderId(null)
                           setEditingFolderName('')
                         }
                       }}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); }}
                       className="flex-1 text-xs xs:text-sm bg-white dark:bg-neutral-800 border border-primary-500 rounded px-1.5 xs:px-2 py-0.5 outline-none"
                       autoFocus
                     />
@@ -1098,14 +1100,14 @@ export default function Sidebar({
             <div
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(undefined, e)}
-              onDragEnter={(e) => handleDragEnter(undefined, e)}
+              onDragEnter={(e) => { handleDragEnter(undefined, e); }}
               onDragLeave={handleDragLeave}
               className={`rounded-md transition-colors ${
                 dropTargetFolderId === 'root' ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
               }`}
             >
               <div
-                onClick={() => toggleFolder('root')}
+                onClick={() => { toggleFolder('root'); }}
                 className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer"
               >
                 <ChevronRight
@@ -1211,7 +1213,7 @@ export default function Sidebar({
           {/* Corbeille */}
           <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
             <button
-              onClick={() => setTrashOpen(!trashOpen)}
+              onClick={() => { setTrashOpen(!trashOpen); }}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
             >
               <ChevronRight

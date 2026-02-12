@@ -1,0 +1,15 @@
+{
+  "exceptions": [
+    {
+      "package": "example-vulnerable-package",
+      "reason": "This is a dev dependency not used in production",
+      "expires": "2025-03-01",
+      "advisory": "GHSA-xxxx-xxxx-xxxx"
+    }
+  ],
+  "notes": [
+    "Add exceptions here only when absolutely necessary",
+    "Each exception must have an expiration date",
+    "Include the GitHub Security Advisory ID when available"
+  ]
+}

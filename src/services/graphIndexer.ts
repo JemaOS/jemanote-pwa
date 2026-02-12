@@ -197,12 +197,12 @@ class GraphIndexer {
    */
   private getColorForNode(tags: string[], degree: number): string {
     // Nœud hub (beaucoup de liens)
-    if (degree >= 10) return '#5a63e9' // Bleu primaire
-    if (degree >= 5) return '#8B92FF'   // Bleu clair
-    if (degree >= 2) return '#A8AEFF'   // Bleu très clair
+    if (degree >= 10) {return '#5a63e9'} // Bleu primaire
+    if (degree >= 5) {return '#8B92FF'}   // Bleu clair
+    if (degree >= 2) {return '#A8AEFF'}   // Bleu très clair
     
     // Nœud isolé
-    if (degree === 0) return '#6B7280' // Gris
+    if (degree === 0) {return '#6B7280'} // Gris
     
     // Nœud normal
     return '#9CA3AF' // Gris clair
@@ -250,7 +250,7 @@ class GraphIndexer {
     // Construire graphe d'adjacence
     const adjacency = new Map<string, string[]>()
     edges.forEach(edge => {
-      if (!adjacency.has(edge.from)) adjacency.set(edge.from, [])
+      if (!adjacency.has(edge.from)) {adjacency.set(edge.from, [])}
       adjacency.get(edge.from)!.push(edge.to)
     })
 

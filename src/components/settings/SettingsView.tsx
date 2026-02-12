@@ -1,10 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React from 'react'
 import { Palette, Type, Zap, Cloud, Moon, Sun, Monitor } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
+import React from 'react'
+
 import AISettingsSection from '@/components/ai/AISettingsSection'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface SettingsViewProps {
   userId?: string | null
@@ -31,7 +32,7 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setTheme('light')}
+                    onClick={() => { setTheme('light'); }}
                     className={`flex items-center gap-2 p-4 border-2 rounded-lg transition-all ${
                       theme === 'light'
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
@@ -42,7 +43,7 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                     <span className="font-medium">Clair</span>
                   </button>
                   <button
-                    onClick={() => setTheme('dark')}
+                    onClick={() => { setTheme('dark'); }}
                     className={`flex items-center gap-2 p-4 border-2 rounded-lg transition-all ${
                       theme === 'dark'
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'

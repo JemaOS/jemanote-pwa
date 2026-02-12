@@ -1,0 +1,201 @@
+# Code Climate Configuration for Jemanote PWA
+# https://docs.codeclimate.com/docs/advanced-configuration
+
+version: "2"
+
+# Global configuration
+checks:
+  # Complexity thresholds
+  method-complexity:
+    enabled: true
+    config:
+      threshold: 10
+  
+  method-lines:
+    enabled: true
+    config:
+      threshold: 50
+  
+  file-lines:
+    enabled: true
+    config:
+      threshold: 300
+  
+  argument-count:
+    enabled: true
+    config:
+      threshold: 4
+  
+  return-statements:
+    enabled: true
+    config:
+      threshold: 4
+  
+  similar-code:
+    enabled: true
+    config:
+      threshold: 50
+  
+  identical-code:
+    enabled: true
+    config:
+      threshold: 30
+  
+  # Cognitive complexity
+  cognitive-complexity:
+    enabled: true
+    config:
+      threshold: 15
+  
+  # Maintainability
+  maintainability:
+    enabled: true
+    config:
+      threshold: "B"
+
+# Plugins configuration
+plugins:
+  # ESLint integration
+  eslint:
+    enabled: true
+    channel: "eslint-8"
+    config:
+      config: eslint.config.js
+      extensions:
+        - .ts
+        - .tsx
+        - .js
+        - .jsx
+    checks:
+      complexity:
+        enabled: true
+      max-lines:
+        enabled: true
+      max-lines-per-function:
+        enabled: true
+      max-params:
+        enabled: true
+      max-depth:
+        enabled: true
+      max-nested-callbacks:
+        enabled: true
+      max-statements:
+        enabled: true
+      max-statements-per-line:
+        enabled: true
+
+  # Stylelint for CSS
+  stylelint:
+    enabled: true
+
+  # Markdown linting
+  markdownlint:
+    enabled: true
+
+  # SonarJavaScript (alternative to SonarQube)
+  sonar-javascript:
+    enabled: true
+    config:
+      tests_patterns:
+        - tests/**/
+        - "**/*.test.ts"
+        - "**/*.test.tsx"
+        - "**/*.spec.ts"
+        - "**/*.spec.tsx"
+
+  # Duplication detection
+  duplication:
+    enabled: true
+    config:
+      languages:
+        typescript:
+          mass_threshold: 50
+          count_threshold: 3
+        javascript:
+          mass_threshold: 50
+          count_threshold: 3
+
+  # Structure analysis
+  structure:
+    enabled: true
+
+  # Nodesecurity (security analysis)
+  nodesecurity:
+    enabled: true
+
+  # Fixme/Todo detection
+  fixme:
+    enabled: true
+    config:
+      strings:
+        - FIXME
+        - TODO
+        - HACK
+        - XXX
+        - BUG
+        - OPTIMIZE
+        - REFACTOR
+
+# Exclude patterns
+exclude_patterns:
+  # Dependencies
+  - "**/node_modules/"
+  
+  # Build outputs
+  - "**/dist/"
+  - "**/build/"
+  - "**/.next/"
+  - "**/out/"
+  
+  # Coverage
+  - "**/coverage/"
+  
+  # Configuration files
+  - "**/*.config.ts"
+  - "**/*.config.js"
+  - "**/*.config.json"
+  - "**/vite-env.d.ts"
+  
+  # Test files
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "tests/**/__mocks__/"
+  - "tests/**/mocks/"
+  
+  # Storybook files
+  - "**/*.stories.tsx"
+  - "**/*.stories.ts"
+  
+  # Scripts
+  - "scripts/"
+  
+  # Public assets
+  - "public/"
+  
+  # Documentation
+  - "**/*.md"
+  
+  # Type definitions
+  - "**/types/*.d.ts"
+
+# Ratings configuration
+ratings:
+  paths:
+    - "src/**"
+
+# Maintainability thresholds
+maintainability:
+  # A: 0-5%
+  # B: 5-10%
+  # C: 10-20%
+  # D: 20-50%
+  # E: 50-100%
+  threshold: "C"
+
+# Test coverage thresholds
+coverage:
+  enabled: true
+  config:
+    threshold: 80

@@ -1,9 +1,10 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState } from 'react'
-import { Note } from '@/types'
 import { Search, X } from 'lucide-react'
+import { useState } from 'react'
+
+import { Note } from '@/types'
 
 interface SearchViewProps {
   userId?: string | null
@@ -39,14 +40,14 @@ export default function SearchView({ userId, notes, searchQuery = '', onSearchQu
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => { setQuery(e.target.value); }}
               placeholder="Rechercher dans toutes vos notes..."
               className="w-full h-16 pl-14 pr-12 text-body-large border-2 border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
               autoFocus
             />
             {query && (
               <button
-                onClick={() => setQuery('')}
+                onClick={() => { setQuery(''); }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-md"
               >
                 <X className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />

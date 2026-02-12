@@ -29,7 +29,7 @@ export function aiContextMenuExtension(onShowMenu: (position: AIContextMenuPosit
         onShowMenu({
           x: event.clientX,
           y: event.clientY,
-          selectedText: selectedText,
+          selectedText,
         })
       }
 

@@ -1,11 +1,6 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { Note } from '@/types'
-import { graphIndexer } from '@/services/graphIndexer'
-import type { GraphNode, GraphEdge } from '@/services/graphIndexer'
-import * as PIXI from 'pixi.js'
 import { 
   ZoomIn, 
   ZoomOut, 
@@ -18,6 +13,12 @@ import {
   SlidersHorizontal,
   Target
 } from 'lucide-react'
+import * as PIXI from 'pixi.js'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
+
+import { graphIndexer } from '@/services/graphIndexer'
+import type { GraphNode, GraphEdge } from '@/services/graphIndexer'
+import { Note } from '@/types'
 
 interface GraphViewProps {
   userId?: string | null
@@ -300,7 +301,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
   // Appliquer zoom et pan
   useEffect(() => {
-    if (!appRef.current) return
+    if (!appRef.current) {return}
     
     const mainContainer = appRef.current.stage.children[0]
     if (mainContainer) {
@@ -354,7 +355,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
   // Créer un nœud PixiJS avec meilleur style
   const createNode = useCallback((nodeData: NodeData) => {
-    if (!appRef.current) return null
+    if (!appRef.current) {return null}
 
     const mainContainer = appRef.current.stage.children[0]
     
@@ -477,7 +478,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
   // Dessiner les arêtes avec style Obsidian
   const drawEdges = useCallback((edges: EdgeData[], nodePositions: Map<string, { x: number, y: number }>) => {
-    if (!edgesRef.current) return
+    if (!edgesRef.current) {return}
     
     edgesRef.current.clear()
     
@@ -573,7 +574,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
           
           // Fonction récursive pour trouver les voisins jusqu'à maxDepth
           const findNeighbors = (nodeId: string, depth: number) => {
-            if (depth >= graphSettings.maxDepth) return
+            if (depth >= graphSettings.maxDepth) {return}
             
             graphData.edges.forEach(edge => {
               if (edge.from === nodeId && !neighbors.has(edge.to)) {
@@ -730,14 +731,14 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
       {/* Contrôles de zoom */}
       <div className="absolute top-4 right-4 flex flex-col gap-2">
         <button
-          onClick={() => setZoom(Math.min(3, zoom * 1.2))}
+          onClick={() => { setZoom(Math.min(3, zoom * 1.2)); }}
           className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
           title="Zoom avant"
         >
           <ZoomIn className="w-5 h-5 text-neutral-300" />
         </button>
         <button
-          onClick={() => setZoom(Math.max(0.1, zoom / 1.2))}
+          onClick={() => { setZoom(Math.max(0.1, zoom / 1.2)); }}
           className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
           title="Zoom arrière"
         >
@@ -762,7 +763,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
           )}
         </button>
         <button
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => { setShowFilters(!showFilters); }}
           className="p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
           title="Paramètres du Graphe"
         >
@@ -798,7 +799,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-neutral-100">Paramètres du Graphe</h3>
             <button
-              onClick={() => setShowFilters(false)}
+              onClick={() => { setShowFilters(false); }}
               className="text-neutral-400 hover:text-neutral-200 text-xs"
             >
               Fermer
@@ -815,7 +816,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-neutral-400">Notes isolées</label>
                   <button
-                    onClick={() => setGraphSettings(prev => ({ ...prev, showOrphans: !prev.showOrphans }))}
+                    onClick={() => { setGraphSettings(prev => ({ ...prev, showOrphans: !prev.showOrphans })); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       graphSettings.showOrphans ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
@@ -836,7 +837,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="10"
                     step="1"
                     value={graphSettings.minLinks}
-                    onChange={(e) => setGraphSettings(prev => ({ ...prev, minLinks: parseInt(e.target.value) }))}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, minLinks: parseInt(e.target.value) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -851,7 +852,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     type="text" 
                     placeholder="Rechercher..." 
                     value={newGroupQuery}
-                    onChange={(e) => setNewGroupQuery(e.target.value)}
+                    onChange={(e) => { setNewGroupQuery(e.target.value); }}
                     className="flex-1 bg-neutral-900 border border-neutral-700 rounded px-2 py-1 text-xs text-white focus:border-blue-500 outline-none"
                   />
                   <button 
@@ -884,7 +885,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                       />
                       <span className="text-xs text-neutral-300 flex-1 truncate">{group.query}</span>
                       <button 
-                        onClick={() => setGroups(groups.filter((_, i) => i !== idx))}
+                        onClick={() => { setGroups(groups.filter((_, i) => i !== idx)); }}
                         className="text-neutral-500 hover:text-red-400"
                       >
                         ×
@@ -907,7 +908,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-neutral-400">Flèches</label>
                   <button
-                    onClick={() => setShowArrows(!showArrows)}
+                    onClick={() => { setShowArrows(!showArrows); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       showArrows ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
@@ -921,7 +922,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-neutral-400">Étiquettes</label>
                   <button
-                    onClick={() => setGraphSettings(prev => ({ ...prev, showLabels: !prev.showLabels }))}
+                    onClick={() => { setGraphSettings(prev => ({ ...prev, showLabels: !prev.showLabels })); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       graphSettings.showLabels ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
@@ -942,7 +943,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="1"
                     step="0.1"
                     value={textFadeThreshold}
-                    onChange={(e) => setTextFadeThreshold(parseFloat(e.target.value))}
+                    onChange={(e) => { setTextFadeThreshold(parseFloat(e.target.value)); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -957,7 +958,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="2"
                     step="0.1"
                     value={graphSettings.nodeSize}
-                    onChange={(e) => setGraphSettings(prev => ({ ...prev, nodeSize: parseFloat(e.target.value) }))}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, nodeSize: parseFloat(e.target.value) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -972,7 +973,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="3"
                     step="0.1"
                     value={graphSettings.linkThickness}
-                    onChange={(e) => setGraphSettings(prev => ({ ...prev, linkThickness: parseFloat(e.target.value) }))}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, linkThickness: parseFloat(e.target.value) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -992,7 +993,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="0.1"
                     step="0.001"
                     value={physicsParams.centerForce}
-                    onChange={(e) => setPhysicsParams({ ...physicsParams, centerForce: parseFloat(e.target.value) })}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, centerForce: parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1007,7 +1008,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="1000"
                     step="10"
                     value={physicsParams.repulsion}
-                    onChange={(e) => setPhysicsParams({ ...physicsParams, repulsion: parseFloat(e.target.value) })}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, repulsion: parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1022,7 +1023,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="0.05"
                     step="0.001"
                     value={physicsParams.attraction}
-                    onChange={(e) => setPhysicsParams({ ...physicsParams, attraction: parseFloat(e.target.value) })}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, attraction: parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1037,7 +1038,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="200"
                     step="5"
                     value={physicsParams.linkDistance}
-                    onChange={(e) => setPhysicsParams({ ...physicsParams, linkDistance: parseFloat(e.target.value) })}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, linkDistance: parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1053,7 +1054,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-neutral-100">Légende</h3>
             <button
-              onClick={() => setShowLegend(false)}
+              onClick={() => { setShowLegend(false); }}
               className="text-neutral-400 hover:text-neutral-200 text-xs"
             >
               Masquer
@@ -1088,7 +1089,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
       {!showLegend && (
         <button
-          onClick={() => setShowLegend(true)}
+          onClick={() => { setShowLegend(true); }}
           className="absolute bottom-4 left-4 p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
           title="Afficher la légende"
         >
@@ -1103,7 +1104,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
             {nodesRef.current.get(selectedNode)?.data.label || 'Note sélectionnée'}
           </div>
           <button
-            onClick={() => setSelectedNode(null)}
+            onClick={() => { setSelectedNode(null); }}
             className="absolute -top-2 -right-2 w-5 h-5 bg-neutral-700 hover:bg-neutral-600 rounded-full flex items-center justify-center text-neutral-300 text-xs"
           >
             ×

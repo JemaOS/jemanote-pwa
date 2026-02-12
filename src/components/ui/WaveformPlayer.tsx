@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState, useEffect, useRef } from 'react'
 import { Play, Pause } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 
 interface WaveformPlayerProps {
   blob: Blob
@@ -27,7 +27,7 @@ export default function WaveformPlayer({
   const animationRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!blob) return
+    if (!blob) {return}
 
     // Générer waveform
     const generateWaveform = async () => {
@@ -117,7 +117,7 @@ export default function WaveformPlayer({
   }, [blob])
 
   const togglePlay = () => {
-    if (!audioRef.current) return
+    if (!audioRef.current) {return}
     if (isPlaying) {
       audioRef.current.pause()
     } else {
@@ -126,7 +126,7 @@ export default function WaveformPlayer({
   }
 
   const handleSeek = (index: number) => {
-    if (!audioRef.current || waveformData.length === 0) return
+    if (!audioRef.current || waveformData.length === 0) {return}
     
     const percentage = index / waveformData.length
     const newTime = percentage * duration

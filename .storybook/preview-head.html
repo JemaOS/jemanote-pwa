@@ -1,0 +1,10 @@
+<!-- Preview head for Storybook -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* Hide non-deterministic elements in visual regression tests */
+  [data-testid="timestamp"],
+  [data-testid="date"],
+  [data-testid="random-id"] {
+    visibility: hidden !important;
+  }
+</style>

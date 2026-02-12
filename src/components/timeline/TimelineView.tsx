@@ -1,11 +1,13 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useMemo, useState } from 'react'
-import { Note } from '@/types'
 import { format, isSameDay, parseISO } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { File, Clock, Plus } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+
+import { Note } from '@/types'
+
 import DateFilter from './DateFilter'
 
 interface TimelineViewProps {
@@ -19,7 +21,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
 
   // Filter notes by date if selected
   const filteredNotes = useMemo(() => {
-    if (!selectedDate) return notes
+    if (!selectedDate) {return notes}
     
     return notes.filter(note => {
       const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at
@@ -64,7 +66,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
 
           <div className="flex items-center bg-white dark:bg-neutral-800 rounded-lg p-1 border border-neutral-200 dark:border-neutral-700 shadow-sm">
             <button
-              onClick={() => setSortBy('updated')}
+              onClick={() => { setSortBy('updated'); }}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
                 sortBy === 'updated'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
@@ -75,7 +77,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
               Modifié
             </button>
             <button
-              onClick={() => setSortBy('created')}
+              onClick={() => { setSortBy('created'); }}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
                 sortBy === 'created'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
@@ -102,7 +104,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
                 {group.notes.map(note => (
                   <div
                     key={note.id}
-                    onClick={() => onOpenNote(note.id)}
+                    onClick={() => { onOpenNote(note.id); }}
                     className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-start gap-3">

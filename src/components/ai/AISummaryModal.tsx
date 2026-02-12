@@ -1,9 +1,10 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useState, useEffect } from 'react'
-import { aiService, type SummaryHistoryEntry } from '@/services/ai/mistralService'
 import { X, Loader2, Sparkles, FileText, List, AlignLeft, Copy, CheckCircle2, FilePlus, History, XCircle } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+
+import { aiService, type SummaryHistoryEntry } from '@/services/ai/mistralService'
 
 interface AISummaryModalProps {
   content: string
@@ -50,7 +51,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
       setError('')
       setProgress(0)
       
-      const result = await aiService.summarize(content, summaryType, (p) => setProgress(p))
+      const result = await aiService.summarize(content, summaryType, (p) => { setProgress(p); })
       setSummary(result)
       
       // Sauvegarder dans l'historique
@@ -90,7 +91,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
     if (summary) {
       await navigator.clipboard.writeText(summary)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setTimeout(() => { setCopied(false); }, 2000)
     }
   }
 
@@ -116,10 +117,10 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
     const diffHours = Math.floor(diffMs / 3600000)
     const diffDays = Math.floor(diffMs / 86400000)
 
-    if (diffMins < 1) return 'À l\'instant'
-    if (diffMins < 60) return `Il y a ${diffMins} min`
-    if (diffHours < 24) return `Il y a ${diffHours}h`
-    if (diffDays < 7) return `Il y a ${diffDays}j`
+    if (diffMins < 1) {return 'À l\'instant'}
+    if (diffMins < 60) {return `Il y a ${diffMins} min`}
+    if (diffHours < 24) {return `Il y a ${diffHours}h`}
+    if (diffDays < 7) {return `Il y a ${diffDays}j`}
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   }
 
@@ -157,7 +158,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
         {/* Tabs */}
         <div className="flex border-b border-neutral-200 dark:border-neutral-700">
           <button
-            onClick={() => setActiveTab('generate')}
+            onClick={() => { setActiveTab('generate'); }}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
               activeTab === 'generate'
                 ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-500'
@@ -168,7 +169,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
             <span className="hidden sm:inline">Générer</span>
           </button>
           <button
-            onClick={() => setActiveTab('history')}
+            onClick={() => { setActiveTab('history'); }}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
               activeTab === 'history'
                 ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-500'
@@ -198,7 +199,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
                   {(Object.keys(summaryTypeLabels) as SummaryType[]).map((type) => (
                     <button
                       key={type}
-                      onClick={() => setSummaryType(type)}
+                      onClick={() => { setSummaryType(type); }}
                       disabled={loading}
                       className={`flex flex-col items-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-lg border-2 transition-all ${
                         summaryType === type
@@ -252,7 +253,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
                           name="applyMode"
                           value={mode}
                           checked={applyMode === mode}
-                          onChange={(e) => setApplyMode(e.target.value as ApplyMode)}
+                          onChange={(e) => { setApplyMode(e.target.value as ApplyMode); }}
                           className="text-primary-500"
                         />
                         <span className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300">
@@ -321,7 +322,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
                           </div>
                         </div>
                         <button
-                          onClick={() => handleApplyHistoryItem(item)}
+                          onClick={() => { handleApplyHistoryItem(item); }}
                           className="px-2 py-1 text-xs bg-primary-500 text-white hover:bg-primary-600 rounded transition-colors opacity-0 group-hover:opacity-100"
                         >
                           Utiliser

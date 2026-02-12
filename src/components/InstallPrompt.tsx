@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState, useEffect } from 'react'
 import { Download, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -59,7 +59,7 @@ export default function InstallPrompt() {
   }, [])
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {return}
 
     // Afficher le prompt d'installation natif
     deferredPrompt.prompt()

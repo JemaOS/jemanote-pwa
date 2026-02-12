@@ -6,8 +6,9 @@
  * Utilise l'analyse de mots-clés et l'IA Mistral pour suggérer des connexions pertinentes
  */
 
-import { aiService } from './ai/mistralService'
 import type { Note } from '@/types'
+
+import { aiService } from './ai/mistralService'
 
 export interface LinkSuggestion {
   targetNoteId: string
@@ -57,7 +58,7 @@ class LinkDetectionService {
    * Calculer la similarité entre deux ensembles de mots-clés
    */
   private calculateSimilarity(keywords1: string[], keywords2: string[]): number {
-    if (keywords1.length === 0 || keywords2.length === 0) return 0
+    if (keywords1.length === 0 || keywords2.length === 0) {return 0}
 
     const set1 = new Set(keywords1)
     const set2 = new Set(keywords2)
@@ -86,10 +87,10 @@ class LinkDetectionService {
     // Analyser chaque note
     for (const note of allNotes) {
       // Ignorer la note courante
-      if (note.id === currentNote.id) continue
+      if (note.id === currentNote.id) {continue}
 
       // Ignorer les notes vides ou trop courtes
-      if (!note.content || note.content.length < 50) continue
+      if (!note.content || note.content.length < 50) {continue}
 
       const noteKeywords = this.extractKeywords(note.content)
       const similarity = this.calculateSimilarity(currentKeywords, noteKeywords)
@@ -159,7 +160,7 @@ Format de réponse:
             suggestions.push({
               targetNoteId: targetNote.id,
               targetNoteTitle: targetNote.title,
-              reason: reason,
+              reason,
               confidence: 85, // Confiance IA élevée
               keywords: [],
             })

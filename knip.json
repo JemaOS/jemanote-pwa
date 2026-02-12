@@ -1,0 +1,49 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/main.tsx",
+    "src/App.tsx"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ],
+  "ignore": [
+    "**/*.test.{ts,tsx}",
+    "**/*.spec.{ts,tsx}",
+    "tests/**/*",
+    "**/__mocks__/**/*",
+    "src/vite-env.d.ts",
+    "src/**/*.d.ts"
+  ],
+  "ignoreDependencies": [
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
+    "@types/react-router-dom",
+    "autoprefixer",
+    "postcss",
+    "tailwindcss",
+    "vite-plugin-pwa",
+    "vite-plugin-source-identifier",
+    "@vitest/coverage-v8",
+    "jsdom",
+    "msw",
+    "@playwright/test"
+  ],
+  "ignoreBinaries": [
+    "playwright"
+  ],
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "optionalPeerDependencies": "warn",
+    "unlisted": "error",
+    "exports": "error",
+    "types": "error",
+    "nsTypes": "error",
+    "enumMembers": "warn",
+    "classMembers": "warn",
+    "duplicates": "warn"
+  }
+}

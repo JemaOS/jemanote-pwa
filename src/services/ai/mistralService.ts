@@ -125,7 +125,7 @@ class MistralAIService {
   private async getFromCache(cacheKey: string): Promise<string | null> {
     try {
       const entry = await aiCache.getItem<CacheEntry>(cacheKey)
-      if (!entry) return null
+      if (!entry) {return null}
 
       const now = Date.now()
       if (now - entry.timestamp > entry.expiresIn) {
@@ -159,7 +159,7 @@ class MistralAIService {
         const entries: Array<[string, CacheEntry]> = []
         for (const key of keys) {
           const entry = await aiCache.getItem<CacheEntry>(key)
-          if (entry) entries.push([key, entry])
+          if (entry) {entries.push([key, entry])}
         }
         
         // Trier par timestamp (les plus récents en premier)
@@ -461,7 +461,7 @@ class MistralAIService {
         const entries: Array<[string, SummaryHistoryEntry]> = []
         for (const key of keys) {
           const item = await summaryHistory.getItem<SummaryHistoryEntry>(key)
-          if (item) entries.push([key, item])
+          if (item) {entries.push([key, item])}
         }
         
         entries.sort((a, b) => b[1].timestamp - a[1].timestamp)
@@ -486,7 +486,7 @@ class MistralAIService {
       
       for (const key of keys) {
         const entry = await summaryHistory.getItem<SummaryHistoryEntry>(key)
-        if (entry) entries.push(entry)
+        if (entry) {entries.push(entry)}
       }
       
       entries.sort((a, b) => b.timestamp - a.timestamp)

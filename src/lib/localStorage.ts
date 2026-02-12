@@ -2,6 +2,7 @@
 // Distributed under the license specified in the root directory of this project.
 
 import localforage from 'localforage'
+
 import { Note, Folder, Tag, Link, Attachment } from '@/types'
 
 // Configure localforage for better performance
@@ -274,7 +275,7 @@ export class LocalStorage {
       
       // Get the note to find user_id
       const note = notes.find((n) => n.id === noteId)
-      if (!note) return
+      if (!note) {return}
       
       // Remove old links from this note
       const filteredLinks = links.filter((l) => l.source_note_id !== noteId)
@@ -316,7 +317,10 @@ export class LocalStorage {
 
   static async saveSettings(settings: any): Promise<void> {
     try {
-      await localforage.setItem(STORES.SETTINGS, settings)
+      // Merge with existing settings
+      const existing = await this.getSettings()
+      const merged = { ...existing, ...settings }
+      await localforage.setItem(STORES.SETTINGS, merged)
     } catch (error) {
       console.error('Error saving settings:', error)
       throw error
@@ -405,6 +409,13 @@ export class LocalStorage {
   static async clearAll(): Promise<void> {
     try {
       await localforage.clear()
+      // Also clear sync localStorage
+      try {
+        localStorage.removeItem(SYNC_KEYS.NOTES)
+        localStorage.removeItem(SYNC_KEYS.PENDING_WRITES)
+      } catch (e) {
+        // Ignore localStorage errors
+      }
     } catch (error) {
       console.error('Error clearing storage:', error)
       throw error

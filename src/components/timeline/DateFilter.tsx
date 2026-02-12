@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React from 'react'
-import { DayPicker } from 'react-day-picker'
 import * as Popover from '@radix-ui/react-popover'
-import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import React from 'react'
+import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 
 interface DateFilterProps {

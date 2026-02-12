@@ -2,20 +2,21 @@
 // Distributed under the license specified in the root directory of this project.
 
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/useAuth'
-import { useLocalNotes } from '@/hooks/useLocalNotes'
-import { ViewMode } from '@/types'
+
+import AuthModal from '@/components/auth/AuthModal'
+import CanvasView from '@/components/canvas/CanvasView'
+import CommandPalette from '@/components/command/CommandPalette'
+import InstallPrompt from '@/components/InstallPrompt'
 import Navigation from '@/components/layout/Navigation'
 import Sidebar from '@/components/layout/Sidebar'
 import StatusBar from '@/components/layout/StatusBar'
-import WorkspaceView from '@/components/workspace/WorkspaceView'
 import SearchView from '@/components/search/SearchView'
 import SettingsView from '@/components/settings/SettingsView'
-import CanvasView from '@/components/canvas/CanvasView'
-import AuthModal from '@/components/auth/AuthModal'
-import CommandPalette from '@/components/command/CommandPalette'
-import InstallPrompt from '@/components/InstallPrompt'
 import TimelineView from '@/components/timeline/TimelineView'
+import WorkspaceView from '@/components/workspace/WorkspaceView'
+import { useAuth } from '@/hooks/useAuth'
+import { useLocalNotes } from '@/hooks/useLocalNotes'
+import { ViewMode } from '@/types'
 
 function App() {
   const { user, loading, signOut } = useAuth()
@@ -75,7 +76,7 @@ function App() {
     window.addEventListener('resize', handleResize)
     // Initial check
     handleResize()
-    return () => window.removeEventListener('resize', handleResize)
+    return () => { window.removeEventListener('resize', handleResize); }
   }, [leftSidebarOpen, hasUserToggledSidebar])
 
   // Keyboard shortcuts
@@ -94,14 +95,14 @@ function App() {
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => { window.removeEventListener('keydown', handleKeyDown); }
   }, [])
 
   // Manual sync function - just toggle sync to trigger a refresh
   const handleManualSync = () => {
     if (user?.id && syncEnabled) {
       disableSync()
-      setTimeout(() => enableSync(), 100)
+      setTimeout(() => { enableSync(); }, 100)
     }
   }
 
@@ -135,7 +136,7 @@ function App() {
       case 'workspace':
         return (
           <WorkspaceView
-            userId={user?.id}
+            userId={user?.id ?? null}
             activeNoteId={activeNoteId}
             onNoteChange={setActiveNoteId}
             rightSidebarOpen={rightSidebarOpen}
@@ -147,7 +148,7 @@ function App() {
       case 'search':
         return (
           <SearchView
-            userId={user?.id}
+            userId={user?.id ?? null}
             notes={notes}
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
@@ -159,11 +160,11 @@ function App() {
           />
         )
       case 'settings':
-        return <SettingsView userId={user?.id} />
+        return <SettingsView userId={user?.id ?? null} />
       case 'canvas':
         return (
           <CanvasView 
-            userId={user?.id} 
+            userId={user?.id ?? null} 
             notes={notes} 
             onOpenNote={(noteId) => {
               setActiveNoteId(noteId)
@@ -186,7 +187,7 @@ function App() {
       default:
         return (
           <WorkspaceView
-            userId={user?.id}
+            userId={user?.id ?? null}
             activeNoteId={activeNoteId}
             onNoteChange={setActiveNoteId}
             rightSidebarOpen={rightSidebarOpen}
@@ -207,11 +208,11 @@ function App() {
           setLeftSidebarOpen(!leftSidebarOpen)
           setHasUserToggledSidebar(true)
         }}
-        onToggleRightSidebar={() => setRightSidebarOpen(!rightSidebarOpen)}
+        onToggleRightSidebar={() => { setRightSidebarOpen(!rightSidebarOpen); }}
         leftSidebarOpen={leftSidebarOpen}
         rightSidebarOpen={rightSidebarOpen}
         user={user}
-        onShowAuth={() => setShowAuthModal(true)}
+        onShowAuth={() => { setShowAuthModal(true); }}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
       />
@@ -221,21 +222,21 @@ function App() {
         {isMobile && leftSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 laptop-sm:hidden"
-            onClick={() => setLeftSidebarOpen(false)}
+            onClick={() => { setLeftSidebarOpen(false); }}
           />
         )}
 
         {/* Left Sidebar */}
         {leftSidebarOpen && (
-          <div className={`${isMobile ? 'fixed left-0 top-[48px] xs:top-[52px] sm:top-[56px] md:top-[60px] bottom-0 z-40 w-[85vw] max-w-[280px] xs:max-w-[300px] sm:max-w-[320px] md:max-w-[340px] animate-slide-in-right shadow-2xl' : 'relative w-[260px] sm:w-[280px] md:w-[300px] laptop-sm:w-[320px] laptop:w-[360px] laptop-lg:w-[400px]'}`}>
+          <div className={isMobile ? 'fixed left-0 top-[48px] xs:top-[52px] sm:top-[56px] md:top-[60px] bottom-0 z-40 w-[85vw] max-w-[280px] xs:max-w-[300px] sm:max-w-[320px] md:max-w-[340px] animate-slide-in-right shadow-2xl' : 'relative w-[260px] sm:w-[280px] md:w-[300px] laptop-sm:w-[320px] laptop:w-[360px] laptop-lg:w-[400px]'}>
             <Sidebar
               side="left"
-              userId={user?.id}
+              userId={user?.id ?? null}
               activeNoteId={activeNoteId}
               onNoteSelect={(noteId) => {
                 setActiveNoteId(noteId)
                 setCurrentView('workspace')
-                if (isMobile) setLeftSidebarOpen(false)
+                if (isMobile) {setLeftSidebarOpen(false)}
               }}
               notes={notes}
               folders={folders}
@@ -258,28 +259,28 @@ function App() {
 
         {currentView === 'workspace' && rightSidebarOpen && (
           <div className="hidden laptop-sm:block">
-            <Sidebar side="right" userId={user?.id} activeNoteId={activeNoteId} />
+            <Sidebar side="right" userId={user?.id ?? null} activeNoteId={activeNoteId} />
           </div>
         )}
       </div>
 
       <StatusBar 
-        userId={user?.id} 
+        userId={user?.id ?? null} 
         activeNoteId={activeNoteId}
         syncing={syncing}
         syncEnabled={syncEnabled}
-        onShowAuth={() => setShowAuthModal(true)}
+        onShowAuth={() => { setShowAuthModal(true); }}
         onEnableSync={enableSync}
         onManualSync={handleManualSync}
       />
 
       {showAuthModal && (
-        <AuthModal onClose={() => setShowAuthModal(false)} />
+        <AuthModal onClose={() => { setShowAuthModal(false); }} />
       )}
 
       <CommandPalette
         open={showCommandPalette}
-        onClose={() => setShowCommandPalette(false)}
+        onClose={() => { setShowCommandPalette(false); }}
         notes={notes}
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -288,7 +289,7 @@ function App() {
           setCurrentView('workspace')
         }}
         onCreateNote={handleCreateNote}
-        onShowAuth={() => setShowAuthModal(true)}
+        onShowAuth={() => { setShowAuthModal(true); }}
         user={user}
         onSignOut={signOut}
       />

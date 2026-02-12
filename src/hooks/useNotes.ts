@@ -1,10 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+import localforage from 'localforage'
 import { useState, useEffect } from 'react'
+
 import { supabase } from '@/lib/supabase'
 import { Note } from '@/types'
-import localforage from 'localforage'
 
 const NOTES_STORAGE_KEY = 'obsidian_pwa_notes'
 
@@ -44,7 +45,7 @@ export function useNotes(userId?: string) {
           .eq('user_id', userId)
           .order('updated_at', { ascending: false })
 
-        if (error) throw error
+        if (error) {throw error}
 
         setNotes(data || [])
         // Cache to local storage
@@ -90,7 +91,7 @@ export function useNotes(userId?: string) {
   }, [userId])
 
   const createNote = async (title: string, content: string = '', folderId?: string) => {
-    if (!userId) return { data: null, error: new Error('User not authenticated') }
+    if (!userId) {return { data: null, error: new Error('User not authenticated') }}
 
     try {
       const { data, error } = await supabase
@@ -104,7 +105,7 @@ export function useNotes(userId?: string) {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {throw error}
       return { data, error: null }
     } catch (err) {
       return { data: null, error: err as Error }
@@ -120,7 +121,7 @@ export function useNotes(userId?: string) {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {throw error}
       return { data, error: null }
     } catch (err) {
       return { data: null, error: err as Error }
@@ -131,7 +132,7 @@ export function useNotes(userId?: string) {
     try {
       const { error } = await supabase.from('notes').delete().eq('id', noteId)
 
-      if (error) throw error
+      if (error) {throw error}
       return { error: null }
     } catch (err) {
       return { error: err as Error }

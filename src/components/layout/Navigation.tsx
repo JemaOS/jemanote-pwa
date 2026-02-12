@@ -1,10 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState } from 'react'
-import { ViewMode } from '@/types'
 import { User } from '@supabase/supabase-js'
-import { useAuth } from '@/hooks/useAuth'
 import {
   Search,
   SidebarOpen,
@@ -21,6 +18,11 @@ import {
   X,
   History,
 } from 'lucide-react'
+import { useState } from 'react'
+
+import { useAuth } from '@/hooks/useAuth'
+import { ViewMode } from '@/types'
+
 
 interface NavigationProps {
   currentView: ViewMode
@@ -92,7 +94,7 @@ export default function Navigation({
         </button>
 
         <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={() => { setMobileMenuOpen(!mobileMenuOpen); }}
           className="p-1.5 xs:p-2 sm:p-2 md:p-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors min-w-[40px] min-h-[40px] xs:min-w-[44px] xs:min-h-[44px] flex items-center justify-center"
           title="Menu"
         >
@@ -145,7 +147,7 @@ export default function Navigation({
 
         <div className="flex items-center gap-1 laptop:gap-1.5 laptop-lg:gap-2">
           <button
-            onClick={() => onViewChange('workspace')}
+            onClick={() => { onViewChange('workspace'); }}
             className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
               currentView === 'workspace'
                 ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -157,7 +159,7 @@ export default function Navigation({
           </button>
 
           <button
-            onClick={() => onViewChange('canvas')}
+            onClick={() => { onViewChange('canvas'); }}
             className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
               currentView === 'canvas'
                 ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -169,7 +171,7 @@ export default function Navigation({
           </button>
 
           <button
-            onClick={() => onViewChange('timeline')}
+            onClick={() => { onViewChange('timeline'); }}
             className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
               currentView === 'timeline'
                 ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -181,7 +183,7 @@ export default function Navigation({
           </button>
 
           <button
-            onClick={() => onViewChange('settings')}
+            onClick={() => { onViewChange('settings'); }}
             className={`p-2 laptop:p-2.5 rounded-md transition-colors ${
               currentView === 'settings'
                 ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -232,7 +234,7 @@ export default function Navigation({
         <div className="laptop-sm:hidden absolute top-full left-0 right-0 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 shadow-lg z-50 animate-slide-up">
           <div className="p-2 xs:p-2.5 sm:p-3 md:p-4 space-y-1.5 xs:space-y-2">
             <button
-              onClick={() => handleViewChange('workspace')}
+              onClick={() => { handleViewChange('workspace'); }}
               className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
                 currentView === 'workspace'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -244,7 +246,7 @@ export default function Navigation({
             </button>
 
             <button
-              onClick={() => handleViewChange('canvas')}
+              onClick={() => { handleViewChange('canvas'); }}
               className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
                 currentView === 'canvas'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -256,7 +258,7 @@ export default function Navigation({
             </button>
 
             <button
-              onClick={() => handleViewChange('timeline')}
+              onClick={() => { handleViewChange('timeline'); }}
               className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
                 currentView === 'timeline'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'
@@ -268,7 +270,7 @@ export default function Navigation({
             </button>
 
             <button
-              onClick={() => handleViewChange('settings')}
+              onClick={() => { handleViewChange('settings'); }}
               className={`w-full flex items-center gap-2 xs:gap-2.5 sm:gap-3 px-3 xs:px-3.5 sm:px-4 py-2.5 xs:py-2.75 sm:py-3 rounded-md transition-colors min-h-[44px] text-sm xs:text-base ${
                 currentView === 'settings'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-500'

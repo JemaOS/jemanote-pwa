@@ -1,9 +1,10 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
 import { Mail, Lock, User } from 'lucide-react'
+import { useState } from 'react'
+
+import { useAuth } from '@/hooks/useAuth'
 
 export default function AuthView() {
   const { signIn, signUp } = useAuth()
@@ -48,7 +49,7 @@ export default function AuthView() {
         <div className="bg-surface-bg dark:bg-neutral-800 rounded-lg shadow-card p-8">
           <div className="mb-6 flex gap-2">
             <button
-              onClick={() => setIsLogin(true)}
+              onClick={() => { setIsLogin(true); }}
               className={`flex-1 py-2 px-4 rounded-md font-semibold transition-colors ${
                 isLogin
                   ? 'bg-primary-500 text-white'
@@ -58,7 +59,7 @@ export default function AuthView() {
               Connexion
             </button>
             <button
-              onClick={() => setIsLogin(false)}
+              onClick={() => { setIsLogin(false); }}
               className={`flex-1 py-2 px-4 rounded-md font-semibold transition-colors ${
                 !isLogin
                   ? 'bg-primary-500 text-white'
@@ -79,7 +80,7 @@ export default function AuthView() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); }}
                   required
                   className="w-full h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-md text-body focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
                   placeholder="votre@email.com"
@@ -96,7 +97,7 @@ export default function AuthView() {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); }}
                   required
                   minLength={6}
                   className="w-full h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-md text-body focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-neutral-500 dark:placeholder:text-neutral-400"

@@ -1,21 +1,22 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useRef, useEffect, useState } from 'react'
-import { EditorView, keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor, rectangularSelection, crosshairCursor, lineNumbers, highlightActiveLineGutter } from '@codemirror/view'
-import { EditorState, Compartment } from '@codemirror/state'
-import { defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching, foldGutter, foldKeymap } from '@codemirror/language'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete'
-import { lintKeymap } from '@codemirror/lint'
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
+import { defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching, foldGutter, foldKeymap } from '@codemirror/language'
+import { lintKeymap } from '@codemirror/lint'
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
+import { EditorState, Compartment } from '@codemirror/state'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { wikiLinksPlugin } from '@/lib/wikiLinks'
-import { audioWidgetPlugin } from '@/lib/audioWidgetExtension'
-import { aiContextMenuExtension } from '@/lib/aiContextMenu'
+import { EditorView, keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor, rectangularSelection, crosshairCursor, lineNumbers, highlightActiveLineGutter } from '@codemirror/view'
+import React, { useRef, useEffect, useState } from 'react'
+
 import AIContextMenu from '@/components/ai/AIContextMenu'
 import { useTheme } from '@/contexts/ThemeContext'
+import { aiContextMenuExtension } from '@/lib/aiContextMenu'
+import { audioWidgetPlugin } from '@/lib/audioWidgetExtension'
+import { wikiLinksPlugin } from '@/lib/wikiLinks'
 
 interface MarkdownEditorProps {
   value: string
@@ -31,7 +32,7 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; selectedText: string } | null>(null)
 
   useEffect(() => {
-    if (!editorRef.current) return
+    if (!editorRef.current) {return}
 
     const startState = EditorState.create({
       doc: value,
@@ -168,7 +169,7 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
 
   // Fonction pour insérer ou remplacer du texte dans l'éditeur
   const handleInsertText = (text: string) => {
-    if (!viewRef.current) return
+    if (!viewRef.current) {return}
 
     const view = viewRef.current
     const selection = view.state.selection.main
@@ -198,7 +199,7 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         <AIContextMenu
           position={{ x: contextMenu.x, y: contextMenu.y }}
           selectedText={contextMenu.selectedText}
-          onClose={() => setContextMenu(null)}
+          onClose={() => { setContextMenu(null); }}
           onInsert={handleInsertText}
         />
       )}

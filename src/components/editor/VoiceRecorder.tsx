@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-﻿import { useState, useEffect, useRef } from 'react'
-import { Square, Play, Pause, Check } from 'lucide-react'
+﻿import { Square, Play, Pause, Check } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 
 interface VoiceRecorderProps {
   onTranscriptChange: (transcript: string) => void
@@ -41,7 +41,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
       if (recognitionRef.current) {
         try { recognitionRef.current.stop() } catch (e) {}
       }
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      if (mediaRecorderRef.current?.state === 'recording') {
         try { mediaRecorderRef.current.stop() } catch (e) {}
       }
       if (timerRef.current) {
@@ -78,7 +78,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcriptPart = event.results[i][0].transcript
         if (event.results[i].isFinal) {
-          finalText += transcriptPart + ' '
+          finalText += `${transcriptPart  } `
         } else {
           interimText += transcriptPart
         }
@@ -101,7 +101,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     }
 
     recognition.onend = () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      if (mediaRecorderRef.current?.state === 'recording') {
         try { recognition.start() } catch (e) {}
       }
     }
@@ -170,7 +170,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
         console.log('Taille totale:', audioChunksRef.current.reduce((sum, chunk) => sum + chunk.size, 0), 'bytes')
         
         // Essayer différents types MIME pour compatibilité
-        let mimeType = mediaRecorder.mimeType || 'audio/webm'
+        const mimeType = mediaRecorder.mimeType || 'audio/webm'
         
         const blob = new Blob(audioChunksRef.current, { type: mimeType })
         console.log('Audio blob créé:', blob.size, 'bytes, type:', mimeType)
@@ -225,13 +225,13 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   }
 
   const visualizeRecording = () => {
-    if (!analyserRef.current) return
+    if (!analyserRef.current) {return}
 
     const bufferLength = analyserRef.current.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
     const draw = () => {
-      if (!isRecording) return
+      if (!isRecording) {return}
 
       analyserRef.current!.getByteFrequencyData(dataArray)
       
@@ -286,7 +286,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     if (recognitionRef.current) {
       try { recognitionRef.current.stop() } catch (e) {}
     }
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+    if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop()
     }
     if (timerRef.current) {
@@ -303,7 +303,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   }
 
   const playAudio = () => {
-    if (!audioBlob) return
+    if (!audioBlob) {return}
 
     // Si l'audio existe déjà, juste le reprendre
     if (audioRef.current) {
@@ -320,7 +320,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     const audio = new Audio(url)
     audioRef.current = audio
 
-    audio.ontimeupdate = () => setAudioCurrentTime(audio.currentTime)
+    audio.ontimeupdate = () => { setAudioCurrentTime(audio.currentTime); }
     audio.onloadedmetadata = () => {
       setAudioDuration(audio.duration)
     }
@@ -331,11 +331,11 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     audio.onended = () => {
       setIsPlayingAudio(false)
       setAudioCurrentTime(0)
-      if (playbackAnimationFrameRef.current) cancelAnimationFrame(playbackAnimationFrameRef.current)
+      if (playbackAnimationFrameRef.current) {cancelAnimationFrame(playbackAnimationFrameRef.current)}
     }
     audio.onpause = () => {
       setIsPlayingAudio(false)
-      if (playbackAnimationFrameRef.current) cancelAnimationFrame(playbackAnimationFrameRef.current)
+      if (playbackAnimationFrameRef.current) {cancelAnimationFrame(playbackAnimationFrameRef.current)}
     }
 
     audio.play().catch(err => {
@@ -346,12 +346,12 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   const pauseAudio = () => {
     if (audioRef.current) {
       audioRef.current.pause()
-      if (playbackAnimationFrameRef.current) cancelAnimationFrame(playbackAnimationFrameRef.current)
+      if (playbackAnimationFrameRef.current) {cancelAnimationFrame(playbackAnimationFrameRef.current)}
     }
   }
 
   const handleWaveformClick = (index: number) => {
-    if (!audioBlob || waveformData.length === 0) return
+    if (!audioBlob || waveformData.length === 0) {return}
     
     // Initialiser l'audio s'il n'existe pas encore
     if (!audioRef.current) {
@@ -359,7 +359,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
       const audio = new Audio(url)
       audioRef.current = audio
 
-      audio.ontimeupdate = () => setAudioCurrentTime(audio.currentTime)
+      audio.ontimeupdate = () => { setAudioCurrentTime(audio.currentTime); }
       audio.onloadedmetadata = () => {
         if (audio.duration && Number.isFinite(audio.duration)) {
           setAudioDuration(audio.duration)
@@ -372,11 +372,11 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
       audio.onended = () => {
         setIsPlayingAudio(false)
         setAudioCurrentTime(0)
-        if (playbackAnimationFrameRef.current) cancelAnimationFrame(playbackAnimationFrameRef.current)
+        if (playbackAnimationFrameRef.current) {cancelAnimationFrame(playbackAnimationFrameRef.current)}
       }
       audio.onpause = () => {
         setIsPlayingAudio(false)
-        if (playbackAnimationFrameRef.current) cancelAnimationFrame(playbackAnimationFrameRef.current)
+        if (playbackAnimationFrameRef.current) {cancelAnimationFrame(playbackAnimationFrameRef.current)}
       }
     }
     
@@ -504,7 +504,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             onMouseDown={(e) => {
               e.preventDefault()
               const container = waveformContainerRef.current
-              if (!container) return
+              if (!container) {return}
               
               const handleMove = (moveEvent: MouseEvent) => {
                 moveEvent.preventDefault()
@@ -533,7 +533,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             onTouchStart={(e) => {
               e.preventDefault()
               const container = waveformContainerRef.current
-              if (!container) return
+              if (!container) {return}
               
               const handleMove = (moveEvent: TouchEvent) => {
                 moveEvent.preventDefault()
@@ -613,7 +613,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
 
             {onSave && (
               <button
-                onClick={() => onSave(audioBlob, audioDuration)}
+                onClick={() => { onSave(audioBlob, audioDuration); }}
                 className="w-full py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
               >
                 <Check className="w-4 h-4" />

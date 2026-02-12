@@ -1,15 +1,16 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+import mermaid from 'mermaid'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
-import mermaid from 'mermaid'
-import { LocalStorage } from '@/lib/localStorage'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+
 import WaveformPlayer from '@/components/ui/WaveformPlayer'
+import { LocalStorage } from '@/lib/localStorage'
 import 'katex/dist/katex.min.css'
 
 interface MarkdownPreviewProps {
@@ -35,7 +36,7 @@ const AudioPlayer = ({ attachmentId }: { attachmentId: string }) => {
     loadAudio()
   }, [attachmentId])
 
-  if (!blob) return <div className="text-xs text-gray-500 italic my-2">Chargement du mémo vocal...</div>
+  if (!blob) {return <div className="text-xs text-gray-500 italic my-2">Chargement du mémo vocal...</div>}
 
   return <WaveformPlayer blob={blob} />
 }
@@ -53,11 +54,11 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
 
   // Rendu des diagrammes Mermaid après le rendu du Markdown
   useEffect(() => {
-    if (!previewRef.current) return
+    if (!previewRef.current) {return}
 
     const renderMermaid = async () => {
       const mermaidElements = previewRef.current?.querySelectorAll('.language-mermaid')
-      if (!mermaidElements || mermaidElements.length === 0) return
+      if (!mermaidElements || mermaidElements.length === 0) {return}
 
       // Nettoyer les anciens SVG
       mermaidElements.forEach((element) => {
@@ -98,7 +99,7 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
 
   // Gérer les clics sur les wiki links
   useEffect(() => {
-    if (!previewRef.current || !onWikiLinkClick) return
+    if (!previewRef.current || !onWikiLinkClick) {return}
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement

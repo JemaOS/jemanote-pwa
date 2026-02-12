@@ -2,10 +2,11 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { useState, useEffect } from 'react'
+
 import { LocalStorage } from '@/lib/localStorage'
 import { supabase } from '@/lib/supabase'
-import { Note, Folder } from '@/types'
 import { extractWikiLinks } from '@/lib/wikiLinks'
+import { Note, Folder } from '@/types'
 
 export function useLocalNotes(userId?: string | null) {
   const [notes, setNotes] = useState<Note[]>([])
@@ -37,7 +38,7 @@ export function useLocalNotes(userId?: string | null) {
 
   // Sync with Supabase if user is logged in
   useEffect(() => {
-    if (!userId || !syncEnabled) return
+    if (!userId || !syncEnabled) {return}
 
     const syncWithCloud = async () => {
       try {
@@ -49,7 +50,15 @@ export function useLocalNotes(userId?: string | null) {
           .select('*')
           .eq('user_id', userId)
 
-        if (error) throw error
+        if (error) {throw error}
+
+        // Get cloud folders
+        const { data: cloudFolders, error: foldersError } = await supabase
+          .from('folders')
+          .select('*')
+          .eq('user_id', userId)
+
+        if (foldersError) {throw foldersError}
 
         // Merge local and cloud notes (cloud takes precedence for conflicts)
         const localNotes = await LocalStorage.getNotes()
@@ -73,6 +82,29 @@ export function useLocalNotes(userId?: string | null) {
             user_id: userId,
           })
         }
+
+        // Merge local and cloud folders (cloud takes precedence for conflicts)
+        const localFolders = await LocalStorage.getFolders()
+        const mergedFolders = mergeFolders(localFolders, cloudFolders || [], userId)
+        
+        setFolders(mergedFolders)
+        
+        // Save all merged folders to local storage
+        for (const folder of mergedFolders) {
+          await LocalStorage.saveFolder(folder)
+        }
+        
+        // Upload local folders that don't exist in cloud
+        const localOnlyFolders = localFolders.filter(
+          (lf) => !cloudFolders?.some((cf) => cf.id === lf.id)
+        )
+        
+        for (const folder of localOnlyFolders) {
+          await supabase.from('folders').insert({
+            ...folder,
+            user_id: userId,
+          })
+        }
       } catch (error) {
         console.error('Sync error:', error)
       } finally {
@@ -82,8 +114,8 @@ export function useLocalNotes(userId?: string | null) {
 
     syncWithCloud()
 
-    // Subscribe to realtime changes
-    const channel = supabase
+    // Subscribe to realtime changes for notes
+    const notesChannel = supabase
       .channel('notes_changes')
       .on(
         'postgres_changes',
@@ -113,8 +145,40 @@ export function useLocalNotes(userId?: string | null) {
       )
       .subscribe()
 
+    // Subscribe to realtime changes for folders
+    const foldersChannel = supabase
+      .channel('folders_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'folders',
+          filter: `user_id=eq.${userId}`,
+        },
+        async (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newFolder = payload.new as Folder
+            setFolders((prev) => [newFolder, ...prev])
+            await LocalStorage.saveFolder(newFolder)
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedFolder = payload.new as Folder
+            setFolders((prev) =>
+              prev.map((folder) => (folder.id === updatedFolder.id ? updatedFolder : folder))
+            )
+            await LocalStorage.saveFolder(updatedFolder)
+          } else if (payload.eventType === 'DELETE') {
+            const deletedId = payload.old.id
+            setFolders((prev) => prev.filter((folder) => folder.id !== deletedId))
+            await LocalStorage.deleteFolder(deletedId)
+          }
+        }
+      )
+      .subscribe()
+
     return () => {
-      channel.unsubscribe()
+      notesChannel.unsubscribe()
+      foldersChannel.unsubscribe()
     }
   }, [userId, syncEnabled])
 
@@ -179,7 +243,7 @@ export function useLocalNotes(userId?: string | null) {
     // Fire-and-forget: sync to cloud if user is logged in
     if (userId && syncEnabled) {
       supabase.from('notes').update(updates).eq('id', noteId).then(({ error }) => {
-        if (error) console.error('Error syncing note to cloud:', error)
+        if (error) {console.error('Error syncing note to cloud:', error)}
       })
     }
 
@@ -189,7 +253,7 @@ export function useLocalNotes(userId?: string | null) {
   const deleteNote = async (noteId: string) => {
     try {
       const note = notes.find((n) => n.id === noteId)
-      if (!note) return { error: new Error('Note not found') }
+      if (!note) {return { error: new Error('Note not found') }}
 
       const updates = { deleted_at: new Date().toISOString() }
       const updatedNote = { ...note, ...updates, updated_at: new Date().toISOString() }
@@ -215,7 +279,7 @@ export function useLocalNotes(userId?: string | null) {
   const restoreNote = async (noteId: string) => {
     try {
       const note = notes.find((n) => n.id === noteId)
-      if (!note) return { error: new Error('Note not found') }
+      if (!note) {return { error: new Error('Note not found') }}
 
       const updates = { deleted_at: null }
       const updatedNote = { ...note, ...updates, updated_at: new Date().toISOString() }
@@ -259,7 +323,7 @@ export function useLocalNotes(userId?: string | null) {
   const deleteFolder = async (folderId: string) => {
     try {
       const folder = folders.find((f) => f.id === folderId)
-      if (!folder) return { error: new Error('Folder not found') }
+      if (!folder) {return { error: new Error('Folder not found') }}
 
       const deletedAt = new Date().toISOString()
       
@@ -297,7 +361,7 @@ export function useLocalNotes(userId?: string | null) {
   const restoreFolder = async (folderId: string) => {
     try {
       const folder = folders.find((f) => f.id === folderId)
-      if (!folder) return { error: new Error('Folder not found') }
+      if (!folder) {return { error: new Error('Folder not found') }}
 
       const updatedAt = new Date().toISOString()
       
@@ -362,8 +426,8 @@ export function useLocalNotes(userId?: string | null) {
     }
   }
 
-  const enableSync = () => setSyncEnabled(true)
-  const disableSync = () => setSyncEnabled(false)
+  const enableSync = () => { setSyncEnabled(true); }
+  const disableSync = () => { setSyncEnabled(false); }
 
   return {
     notes: notes.filter(n => !n.deleted_at),
@@ -399,7 +463,24 @@ function mergeNotes(localNotes: Note[], cloudNotes: Note[], userId: string): Not
     }
   }
 
-  return merged.sort((a, b) => 
+  return merged.sort((a, b) =>
+    new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  )
+}
+
+// Helper function to merge local and cloud folders
+function mergeFolders(localFolders: Folder[], cloudFolders: Folder[], userId: string): Folder[] {
+  const merged = [...cloudFolders]
+  const cloudIds = new Set(cloudFolders.map((f) => f.id))
+
+  // Add local folders that don't exist in cloud
+  for (const localFolder of localFolders) {
+    if (!cloudIds.has(localFolder.id)) {
+      merged.push({ ...localFolder, user_id: userId })
+    }
+  }
+
+  return merged.sort((a, b) =>
     new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
   )
 }

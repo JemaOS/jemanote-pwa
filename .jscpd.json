@@ -1,0 +1,53 @@
+{
+  "threshold": 3,
+  "reporters": ["html", "console", "json"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__mocks__/**",
+    "**/mocks/**",
+    "**/*.stories.tsx",
+    "**/*.stories.ts",
+    "**/*.config.ts",
+    "**/*.config.js",
+    "**/scripts/**",
+    "**/public/**",
+    "**/types/**",
+    "**/*.d.ts",
+    "**/vite-env.d.ts"
+  ],
+  "absolute": false,
+  "gitignore": true,
+  "minLines": 5,
+  "minTokens": 50,
+  "maxLines": 1000,
+  "maxSize": "100kb",
+  "maxFiles": 1000,
+  "skipLocal": false,
+  "blame": true,
+  "cache": true,
+  "format": ["typescript", "javascript", "tsx", "jsx"],
+  "output": "reports/jscpd-report",
+  "mode": "mild",
+  "consoleFull": false,
+  "verbose": false,
+  "debug": false,
+  "silent": false,
+  "store": ".jscpd/store.json",
+  "ignoreCase": false,
+  "ignoreDecorators": false,
+  "formatters": {
+    "html": {
+      "output": "reports/jscpd-report.html"
+    },
+    "json": {
+      "output": "reports/jscpd-report.json"
+    }
+  }
+}

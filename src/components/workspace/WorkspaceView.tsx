@@ -1,15 +1,16 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+import { Eye, Edit3, Columns2, Sparkles, Lightbulb, X, Bot, Mic } from 'lucide-react'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Note, Attachment } from '@/types'
-import { LocalStorage } from '@/lib/localStorage'
+
+import AIPanel from '@/components/ai/AIPanel'
+import AISummaryModal from '@/components/ai/AISummaryModal'
 import MarkdownEditor from '@/components/editor/MarkdownEditor'
 import MarkdownPreview from '@/components/editor/MarkdownPreview'
 import VoiceRecorder from '@/components/editor/VoiceRecorder'
-import AISummaryModal from '@/components/ai/AISummaryModal'
-import AIPanel from '@/components/ai/AIPanel'
-import { Eye, Edit3, Columns2, Sparkles, Lightbulb, X, Bot, Mic } from 'lucide-react'
+import { LocalStorage } from '@/lib/localStorage'
+import { Note, Attachment } from '@/types'
 
 interface WorkspaceViewProps {
   userId?: string | null
@@ -78,7 +79,7 @@ export default function WorkspaceView({
 
   // Fonction de sauvegarde - fire-and-forget pour garder l'UX fluide
   const saveNote = useCallback(async (updates: Partial<Note>) => {
-    if (!activeNoteId) return
+    if (!activeNoteId) {return}
 
     // updateNote() met à jour l'état React de façon SYNCHRONE en interne
     // La persistance localStorage se fait en arrière-plan (fire-and-forget)
@@ -87,7 +88,7 @@ export default function WorkspaceView({
     if (result.error) {
       console.error('Erreur de sauvegarde:', result.error)
       setSaveStatus('error')
-      setTimeout(() => setSaveStatus('unsaved'), 2000)
+      setTimeout(() => { setSaveStatus('unsaved'); }, 2000)
     } else {
       // Mise à jour des dernières valeurs sauvegardées
       if (updates.content !== undefined) {
@@ -105,7 +106,7 @@ export default function WorkspaceView({
   const handleContentChange = (newContent: string) => {
     setContent(newContent)
     
-    if (!activeNoteId) return
+    if (!activeNoteId) {return}
 
     // Sauvegarder IMMÉDIATEMENT pour synchronisation instantanée avec le canvas
     // updateNote() met à jour l'état React de façon synchrone, puis persiste en async
@@ -133,7 +134,7 @@ export default function WorkspaceView({
     const newTitle = e.target.value
     setTitle(newTitle)
     
-    if (!activeNoteId) return
+    if (!activeNoteId) {return}
 
     // Sauvegarder IMMÉDIATEMENT pour synchronisation instantanée avec le canvas
     if (newTitle !== lastSavedTitle.current) {
@@ -216,7 +217,7 @@ export default function WorkspaceView({
 
   // Sauvegarder le mémo vocal
   const handleSaveVoiceMemo = async (blob: Blob, duration: number) => {
-    if (!activeNoteId) return
+    if (!activeNoteId) {return}
 
     try {
       const attachmentId = crypto.randomUUID()
@@ -320,7 +321,7 @@ export default function WorkspaceView({
           <div className="flex items-center gap-1 laptop:gap-1.5 laptop-lg:gap-2 order-3 laptop:order-2 flex-shrink-0">
             {/* Bouton Note Vocale */}
             <button
-              onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+              onClick={() => { setShowVoiceRecorder(!showVoiceRecorder); }}
               className={`flex items-center justify-center gap-1 px-2 laptop:px-2.5 laptop-lg:px-3 py-1.5 laptop:py-2 rounded-lg transition-colors text-xs laptop:text-sm font-medium min-h-touch flex-shrink-0 ${
                 showVoiceRecorder
                   ? 'bg-primary-600 text-white'
@@ -333,7 +334,7 @@ export default function WorkspaceView({
             
             {/* Boutons IA - Compacts */}
             <button
-              onClick={() => setShowAISummary(true)}
+              onClick={() => { setShowAISummary(true); }}
               disabled={!content.trim()}
               className="flex items-center justify-center gap-1 px-2 laptop:px-2.5 laptop-lg:px-3 py-1.5 laptop:py-2 bg-primary-500 text-white hover:bg-primary-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs laptop:text-sm font-medium min-h-touch flex-shrink-0"
               title="Générer un résumé avec l'IA"
@@ -343,7 +344,7 @@ export default function WorkspaceView({
             </button>
             
             <button
-              onClick={() => setShowAIPanel(!showAIPanel)}
+              onClick={() => { setShowAIPanel(!showAIPanel); }}
               className={`flex items-center justify-center gap-1 px-2 laptop:px-2.5 laptop-lg:px-3 py-1.5 laptop:py-2 rounded-lg transition-colors text-xs laptop:text-sm font-medium min-h-touch flex-shrink-0 ${
                 showAIPanel
                   ? 'bg-primary-600 text-white'
@@ -358,7 +359,7 @@ export default function WorkspaceView({
             {/* Boutons de mode de visualisation - Toujours visibles */}
             <div className="flex items-center gap-0.5 laptop-lg:gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 laptop-lg:p-1 flex-shrink-0">
               <button
-                onClick={() => setViewMode('edit')}
+                onClick={() => { setViewMode('edit'); }}
                 className={`p-1.5 laptop:p-2 rounded transition-colors ${
                   viewMode === 'edit'
                     ? 'bg-white dark:bg-neutral-700 text-primary shadow-sm'
@@ -369,7 +370,7 @@ export default function WorkspaceView({
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setViewMode('split')}
+                onClick={() => { setViewMode('split'); }}
                 className={`p-1.5 laptop:p-2 rounded transition-colors ${
                   viewMode === 'split'
                     ? 'bg-white dark:bg-neutral-700 text-primary shadow-sm'
@@ -380,7 +381,7 @@ export default function WorkspaceView({
                 <Columns2 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setViewMode('preview')}
+                onClick={() => { setViewMode('preview'); }}
                 className={`p-1.5 laptop:p-2 rounded transition-colors ${
                   viewMode === 'preview'
                     ? 'bg-white dark:bg-neutral-700 text-primary shadow-sm'
@@ -412,7 +413,7 @@ export default function WorkspaceView({
       <div className="flex-1 overflow-hidden flex">
         {/* Éditeur */}
         {(viewMode === 'edit' || viewMode === 'split') && (
-          <div className={`${viewMode === 'split' ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'}`}>
+          <div className={viewMode === 'split' ? 'w-1/2 border-r border-neutral-200 dark:border-neutral-800' : 'w-full'}>
             <MarkdownEditor 
               value={content} 
               onChange={handleContentChange}
@@ -423,7 +424,7 @@ export default function WorkspaceView({
 
         {/* Prévisualisation */}
         {(viewMode === 'preview' || viewMode === 'split') && (
-          <div className={`${viewMode === 'split' ? 'w-1/2' : 'w-full'}`}>
+          <div className={viewMode === 'split' ? 'w-1/2' : 'w-full'}>
             <MarkdownPreview
               content={content}
               onWikiLinkClick={handleWikiLinkClick}
@@ -438,7 +439,7 @@ export default function WorkspaceView({
           content={content}
           noteId={activeNoteId || undefined}
           noteTitle={title || undefined}
-          onClose={() => setShowAISummary(false)}
+          onClose={() => { setShowAISummary(false); }}
           onApply={handleApplySummary}
           onCreateNote={createNote ? handleCreateNoteFromSummary : undefined}
         />
@@ -449,7 +450,7 @@ export default function WorkspaceView({
         <AIPanel
           currentNote={activeNote}
           notes={notes}
-          onClose={() => setShowAIPanel(false)}
+          onClose={() => { setShowAIPanel(false); }}
           onCreateNote={async (title, content) => {
             if (createNote) {
               await createNote(title, content, activeNote?.folder_id)
@@ -459,7 +460,7 @@ export default function WorkspaceView({
             // Ajouter les tags au contenu de la note
             const note = notes.find(n => n.id === noteId)
             if (note) {
-              const newContent = note.content + '\n\n' + tags.map(t => `#${t}`).join(' ')
+              const newContent = `${note.content  }\n\n${  tags.map(t => `#${t}`).join(' ')}`
               updateNote(noteId, { content: newContent })
             }
           }}

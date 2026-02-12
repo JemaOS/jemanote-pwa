@@ -2,7 +2,9 @@
 // Distributed under the license specified in the root directory of this project.
 
 import path from "path"
+
 import react from "@vitejs/plugin-react"
+import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from "vite"
 import { VitePWA } from 'vite-plugin-pwa'
 import sourceIdentifierPlugin from 'vite-plugin-source-identifier'
@@ -71,6 +73,13 @@ export default defineConfig({
       enabled: !isProd,
       attributePrefix: 'data-matrix',
       includeProps: true,
+    }),
+    // Plugin de visualisation du bundle (activé uniquement avec ANALYZE=true)
+    visualizer({
+      open: process.env.ANALYZE === 'true',
+      filename: 'dist/stats.html',
+      gzipSize: true,
+      brotliSize: true,
     })
   ],
   resolve: {

@@ -1,10 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { useRef, useEffect, useState, useCallback } from 'react'
-import { Note } from '@/types'
 import { ZoomIn, ZoomOut, Maximize2, Plus, Trash2, CheckSquare, Square, X } from 'lucide-react'
+import { useRef, useEffect, useState, useCallback } from 'react'
+
 import { LocalStorage } from '@/lib/localStorage'
+import { Note } from '@/types'
 
 interface CanvasViewProps {
   userId?: string | null
@@ -49,13 +50,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   const lastTouchDistance = useRef<number | null>(null)
   const lastTap = useRef<number>(0)
   const justCreatedIds = useRef<Set<string>>(new Set()) // Track locally created notes to prevent sync race conditions
-
-  // Helper for pinch zoom distance
-  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
-    const dx = touch1.clientX - touch2.clientX
-    const dy = touch1.clientY - touch2.clientY
-    return Math.sqrt(dx * dx + dy * dy)
-  }
 
   // Initialize canvas with some example nodes
   useEffect(() => {
@@ -107,6 +101,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       // AND update content/title for existing notes
       for (let i = nextNodes.length - 1; i >= 0; i--) {
         const node = nextNodes[i]
+        if (!node) {continue}
         if (node.type === 'note') {
           const inNotes = currentNoteIds.has(node.id)
           const isJustCreated = justCreatedIds.current.has(node.id)
@@ -122,8 +117,15 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             if (sourceNote && (node.content !== sourceNote.content || node.title !== sourceNote.title)) {
               nextNodes[i] = {
                 ...node,
+                id: node.id,
+                type: node.type,
+                x: node.x,
+                y: node.y,
+                width: node.width,
+                height: node.height,
                 content: sourceNote.content,
                 title: sourceNote.title,
+                color: node.color ?? '#5a63e9',
               }
               hasChanges = true
             }
@@ -175,7 +177,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   useEffect(() => {
     if (canvasNodes.length > 0) {
       LocalStorage.setItem('canvas-nodes', canvasNodes).catch(err => 
-        console.error('Error saving canvas nodes:', err)
+        { console.error('Error saving canvas nodes:', err); }
       )
     }
   }, [canvasNodes])
@@ -186,6 +188,13 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       setIsDragging(true)
       setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
     }
+  }
+
+  // Helper for pinch zoom distance
+  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
+    const dx = touch1.clientX - touch2.clientX
+    const dy = touch1.clientY - touch2.clientY
+    return Math.sqrt(dx * dx + dy * dy)
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -224,7 +233,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     } else if (e.touches.length === 1) {
       // Pan start
       const touch = e.touches[0]
-      handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY, target: e.target } as any)
+      if (touch) {
+        handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY, target: e.target } as any)
+      }
     }
   }
 
@@ -237,6 +248,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       return
     } else if (e.touches.length === 1) {
       const touch = e.touches[0]
+      if (!touch) {return}
       
       if (!draggedNode) {
         // Pan move
@@ -314,7 +326,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
 
   // Delete selected nodes
   const deleteSelectedNodes = useCallback(async () => {
-    if (selectedNodes.size === 0) return
+    if (selectedNodes.size === 0) {return}
 
     const noteNodes = canvasNodes.filter(n => selectedNodes.has(n.id) && n.type === 'note')
     
@@ -369,7 +381,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
 
   const handleNodeTouchStart = (e: React.TouchEvent, nodeId: string) => {
     // Allow pinch zoom to bubble up
-    if (e.touches.length > 1) return
+    if (e.touches.length > 1) {return}
 
     e.stopPropagation()
     const now = Date.now()
@@ -396,12 +408,14 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       const node = canvasNodes.find((n) => n.id === nodeId)
       if (node) {
         const touch = e.touches[0]
-        const mouseX = (touch.clientX - pan.x) / zoom
-        const mouseY = (touch.clientY - pan.y) / zoom
-        setDragOffset({
-          x: mouseX - node.x,
-          y: mouseY - node.y
-        })
+        if (touch) {
+          const mouseX = (touch.clientX - pan.x) / zoom
+          const mouseY = (touch.clientY - pan.y) / zoom
+          setDragOffset({
+            x: mouseX - node.x,
+            y: mouseY - node.y
+          })
+        }
       }
       setDraggedNode(nodeId)
       setSelectedNode(nodeId)
@@ -412,7 +426,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
 
   // Add new note node
   const addNoteNode = async () => {
-    if (!createNote) return
+    if (!createNote) {return}
 
     // Create a real note first
     const newNote = await createNote('Nouvelle note', '')
@@ -422,7 +436,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       
       setCanvasNodes((prev) => {
         // Check if already exists (race condition protection)
-        if (prev.some(n => n.id === newNote.id)) return prev
+        if (prev.some(n => n.id === newNote.id)) {return prev}
         
         // Calculate position based on existing nodes for grid-like arrangement
         const NODE_WIDTH = 250
@@ -464,9 +478,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     }
 
     setCanvasNodes((prev) => prev.filter((n) => n.id !== nodeId))
-    if (selectedNode === nodeId) setSelectedNode(null)
-    if (draggedNode === nodeId) setDraggedNode(null)
-    if (editingNodeId === nodeId) setEditingNodeId(null)
+    if (selectedNode === nodeId) {setSelectedNode(null)}
+    if (draggedNode === nodeId) {setDraggedNode(null)}
+    if (editingNodeId === nodeId) {setEditingNodeId(null)}
   }
 
   return (
@@ -506,14 +520,14 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       {/* Canvas Controls - Responsive positioning */}
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex flex-col gap-2">
         <button
-          onClick={() => handleZoom(0.1)}
+          onClick={() => { handleZoom(0.1); }}
           className="p-2.5 sm:p-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors shadow-lg min-w-touch min-h-touch flex items-center justify-center"
           title="Zoom avant"
         >
           <ZoomIn className="h-5 w-5 text-neutral-700 dark:text-neutral-300" />
         </button>
         <button
-          onClick={() => handleZoom(-0.1)}
+          onClick={() => { handleZoom(-0.1); }}
           className="p-2.5 sm:p-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors shadow-lg min-w-touch min-h-touch flex items-center justify-center"
           title="Zoom arrière"
         >
@@ -594,7 +608,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             {connections.map((conn) => {
               const fromNode = canvasNodes.find((n) => n.id === conn.from)
               const toNode = canvasNodes.find((n) => n.id === conn.to)
-              if (!fromNode || !toNode) return null
+              if (!fromNode || !toNode) {return null}
 
               const x1 = fromNode.x + fromNode.width / 2
               const y1 = fromNode.y + fromNode.height / 2
@@ -637,11 +651,11 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                 width: node.width,
                 height: node.height,
               }}
-              onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
-              onTouchStart={(e) => handleNodeTouchStart(e, node.id)}
+              onMouseDown={(e) => { handleNodeMouseDown(e, node.id); }}
+              onTouchStart={(e) => { handleNodeTouchStart(e, node.id); }}
               onDoubleClick={(e) => {
                 e.stopPropagation()
-                if (isMultiSelectMode) return // Disable double-click in multi-select mode
+                if (isMultiSelectMode) {return} // Disable double-click in multi-select mode
                 if (node.type === 'text') {
                   setEditingNodeId(node.id)
                 } else if (node.type === 'note' && onOpenNote) {
@@ -696,7 +710,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                     </h3>
                   </div>
                   <div className="text-xs text-neutral-600 dark:text-neutral-400 overflow-hidden line-clamp-6">
-                    {node.content.length > 200 ? node.content.slice(0, 200) + '...' : node.content}
+                    {node.content.length > 200 ? `${node.content.slice(0, 200)  }...` : node.content}
                   </div>
                 </div>
               )}
@@ -713,9 +727,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                           prev.map((n) => (n.id === node.id ? { ...n, content: newContent } : n))
                         )
                       }}
-                      onBlur={() => setEditingNodeId(null)}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onTouchStart={(e) => e.stopPropagation()}
+                      onBlur={() => { setEditingNodeId(null); }}
+                      onMouseDown={(e) => { e.stopPropagation(); }}
+                      onTouchStart={(e) => { e.stopPropagation(); }}
                     />
                   ) : (
                     <div className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap h-full select-none pointer-events-none">

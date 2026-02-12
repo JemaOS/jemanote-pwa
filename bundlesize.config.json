@@ -1,0 +1,29 @@
+{
+  "$schema": "https://bundlesize.io/schema.json",
+  "files": [
+    {
+      "path": "./dist/assets/*.js",
+      "maxSize": "300 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/assets/*.css",
+      "maxSize": "50 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/index.html",
+      "maxSize": "5 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "./dist/manifest.json",
+      "maxSize": "2 kB",
+      "compression": "gzip"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "develop"],
+    "repoBranchBase": "main"
+  }
+}

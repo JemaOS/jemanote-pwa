@@ -324,9 +324,13 @@ class MistralAIService {
   async continueText(text: string, context?: string): Promise<string> {
     const systemPrompt = 'Tu es un assistant de rédaction qui aide à continuer et développer des idées de manière cohérente et naturelle.'
     
+    // Ajouter un identifiant unique basé sur le timestamp pour éviter le cache
+    // quand on change de note
+    const uniqueId = Date.now().toString(36).substring(0, 4)
+    
     const prompt = context
-      ? `Contexte: ${context}\n\nTexte à continuer: ${text}\n\nContinue ce texte de manière naturelle et cohérente.`
-      : `Continue ce texte de manière naturelle et cohérente:\n\n${text}`
+      ? `Contexte: ${context}\n\nTexte à continuer: ${text}\n\nContinue ce texte de manière naturelle et cohérente. [${uniqueId}]`
+      : `Continue ce texte de manière naturelle et cohérente:\n\n${text}\n\n[${uniqueId}]`
 
     const response = await this.callAPI(prompt, systemPrompt)
     return response.content

@@ -97,18 +97,17 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       const existingNodeIds = new Set(prev.map(n => n.id))
       let hasChanges = false
       
-      // 1. Remove nodes that are no longer in notes (and not just created)
+      // 1. Remove nodes that are no longer in notes (deleted notes should be removed immediately)
       // AND update content/title for existing notes
       for (let i = nextNodes.length - 1; i >= 0; i--) {
         const node = nextNodes[i]
         if (!node) {continue}
         if (node.type === 'note') {
           const inNotes = currentNoteIds.has(node.id)
-          const isJustCreated = justCreatedIds.current.has(node.id)
           
           if (inNotes) {
             // It's in notes, so we can stop tracking it as "just created"
-            if (isJustCreated) {
+            if (justCreatedIds.current.has(node.id)) {
               justCreatedIds.current.delete(node.id)
             }
             
@@ -129,8 +128,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
               }
               hasChanges = true
             }
-          } else if (!isJustCreated) {
-            // Not in notes and not just created -> delete it
+          } else {
+            // Not in notes -> delete it immediately (note was deleted)
             nextNodes.splice(i, 1)
             hasChanges = true
           }

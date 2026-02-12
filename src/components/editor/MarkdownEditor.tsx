@@ -1,38 +1,67 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
-import { markdown } from '@codemirror/lang-markdown'
-import { defaultHighlightStyle, syntaxHighlighting, indentOnInput, bracketMatching, foldGutter, foldKeymap } from '@codemirror/language'
-import { lintKeymap } from '@codemirror/lint'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
-import { EditorState, Compartment } from '@codemirror/state'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { EditorView, keymap, highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor, rectangularSelection, crosshairCursor, lineNumbers, highlightActiveLineGutter } from '@codemirror/view'
-import React, { useRef, useEffect, useState } from 'react'
+import {
+  autocompletion,
+  completionKeymap,
+  closeBrackets,
+  closeBracketsKeymap,
+} from '@codemirror/autocomplete';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { markdown } from '@codemirror/lang-markdown';
+import {
+  defaultHighlightStyle,
+  syntaxHighlighting,
+  indentOnInput,
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+} from '@codemirror/language';
+import { lintKeymap } from '@codemirror/lint';
+import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import { EditorState, Compartment } from '@codemirror/state';
+import { oneDark } from '@codemirror/theme-one-dark';
+import {
+  EditorView,
+  keymap,
+  highlightSpecialChars,
+  drawSelection,
+  highlightActiveLine,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+  lineNumbers,
+  highlightActiveLineGutter,
+} from '@codemirror/view';
+import React, { useRef, useEffect, useState } from 'react';
 
-import AIContextMenu from '@/components/ai/AIContextMenu'
-import { useTheme } from '@/contexts/ThemeContext'
-import { aiContextMenuExtension } from '@/lib/aiContextMenu'
-import { audioWidgetPlugin } from '@/lib/audioWidgetExtension'
-import { wikiLinksPlugin } from '@/lib/wikiLinks'
+import AIContextMenu from '@/components/ai/AIContextMenu';
+import { useTheme } from '@/contexts/ThemeContext';
+import { aiContextMenuExtension } from '@/lib/aiContextMenu';
+import { audioWidgetPlugin } from '@/lib/audioWidgetExtension';
+import { wikiLinksPlugin } from '@/lib/wikiLinks';
 
 interface MarkdownEditorProps {
-  value: string
-  onChange: (value: string) => void
-  onWikiLinkClick?: (noteTitle: string) => void
+  value: string;
+  onChange: (value: string) => void;
+  onWikiLinkClick?: (noteTitle: string) => void;
 }
 
 export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: MarkdownEditorProps) {
-  const { theme } = useTheme()
-  const editorRef = useRef<HTMLDivElement>(null)
-  const viewRef = useRef<EditorView | null>(null)
-  const themeCompartment = useRef(new Compartment())
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; selectedText: string } | null>(null)
+  const { theme } = useTheme();
+  const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
+  const themeCompartment = useRef(new Compartment());
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    selectedText: string;
+  } | null>(null);
 
   useEffect(() => {
-    if (!editorRef.current) {return}
+    if (!editorRef.current) {
+      return;
+    }
 
     const startState = EditorState.create({
       doc: value,
@@ -68,13 +97,13 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         markdown(),
         wikiLinksPlugin,
         audioWidgetPlugin,
-        aiContextMenuExtension((position) => {
-          setContextMenu(position)
+        aiContextMenuExtension(position => {
+          setContextMenu(position);
         }),
-        EditorView.updateListener.of((update) => {
+        EditorView.updateListener.of(update => {
           if (update.docChanged) {
-            const newValue = update.state.doc.toString()
-            onChange(newValue)
+            const newValue = update.state.doc.toString();
+            onChange(newValue);
           }
         }),
         EditorView.theme({
@@ -118,43 +147,43 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
           },
         }),
         EditorView.domEventHandlers({
-          click: (event, view) => {
-            const target = event.target as HTMLElement
+          click: (event, _view) => {
+            const target = event.target as HTMLElement;
             if (target.classList.contains('wiki-link') && onWikiLinkClick) {
-              event.preventDefault()
-              const noteTitle = target.textContent || ''
-              onWikiLinkClick(noteTitle)
-              return true
+              event.preventDefault();
+              const noteTitle = target.textContent ?? '';
+              onWikiLinkClick(noteTitle);
+              return true;
             }
-            return false
+            return false;
           },
         }),
       ],
-    })
+    });
 
     const view = new EditorView({
       state: startState,
       parent: editorRef.current,
-    })
+    });
 
-    viewRef.current = view
+    viewRef.current = view;
 
     return () => {
-      view.destroy()
-    }
-  }, [])
+      view.destroy();
+    };
+  }, [onChange, onWikiLinkClick, theme, value]);
 
   useEffect(() => {
     if (viewRef.current) {
       viewRef.current.dispatch({
-        effects: themeCompartment.current.reconfigure(theme === 'dark' ? oneDark : [])
-      })
+        effects: themeCompartment.current.reconfigure(theme === 'dark' ? oneDark : []),
+      });
     }
-  }, [theme])
+  }, [theme]);
 
   useEffect(() => {
     if (viewRef.current) {
-      const currentValue = viewRef.current.state.doc.toString()
+      const currentValue = viewRef.current.state.doc.toString();
       if (currentValue !== value) {
         viewRef.current.dispatch({
           changes: {
@@ -162,17 +191,19 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
             to: currentValue.length,
             insert: value,
           },
-        })
+        });
       }
     }
-  }, [value])
+  }, [value]);
 
   // Fonction pour insérer ou remplacer du texte dans l'éditeur
   const handleInsertText = (text: string) => {
-    if (!viewRef.current) {return}
+    if (!viewRef.current) {
+      return;
+    }
 
-    const view = viewRef.current
-    const selection = view.state.selection.main
+    const view = viewRef.current;
+    const selection = view.state.selection.main;
 
     // Remplacer le texte sélectionné par le nouveau texte
     view.dispatch({
@@ -184,25 +215,28 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
       selection: {
         anchor: selection.from + text.length,
       },
-    })
+    });
 
     // Fermer le menu contextuel
-    setContextMenu(null)
-  }
+    setContextMenu(null);
+  };
 
   return (
     <>
       <div ref={editorRef} className="h-full w-full" />
-      
+
       {/* Menu contextuel IA */}
       {contextMenu && (
         <AIContextMenu
+          key={`ai-menu-${contextMenu.x.toString()}-${contextMenu.y.toString()}-${Date.now().toString()}`}
           position={{ x: contextMenu.x, y: contextMenu.y }}
           selectedText={contextMenu.selectedText}
-          onClose={() => { setContextMenu(null); }}
+          onClose={() => {
+            setContextMenu(null);
+          }}
           onInsert={handleInsertText}
         />
       )}
     </>
-  )
+  );
 }

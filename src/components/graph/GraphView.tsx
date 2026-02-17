@@ -857,6 +857,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 : 'bg-neutral-800 hover:bg-neutral-700 border-neutral-700'
             }`}
             title={graphSettings.localMode ? 'Vue Globale' : 'Vue Locale'}
+            aria-label={graphSettings.localMode ? 'Passer en vue globale' : 'Passer en vue locale'}
           >
             <Target className="w-5 h-5 text-neutral-300" />
           </button>
@@ -945,10 +946,11 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
 
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {groups.map((group, idx) => (
-                    <div key={idx} className="flex items-center gap-2 bg-neutral-900 p-1.5 rounded border border-neutral-800">
+                    <div key={`group-${group.query}-${idx}`} className="flex items-center gap-2 bg-neutral-900 p-1.5 rounded border border-neutral-800">
                       <input 
                         type="color" 
                         value={group.color}
+                        aria-label={`Couleur du groupe ${group.query}`}
                         onChange={(e) => {
                           const newGroups = [...groups]
                           newGroups[idx].color = e.target.value
@@ -960,6 +962,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                       <button 
                         onClick={() => { setGroups(groups.filter((_, i) => i !== idx)); }}
                         className="text-neutral-500 hover:text-red-400"
+                        aria-label={`Supprimer le groupe ${group.query}`}
                       >
                         ×
                       </button>

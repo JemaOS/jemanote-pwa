@@ -225,6 +225,19 @@ function App() {
             }}
           />
         )
+      case 'graph':
+        // Graph view uses workspace as base with graph overlay
+        return (
+          <WorkspaceView
+            userId={user?.id ?? null}
+            activeNoteId={activeNoteId}
+            onNoteChange={setActiveNoteId}
+            rightSidebarOpen={rightSidebarOpen}
+            notes={notes}
+            updateNote={updateNote}
+            createNote={handleCreateNoteFromAI}
+          />
+        )
       default:
         return (
           <WorkspaceView

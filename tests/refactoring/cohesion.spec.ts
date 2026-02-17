@@ -148,14 +148,27 @@ describe('Module Cohesion Analysis', () => {
       const violations: string[] = [];
 
       const checkHookComplexity = (analysis: any, content: string) => {
-        const hookMatches = content.match(/export\s+function\s+use\w+/g) || [];
+        // SECURITY FIX: Limit content size to prevent ReDoS
+        const MAX_CONTENT_LENGTH = 1000000; // 1MB max
+        const safeContent = content.length > MAX_CONTENT_LENGTH
+          ? content.substring(0, MAX_CONTENT_LENGTH)
+          : content;
+
+        const hookMatches = safeContent.match(/export\s+function\s+use[a-zA-Z_]\w{0,99}/g) || [];
         for (const hook of hookMatches) {
           const hookName = hook.replace('export function ', '');
+          
+          // SECURITY FIX: Validate hook name to prevent ReDoS in dynamic regex
+          if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(hookName)) {
+            continue; // Skip invalid hook names
+          }
+          
+          // SECURITY FIX: Use safer regex with length limits
           const hookRegex = new RegExp(
-            `export\\s+function\\s+${hookName}\\s*\\([^)]*\\)\\s*\\{([^}]*\\{[^}]*\\}[^}]*)*[^}]*\\}`,
+            `export\\s+function\\s+${hookName}\\s*\\([^)]{0,500}\\)\\s*\\{[\\s\\S]{0,50000}\\}`,
             's'
           );
-          const hookMatch = content.match(hookRegex);
+          const hookMatch = safeContent.match(hookRegex);
           if (!hookMatch) continue;
           
           const useEffectCount = (hookMatch[0].match(/useEffect/g) || []).length;

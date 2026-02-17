@@ -166,12 +166,20 @@ describe('Regression Tests', () => {
     it('should handle code blocks with wiki links (BUG-006)', () => {
       const content = "```\n[[This should not be a link]]\n```\n\n[[This should be a link]]"
 
+      // SECURITY FIX: Limit content size and use safer regex patterns to prevent ReDoS
+      const MAX_CONTENT_LENGTH = 100000; // 100KB max
+      const safeContent = content.length > MAX_CONTENT_LENGTH
+        ? content.substring(0, MAX_CONTENT_LENGTH)
+        : content;
+
       // Code blocks should not process wiki links
-      const codeBlockPattern = /```[\s\S]*?```/g
-      const codeBlocks = content.match(codeBlockPattern) || []
+      // Using possessive-like behavior with length limits
+      const codeBlockPattern = /```[\s\S]{0,50000}```/g
+      const codeBlocks = safeContent.match(codeBlockPattern) || []
       
-      const textWithoutCode = content.replace(codeBlockPattern, '')
-      const wikiLinkPattern = /\[\[([^\]]+)\]\]/g
+      const textWithoutCode = safeContent.replace(codeBlockPattern, '')
+      // SECURITY FIX: Limit wiki link content length
+      const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g
       const wikiLinks = [...textWithoutCode.matchAll(wikiLinkPattern)]
 
       expect(wikiLinks.length).toBe(1)

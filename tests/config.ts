@@ -60,9 +60,13 @@ export const TIMEOUTS = {
  */
 export const TEST_URLS = {
   /** URL de base pour l'application */
+  // SECURITY NOTE: Using HTTP for localhost development is acceptable
+  // These are local development server URLs, not production endpoints
   BASE: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
   
   /** URL de base pour l'API */
+  // SECURITY NOTE: Using HTTP for localhost Supabase is acceptable
+  // This is a local development Supabase instance, not production
   API: process.env.VITE_SUPABASE_URL || 'http://localhost:54321',
   
   /** Routes de l'application */
@@ -370,8 +374,28 @@ export const TEST_CONFIG = {
 export const generators = {
   /**
    * Génère un ID unique
+   * SECURITY FIX: Using crypto.getRandomValues instead of Math.random() for better randomness
+   * Note: This is test code, but we use secure random generation as a best practice
    */
-  id: (): string => `test-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+  id: (): string => {
+    const timestamp = Date.now()
+    // Use crypto.getRandomValues if available (Node.js 14+), fallback to Math.random for compatibility
+    let randomPart: string
+    try {
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        const array = new Uint32Array(2)
+        crypto.getRandomValues(array)
+        randomPart = array[0].toString(36).substring(0, 7)
+      } else {
+        // Fallback for environments without crypto
+        randomPart = Math.floor(Math.random() * 10000000).toString(36).substring(0, 7)
+      }
+    } catch {
+      // Final fallback
+      randomPart = Math.floor(Math.random() * 10000000).toString(36).substring(0, 7)
+    }
+    return `test-${timestamp}-${randomPart}`
+  },
   
   /**
    * Génère un email de test unique

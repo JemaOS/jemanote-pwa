@@ -102,11 +102,17 @@ const code = "example";
 
       const start = performance.now()
       
-      // Simple processing simulation
-      const processed = complexContent
-        .replace(/# (.+)/g, '<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // SECURITY FIX: Limit content size to prevent ReDoS during processing
+      const MAX_CONTENT_LENGTH = 1000000 // 1MB max
+      const safeContent = complexContent.length > MAX_CONTENT_LENGTH
+        ? complexContent.substring(0, MAX_CONTENT_LENGTH)
+        : complexContent
+      
+      // Simple processing simulation with safer regex patterns
+      const processed = safeContent
+        .replace(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
+        .replace(/\*\*([^\*]{1,500}?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^\*]{1,500}?)\*/g, '<em>$1</em>')
       
       const end = performance.now()
       expect(end - start).toBeLessThan(200)
@@ -345,8 +351,12 @@ const code = "example";
 
       const start = performance.now()
       
-      // Simple keyword extraction
-      const words = text.toLowerCase().match(/\b\w{4,}\b/g) || []
+      // SECURITY FIX: Limit text size for regex processing
+      const MAX_TEXT_LENGTH = 1000000 // 1MB max
+      const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
+      
+      // Simple keyword extraction with safer regex
+      const words = safeText.toLowerCase().match(/\b[a-zA-Z]{4,50}\b/g) || []
       const frequency: Record<string, number> = {}
       words.forEach(word => {
         frequency[word] = (frequency[word] || 0) + 1

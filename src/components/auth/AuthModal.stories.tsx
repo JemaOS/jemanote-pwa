@@ -45,11 +45,11 @@ export const LoginTab: Story = {
 
 export const SignupTab: Story = {
   args: defaultProps,
-  play: async ({ canvasElement }) => {
+  play: ({ canvasElement }) => {
     // Simuler le clic sur l'onglet Inscription
-    const signupButton = canvasElement.querySelector('button:nth-child(2)') as HTMLButtonElement | null
+    const signupButton = canvasElement.querySelector('button:nth-child(2)')
     if (signupButton) {
-      signupButton.click()
+      ;(signupButton as HTMLButtonElement).click()
     }
   },
 }

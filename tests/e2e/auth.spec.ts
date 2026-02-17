@@ -9,6 +9,7 @@
 import { test, expect, Page } from '@playwright/test'
 
 // Generate unique test data to avoid conflicts
+// SECURITY NOTE: Math.random() is acceptable here for test email generation
 const generateTestEmail = () => `test-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@example.com`
 const generateTestPassword = () => `TestPass${Date.now()}!`
 

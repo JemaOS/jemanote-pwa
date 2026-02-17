@@ -133,6 +133,7 @@ test.describe('Injection Attack Prevention', () => {
     for (const payload of SQL_INJECTION_PAYLOADS.slice(0, 3)) {
       await page.evaluate((title) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-sql-${Math.random()}`,
           title,
           content: 'Test content',
@@ -168,6 +169,7 @@ test.describe('Injection Attack Prevention', () => {
     for (const payload of NOSQL_INJECTION_PAYLOADS) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-nosql-${Math.random()}`,
           title: 'NoSQL Injection Test',
           content,
@@ -195,6 +197,7 @@ test.describe('Injection Attack Prevention', () => {
       
       await page.evaluate((fileName) => {
         const attachments = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-cmd-${Math.random()}`,
           name: fileName,
           note_id: 'test-note-1',
@@ -241,6 +244,7 @@ test.describe('Injection Attack Prevention', () => {
     for (const payload of XPATH_INJECTION_PAYLOADS) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-xpath-${Math.random()}`,
           title: 'XPath Injection Test',
           content,
@@ -282,6 +286,7 @@ test.describe('Injection Attack Prevention', () => {
     for (const { input, description } of specialChars) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-special-${Math.random()}`,
           title: 'Special Character Test',
           content,

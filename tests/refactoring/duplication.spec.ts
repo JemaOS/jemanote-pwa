@@ -363,11 +363,17 @@ function findSimilarFunctions(files: string[]): string[] {
     const content = fs.readFileSync(file, 'utf-8');
     const relativePath = path.relative(CONFIG.sourceDir, file);
 
-    // Extract function bodies (simplified)
-    const functionRegex = /(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\([^)]*\)\s*\{([^}]*)\}/g;
+    // SECURITY FIX: Added content length limit and safer regex to prevent ReDoS
+    const MAX_CONTENT_LENGTH = 1000000; // 1MB max per file
+    const safeContent = content.length > MAX_CONTENT_LENGTH
+      ? content.substring(0, MAX_CONTENT_LENGTH)
+      : content;
+
+    // Extract function bodies (simplified) with safer regex patterns
+    const functionRegex = /(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z_]\w{0,99})\s*\([^)]{0,500}\)\s*\{([^}]*)\}/g;
     let match;
 
-    while ((match = functionRegex.exec(content)) !== null) {
+    while ((match = functionRegex.exec(safeContent)) !== null) {
       const funcName = match[1];
       const funcBody = match[2].replace(/\s+/g, ' ').trim();
 
@@ -396,11 +402,17 @@ function findDuplicatedErrorHandling(files: string[]): string[] {
     const content = fs.readFileSync(file, 'utf-8');
     const relativePath = path.relative(CONFIG.sourceDir, file);
 
-    // Find try-catch blocks
-    const tryCatchRegex = /try\s*\{[^}]*\}\s*catch\s*\([^)]*\)\s*\{([^}]*)\}/g;
+    // SECURITY FIX: Limit content size for regex processing
+    const MAX_CONTENT_LENGTH = 1000000; // 1MB max per file
+    const safeContent = content.length > MAX_CONTENT_LENGTH
+      ? content.substring(0, MAX_CONTENT_LENGTH)
+      : content;
+
+    // Find try-catch blocks with safer regex
+    const tryCatchRegex = /try\s*\{[\s\S]{0,10000}\}\s*catch\s*\([^)]{0,200}\)\s*\{([^}]*)\}/g;
     let match;
 
-    while ((match = tryCatchRegex.exec(content)) !== null) {
+    while ((match = tryCatchRegex.exec(safeContent)) !== null) {
       const catchBody = match[1].replace(/\s+/g, ' ').trim();
 
       if (!errorPatterns[catchBody]) {
@@ -463,6 +475,12 @@ function findUnusedImports(content: string): string[] {
     const imports = match[1].split(',').map(i => i.trim().split(' as ')[0]);
 
     for (const imp of imports) {
+      // SECURITY FIX: Escape special regex characters in import names to prevent ReDoS
+      // and validate import name format before creating dynamic regex
+      if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(imp)) {
+        continue; // Skip invalid import names
+      }
+      
       // Check if import is used (excluding the import statement itself)
       const usageRegex = new RegExp(`\\b${imp}\\b`, 'g');
       const usages = content.match(usageRegex) || [];

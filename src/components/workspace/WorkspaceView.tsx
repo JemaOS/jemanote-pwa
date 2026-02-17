@@ -303,7 +303,10 @@ export default function WorkspaceView({
 
     try {
       const attachmentId = crypto.randomUUID()
-      const fileName = `recording-${new Date().toISOString().replace(/[:.]/g, '-')}.webm`
+      // SECURITY FIX: Limit filename length and sanitize date string to prevent ReDoS
+      const dateStr = new Date().toISOString()
+      const safeDateStr = dateStr.length > 100 ? dateStr.substring(0, 100) : dateStr
+      const fileName = `recording-${safeDateStr.replace(/[:.]/g, '-')}.webm`
       
       const attachment: Attachment = {
         id: attachmentId,

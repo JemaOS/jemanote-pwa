@@ -69,6 +69,8 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
   }
   
   // Échantillonnage
+  // SECURITY NOTE: Math.random() is acceptable here for sampling purposes
+  // This is not used for cryptographic operations, just for statistical sampling
   if (Math.random() > (config.sampleRate || 1)) {
     return;
   }

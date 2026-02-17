@@ -34,10 +34,16 @@ class LinkDetectionService {
       'est', 'sont', 'était', 'a', 'ai', 'as', 'ont', 'avons', 'avez',
     ])
 
+    // SECURITY FIX: Limit input size to prevent ReDoS attacks on regex processing
+    // Maximum 100KB of text to process for keyword extraction
+    const MAX_TEXT_LENGTH = 100000
+    const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
+
     // Nettoyer et extraire les mots
-    const words = text
+    // SECURITY FIX: Using a safer character class regex with length limits
+    const words = safeText
       .toLowerCase()
-      .replace(/[^\w\sàâäéèêëïîôùûüÿæœç-]/g, ' ')
+      .replace(/[^\w\sàâäéèêëïîôùûüÿæœç-]+/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 3 && !stopWords.has(word))
 
@@ -76,7 +82,7 @@ class LinkDetectionService {
   /**
    * Détecter les liens potentiels pour une note donnée
    */
-  async detectLinks(currentNote: Note, allNotes: Note[]): Promise<LinkSuggestion[]> {
+  detectLinks(currentNote: Note, allNotes: Note[]): LinkSuggestion[] {
     if (!currentNote.content || currentNote.content.length < 50) {
       return []
     }
@@ -147,10 +153,12 @@ Format de réponse:
 
       // Parser la réponse de l'IA
       const suggestions: LinkSuggestion[] = []
-      const lines = response.split('\n').filter(line => line.match(/^\d+\./))
+      // SECURITY FIX: Limit line length to prevent ReDoS on regex matching
+      const lines = response.split('\n').filter(line => line.length <= 500 && /^\d+\./.test(line))
 
       for (const line of lines) {
-        const match = line.match(/^\d+\.\s*\[?(\d+)\]?:\s*(.+)$/)
+        // SECURITY FIX: Use safer regex with length limits for AI response parsing
+        const match = line.match(/^\d{1,3}\.\s*\[?(\d{1,5})\]?:\s*(.{1,500})$/)
         if (match) {
           const noteIndex = parseInt(match[1]) - 1
           const reason = match[2].trim()

@@ -18,6 +18,8 @@ describe('graphIndexer', () => {
   })
 
   const createMockNote = (overrides: Partial<Note> = {}): Note => ({
+    // SECURITY NOTE: Math.random() is acceptable here for test ID generation
+    // Test IDs don't require cryptographic randomness
     id: `note-${Math.random().toString(36).substr(2, 9)}`,
     user_id: 'user-1',
     title: 'Test Note',

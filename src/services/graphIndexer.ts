@@ -31,9 +31,13 @@ export interface GraphData {
 }
 
 class GraphIndexer {
-  private wikilinkRegex = /\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]/g
-  private mdLinkRegex = /\[.*?\]\(([^)]+)\)/g
-  private tagRegex = /#[\w\-]+/g
+  // SECURITY FIX: Using safe regex patterns with length limits to prevent ReDoS
+  // (Regular Expression Denial of Service) attacks. These patterns limit the
+  // maximum match length and avoid nested quantifiers that could cause
+  // catastrophic backtracking on malicious input.
+  private wikilinkRegex = /\[\[([^\]|#]{1,200})(?:#[^\]|]{0,100})?(?:\|[^\]]{0,100})?\]\]/g
+  private mdLinkRegex = /\[[^\]]{0,200}\]\(([^)]{1,500})\)/g
+  private tagRegex = /#[\w-]{1,50}/g
 
   /**
    * Indexer toutes les notes et construire le graphe

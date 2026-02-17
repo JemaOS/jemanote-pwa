@@ -347,6 +347,7 @@ test.describe('XSS Prevention', () => {
     for (const payload of templatePayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-xss-${Math.random()}`,
           title: 'Template Injection Test',
           content,
@@ -411,6 +412,7 @@ test.describe('XSS Prevention', () => {
     for (const payload of xssPayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-xss-${Math.random()}`,
           title: 'InnerHTML Test',
           content,

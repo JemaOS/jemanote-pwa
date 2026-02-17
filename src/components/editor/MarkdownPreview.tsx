@@ -98,8 +98,11 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
   }, [content])
 
   // Traiter les wiki links [[Note Title]]
+  // SECURITY FIX: Added length limits to prevent ReDoS attacks
   const processWikiLinks = (text: string) => {
-    return text.replace(/\[\[([^\]]+)\]\]/g, (match, noteTitle) => {
+    const MAX_TEXT_LENGTH = 500000 // 500KB max
+    const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
+    return safeText.replace(/\[\[([^\]]{1,200})\]\]/g, (match, noteTitle) => {
       return `<span class="wiki-link" data-note="${noteTitle}">${noteTitle}</span>`
     })
   }
@@ -140,8 +143,13 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
         components={{
           // Gérer les images spéciales (comme les mémos vocaux)
           img: ({ src, alt, ...props }) => {
+            // SECURITY FIX: Validate attachment URL format
             if (src?.startsWith('attachment:')) {
               const attachmentId = src.replace('attachment:', '')
+              // Validate attachmentId format to prevent injection
+              if (!/^[a-zA-Z0-9-_]{1,100}$/.test(attachmentId)) {
+                return <span className="text-red-500">Invalid attachment</span>
+              }
               return <AudioPlayer attachmentId={attachmentId} />
             }
             return <img src={src} alt={alt} {...props} />

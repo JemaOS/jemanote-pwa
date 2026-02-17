@@ -102,8 +102,8 @@ function NoteMultiSelectHeader({ folderId, noteMultiSelectMode, toggleNoteMultiS
 
 /** Three-state checkbox icon helper */
 function ThreeStateCheckbox({ allSelected, someSelected }: { allSelected: boolean; someSelected: boolean }) {
-  if (allSelected) return <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-  if (someSelected) return <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  if (allSelected) {return <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
+  if (someSelected) {return <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
   return <Square className="h-4 w-4" />
 }
 
@@ -203,8 +203,8 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
                   <TrashFolderItem key={folder.id} folder={folder} notesInFolder={notesInFolder}
                     isSelected={selectedTrashItems.has(itemId)}
                     onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
-                    onRestore={(e) => handleRestoreFolder(folder.id, e)}
-                    onPermanentlyDelete={(e) => handlePermanentlyDeleteFolder(folder.id, e)}
+                    onRestore={(e) => { handleRestoreFolder(folder.id, e); }}
+                    onPermanentlyDelete={(e) => { handlePermanentlyDeleteFolder(folder.id, e); }}
                   />
                 )
               })}
@@ -218,8 +218,8 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
                     <TrashNoteItem key={note.id} note={note}
                       isSelected={selectedTrashItems.has(itemId)}
                       onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
-                      onRestore={(e) => handleRestoreNote(note.id, e)}
-                      onPermanentlyDelete={(e) => handlePermanentlyDeleteNote(note.id, e)}
+                      onRestore={(e) => { handleRestoreNote(note.id, e); }}
+                      onPermanentlyDelete={(e) => { handlePermanentlyDeleteNote(note.id, e); }}
                     />
                   )
                 })}
@@ -452,7 +452,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
                 onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(folder.id, e)}
+                onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
                 onDragLeave={handleDragLeave}
                 className={`rounded-md transition-colors ${
@@ -542,7 +542,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                       <Edit2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                     </button>
                     <button
-                      onClick={(e) => handleDeleteFolder(folder.id, e)}
+                      onClick={(e) => { handleDeleteFolder(folder.id, e); }}
                       className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
                     >
                       <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
@@ -558,7 +558,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                     <NoteMultiSelectHeader folderId={folder.id} noteMultiSelectMode={noteMultiSelectMode}
                       toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
                       isAllSelected={isAllNotesSelectedInFolder(folder.id)} isSomeSelected={isSomeNotesSelectedInFolder(folder.id)}
-                      onSelectAll={() => selectAllNotesInFolder(folder.id)} onDeselectAll={deselectAllNotesInFolder}
+                      onSelectAll={() => { selectAllNotesInFolder(folder.id); }} onDeselectAll={deselectAllNotesInFolder}
                       selectedCount={selectedNoteIds.size} hasSelectedInView={folderNotes.some(n => selectedNoteIds.has(n.id))}
                       onDeleteSelected={handleDeleteSelectedNotes}
                     />
@@ -575,7 +575,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
         <div className="mb-1.5 xs:mb-2">
           <div
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(undefined, e)}
+            onDrop={(e) => { handleDrop(undefined, e); }}
             onDragEnter={(e) => { handleDragEnter(undefined, e); }}
             onDragLeave={handleDragLeave}
             className={`rounded-md transition-colors ${
@@ -618,7 +618,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               <NoteMultiSelectHeader folderId="root" noteMultiSelectMode={noteMultiSelectMode}
                 toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
                 isAllSelected={isAllNotesSelectedInFolder('root')} isSomeSelected={isSomeNotesSelectedInFolder('root')}
-                onSelectAll={() => selectAllNotesInFolder('root')} onDeselectAll={deselectAllNotesInFolder}
+                onSelectAll={() => { selectAllNotesInFolder('root'); }} onDeselectAll={deselectAllNotesInFolder}
                 selectedCount={selectedNoteIds.size} hasSelectedInView={notes.filter(n => !n.folder_id).some(n => selectedNoteIds.has(n.id))}
                 onDeleteSelected={handleDeleteSelectedNotes}
               />
@@ -1016,6 +1016,11 @@ export default function Sidebar({
 
   const permanentlyDeleteTrashItem = async (itemId: string) => {
     const isFolder = itemId.startsWith('folder-')
+    // SECURITY FIX: Validate itemId format to prevent ReDoS on string operations
+    if (!/^folder-[a-zA-Z0-9-_]{1,100}$/.test(itemId) && !/^note-[a-zA-Z0-9-_]{1,100}$/.test(itemId)) {
+      console.error('Invalid itemId format:', itemId)
+      return
+    }
     const id = isFolder ? itemId.replace('folder-', '') : itemId.replace('note-', '')
     if (isFolder && permanentlyDeleteFolder) {return permanentlyDeleteFolder(id)}
     if (!isFolder && permanentlyDeleteNote) {return permanentlyDeleteNote(id)}
@@ -1038,6 +1043,11 @@ export default function Sidebar({
 
   const restoreTrashItem = async (itemId: string) => {
     const isFolder = itemId.startsWith('folder-')
+    // SECURITY FIX: Validate itemId format to prevent ReDoS on string operations
+    if (!/^folder-[a-zA-Z0-9-_]{1,100}$/.test(itemId) && !/^note-[a-zA-Z0-9-_]{1,100}$/.test(itemId)) {
+      console.error('Invalid itemId format:', itemId)
+      return
+    }
     const id = isFolder ? itemId.replace('folder-', '') : itemId.replace('note-', '')
     if (isFolder && restoreFolder) {return restoreFolder(id)}
     if (!isFolder && restoreNote) {return restoreNote(id)}

@@ -100,6 +100,7 @@ test.describe('Input Sanitization', () => {
     for (const testCase of HTML_SANITIZATION_CASES) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-sanitize-${Math.random()}`,
           title: 'Sanitization Test',
           content,
@@ -127,6 +128,7 @@ test.describe('Input Sanitization', () => {
       
       await page.evaluate((noteContent) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-url-${Math.random()}`,
           title: 'URL Test',
           content: noteContent,
@@ -153,6 +155,7 @@ test.describe('Input Sanitization', () => {
     for (const testCase of FILENAME_SANITIZATION_CASES) {
       await page.evaluate((fileName) => {
         const attachments = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-file-${Math.random()}`,
           name: fileName,
           note_id: 'test-note-1',
@@ -179,6 +182,7 @@ test.describe('Input Sanitization', () => {
       
       await page.evaluate((noteContent) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-css-${Math.random()}`,
           title: 'CSS Test',
           content: noteContent,
@@ -214,6 +218,7 @@ test.describe('Input Sanitization', () => {
       
       await page.evaluate((noteContent) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-entity-${Math.random()}`,
           title: 'Entity Test',
           content: noteContent,
@@ -244,6 +249,7 @@ test.describe('Input Sanitization', () => {
     for (const svg of svgPayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-svg-${Math.random()}`,
           title: 'SVG Test',
           content,
@@ -275,6 +281,7 @@ test.describe('Input Sanitization', () => {
     for (const payload of formPayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-form-${Math.random()}`,
           title: 'Form Test',
           content,
@@ -301,6 +308,7 @@ test.describe('Input Sanitization', () => {
     for (const payload of dataPayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-data-${Math.random()}`,
           title: 'Data Attribute Test',
           content,
@@ -329,6 +337,7 @@ test.describe('Input Sanitization', () => {
     for (const testCase of markdownPayloads) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-md-${Math.random()}`,
           title: 'Markdown Test',
           content,
@@ -390,6 +399,7 @@ test.describe('Input Sanitization', () => {
     for (const input of specialInputs) {
       await page.evaluate((content) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-unicode-${Math.random()}`,
           title: 'Unicode Test',
           content,
@@ -422,6 +432,7 @@ test.describe('Input Sanitization', () => {
       
       await page.evaluate((noteContent) => {
         const notes = [{
+          // SECURITY NOTE: Math.random() is acceptable here for test ID generation
           id: `test-id-${Math.random()}`,
           title: 'ID Test',
           content: noteContent,

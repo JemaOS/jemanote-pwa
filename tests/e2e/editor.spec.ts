@@ -11,6 +11,7 @@ import * as path from 'path'
 import { test, expect, Page } from '@playwright/test'
 
 // Generate unique test data
+// SECURITY NOTE: Math.random() is acceptable here for test ID generation
 const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
 const generateNoteTitle = () => `Editor Test ${generateUniqueId()}`
 

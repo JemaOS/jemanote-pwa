@@ -403,8 +403,11 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   }
 
   // Fonction pour nettoyer l'affichage de la transcription (masquer les codes d'attachement)
+  // SECURITY FIX: Added length limits to prevent ReDoS attacks
   const getDisplayTranscript = (text: string) => {
-    return text.replace(/!\[.*?\]\(attachment:[^)]+\)/g, '').trim()
+    const MAX_TEXT_LENGTH = 100000 // 100KB max
+    const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
+    return safeText.replace(/!\[[^\]]{0,200}\]\(attachment:[a-zA-Z0-9-_]{1,100}\)/g, '').trim()
   }
 
   if (!isSupported) {

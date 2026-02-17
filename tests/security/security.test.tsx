@@ -7,7 +7,13 @@ describe('Security Tests', () => {
   describe('XSS Prevention', () => {
     it('should sanitize script tags in note content', () => {
       const maliciousContent = '<script>alert("XSS")</script>'
-      const sanitized = maliciousContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      // SECURITY FIX: Limit content length and use safer regex to prevent ReDoS
+      const MAX_CONTENT_LENGTH = 100000
+      const safeContent = maliciousContent.length > MAX_CONTENT_LENGTH
+        ? maliciousContent.substring(0, MAX_CONTENT_LENGTH)
+        : maliciousContent
+      // Using a simpler, safer regex pattern with length limits
+      const sanitized = safeContent.replace(/<script\b[^<]{0,1000}(?:(?!<\/script>)<[^<]{0,1000}){0,100}<\/script>/gi, '')
       expect(sanitized).not.toContain('<script>')
     })
 
@@ -300,8 +306,11 @@ describe('Security Tests', () => {
       ]
 
       fileNames.forEach(({ input }) => {
+        // SECURITY FIX: Limit input size and use safer regex patterns
+        const MAX_INPUT_LENGTH = 10000
+        const safeInput = input.length > MAX_INPUT_LENGTH ? input.substring(0, MAX_INPUT_LENGTH) : input
         // First remove path traversal sequences, then replace special chars
-        const sanitized = input.replace(/\.\./g, '').replace(/[^a-zA-Z0-9._-]/g, '_')
+        const sanitized = safeInput.replace(/\.\./g, '').replace(/[^a-zA-Z0-9._-]/g, '_')
         expect(sanitized).not.toContain('..')
         expect(sanitized).not.toContain('<')
       })
@@ -329,7 +338,8 @@ describe('Security Tests', () => {
   describe('Error Handling', () => {
     it('should not leak sensitive info in error messages', () => {
       const error = new Error('Database connection failed: postgres://user:pass@host/db')
-      const sanitizedError = error.message.replace(/postgres:\/\/[^\s]+/, '[DATABASE_URL]')
+      // SECURITY FIX: Use safer regex with length limit
+      const sanitizedError = error.message.replace(/postgres:\/\/[a-zA-Z0-9:@.\/_-]{0,500}/, '[DATABASE_URL]')
 
       expect(sanitizedError).not.toContain('postgres://')
       expect(sanitizedError).toContain('[DATABASE_URL]')

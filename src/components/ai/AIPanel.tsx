@@ -6,7 +6,7 @@
  * Inclut: Résumés, Tags, Brainstorming, Synthèse multi-notes
  */
 
-import { X, Sparkles, Tag, Lightbulb, FileText, Settings, Link as LinkIcon } from 'lucide-react'
+import { X, Sparkles, Tag, Lightbulb, FileText, Link as LinkIcon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 import { aiService, type SummaryHistoryEntry } from '@/services/ai/mistralService'
@@ -57,15 +57,22 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
       const history = await aiService.getSummaryHistory(10)
       setSummaryHistory(history)
     }
-    loadHistory()
+    void loadHistory()
   }, [])
 
   // Charger les tags actuels de la note
   useEffect(() => {
     if (currentNote) {
+      // SECURITY FIX: Added length limit to prevent ReDoS attacks
+      // Limit content size and tag length for safe regex processing
+      const MAX_CONTENT_LENGTH = 100000 // 100KB max
+      const safeContent = currentNote.content.length > MAX_CONTENT_LENGTH
+        ? currentNote.content.substring(0, MAX_CONTENT_LENGTH)
+        : currentNote.content
+      
       // Extraire les tags du contenu de la note (format #tag)
-      const tagRegex = /#[\w-]+/g
-      const matches = currentNote.content.match(tagRegex) || []
+      const tagRegex = /#[\w-]{1,50}/g
+      const matches = safeContent.match(tagRegex) ?? []
       const extractedTags = matches.map(tag => tag.slice(1))
       setSelectedTags(extractedTags)
     }
@@ -144,7 +151,6 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
     // Ajouter les tags au contenu de la note
     const newTags = suggestedTags.filter(tag => !selectedTags.includes(tag))
     if (newTags.length > 0) {
-      const tagsText = `\n\n${  newTags.map(tag => `#${tag}`).join(' ')}`
       onUpdateNoteTags(currentNote.id, [...selectedTags, ...newTags])
       setSelectedTags([...selectedTags, ...newTags])
     }
@@ -152,7 +158,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
 
   // Fonction: Brainstorming
   const handleBrainstorm = async () => {
-    const topic = brainstormTopic || currentNote?.title || ''
+    const topic = brainstormTopic ?? currentNote?.title ?? ''
     
     if (!topic) {
       setError('Veuillez entrer un sujet de brainstorming')
@@ -216,7 +222,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
   }
 
   // Fonction: Détecter les liens automatiques
-  const handleDetectLinks = async () => {
+  const handleDetectLinks = () => {
     if (!currentNote?.content) {
       setError('Aucune note sélectionnée ou note vide')
       return
@@ -227,7 +233,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
 
     try {
       // Utiliser la détection par mots-clés (rapide)
-      const suggestions = await linkDetectionService.detectLinks(currentNote, notes)
+      const suggestions = linkDetectionService.detectLinks(currentNote, notes)
       setLinkSuggestions(suggestions)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la détection de liens')
@@ -241,10 +247,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
     if (!currentNote) {return}
     
     // Créer un lien wiki [[Note cible]]
-    const link = `[[${targetNoteTitle}]]`
+    // const link = `[[${targetNoteTitle}]]`
     
     // Ajouter le lien à la fin du contenu de la note
-    const newContent = `${currentNote.content  }\n\n${link}`
     onUpdateNoteTags(currentNote.id, [])  // Utiliser la fonction disponible pour mettre à jour
     
     // Note: Dans une implémentation complète, il faudrait une fonction dédiée onUpdateNoteContent
@@ -260,6 +265,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         </div>
         <button
           onClick={onClose}
+          type="button"
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
         >
           <X className="w-5 h-5" />
@@ -270,6 +276,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
       <div className="flex border-b border-gray-200 dark:border-gray-800 overflow-x-auto no-scrollbar">
         <button
           onClick={() => { setActiveTab('summary'); }}
+          type="button"
           className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'summary'
               ? 'text-primary-600 border-b-2 border-primary-600'
@@ -281,6 +288,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         </button>
         <button
           onClick={() => { setActiveTab('tags'); }}
+          type="button"
           className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'tags'
               ? 'text-primary-600 border-b-2 border-primary-600'
@@ -292,6 +300,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         </button>
         <button
           onClick={() => { setActiveTab('links'); }}
+          type="button"
           className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'links'
               ? 'text-primary-600 border-b-2 border-primary-600'
@@ -303,6 +312,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         </button>
         <button
           onClick={() => { setActiveTab('brainstorm'); }}
+          type="button"
           className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'brainstorm'
               ? 'text-primary-600 border-b-2 border-primary-600'
@@ -314,6 +324,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         </button>
         <button
           onClick={() => { setActiveTab('synthesis'); }}
+          type="button"
           className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
             activeTab === 'synthesis'
               ? 'text-primary-600 border-b-2 border-primary-600'
@@ -337,10 +348,11 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         {activeTab === 'summary' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Type de résumé</label>
+              <label htmlFor="summary-type" className="block text-sm font-medium mb-2">Type de résumé</label>
               <select
+                id="summary-type"
                 value={summaryType}
-                onChange={(e) => { setSummaryType(e.target.value as any); }}
+                onChange={(e) => { setSummaryType(e.target.value as 'short' | 'detailed' | 'bullets'); }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100"
               >
                 <option value="short">Résumé court</option>
@@ -350,8 +362,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
             </div>
 
             <button
-              onClick={handleGenerateSummary}
+              onClick={() => { void handleGenerateSummary(); }}
               disabled={loading || !currentNote}
+              type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Génération...' : 'Générer un résumé'}
@@ -361,7 +374,8 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
                 <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">{summary}</p>
                 <button
-                  onClick={() => onCreateNote(`Résumé - ${  currentNote?.title}`, summary)}
+                  onClick={() => { void onCreateNote(`Résumé - ${  currentNote?.title ?? 'Note'}`, summary); }}
+                  type="button"
                   className="mt-3 w-full px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   Créer une note
@@ -378,6 +392,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       key={entry.id}
                       className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => { setSummary(entry.summary); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSummary(entry.summary); } }}
+                      role="button"
+                      tabIndex={0}
                     >
                       <div className="font-medium text-xs text-gray-500 mb-1">
                         {entry.noteTitle} - {new Date(entry.timestamp).toLocaleDateString()}
@@ -397,8 +414,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         {activeTab === 'tags' && (
           <div className="space-y-4">
             <button
-              onClick={handleGenerateTags}
+              onClick={() => { void handleGenerateTags(); }}
               disabled={loading || !currentNote}
+              type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Génération...' : 'Générer des tags'}
@@ -452,8 +470,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
             </div>
 
             <button
-              onClick={handleDetectLinks}
+              onClick={() => { void handleDetectLinks(); }}
               disabled={loadingLinks || !currentNote}
+              type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loadingLinks ? 'Analyse en cours...' : 'Détecter les liens'}
@@ -471,6 +490,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       <div className="flex items-start justify-between mb-2">
                         <button
                           onClick={() => { onNavigateToNote(suggestion.targetNoteId); }}
+                          type="button"
                           className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex-1 text-left"
                         >
                           {suggestion.targetNoteTitle}
@@ -496,6 +516,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       )}
                       <button
                         onClick={() => { handleInsertLink(suggestion.targetNoteTitle); }}
+                        type="button"
                         className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                       >
                         Insérer lien [[{suggestion.targetNoteTitle}]]
@@ -520,19 +541,21 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         {activeTab === 'brainstorm' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Sujet de brainstorming</label>
+              <label htmlFor="brainstorm-topic" className="block text-sm font-medium mb-2">Sujet de brainstorming</label>
               <input
+                id="brainstorm-topic"
                 type="text"
                 value={brainstormTopic}
                 onChange={(e) => { setBrainstormTopic(e.target.value); }}
-                placeholder={currentNote?.title || "Entrez un sujet..."}
+                placeholder={currentNote?.title ?? "Entrez un sujet..."}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100"
               />
             </div>
 
             <button
-              onClick={handleBrainstorm}
+              onClick={() => { void handleBrainstorm(); }}
               disabled={loading}
+              type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Génération...' : 'Générer des idées'}
@@ -550,14 +573,16 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{idea}</p>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => handleCreateNoteFromIdea(idea)}
+                          onClick={() => { void handleCreateNoteFromIdea(idea); }}
+                          type="button"
                           className="text-xs text-primary-600 hover:text-primary-700"
                         >
                           Créer une note
                         </button>
                         {onUpdateNoteContent && (
                           <button
-                            onClick={() => { handleAddIdeaToCurrentNote(idea); }}
+                            onClick={() => { void handleAddIdeaToCurrentNote(idea); }}
+                            type="button"
                             className="text-xs text-primary-600 hover:text-primary-700"
                           >
                             Ajouter à la note
@@ -602,18 +627,20 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
             </div>
 
             <button
-              onClick={handleSynthesis}
+              onClick={() => { void handleSynthesis(); }}
               disabled={loading || selectedNotes.length === 0}
+              type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Génération...' : `Synthétiser ${selectedNotes.length} note(s)`}
+              {loading ? 'Génération...' : `Synthétiser ${String(selectedNotes.length)} note(s)`}
             </button>
 
             {synthesis && (
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
                 <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300">{synthesis}</p>
                 <button
-                  onClick={handleCreateNoteFromSynthesis}
+                  onClick={() => { void handleCreateNoteFromSynthesis(); }}
+                  type="button"
                   className="mt-3 w-full px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   Créer une note

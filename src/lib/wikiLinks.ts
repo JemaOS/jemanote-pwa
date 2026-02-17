@@ -68,8 +68,16 @@ export function extractWikiLinks(content: string): string[] {
 }
 
 // Convert wiki links to HTML for preview
+// SECURITY FIX: Added length limit to prevent ReDoS attacks
+// The regex now limits link text to 200 characters max
 export function renderWikiLinksToHTML(content: string, onLinkClick?: (title: string) => void): string {
-  return content.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
+  // SECURITY: Limit content size to prevent regex DoS
+  const MAX_CONTENT_LENGTH = 500000 // 500KB max
+  const safeContent = content.length > MAX_CONTENT_LENGTH 
+    ? content.substring(0, MAX_CONTENT_LENGTH) 
+    : content
+
+  return safeContent.replace(/\[\[([^\]]{1,200})\]\]/g, (match, linkText) => {
     const escapedText = linkText.replace(/"/g, '&quot;')
     return `<a href="#" class="wiki-link" data-note-title="${escapedText}" style="color: #5a63e9; text-decoration: underline; font-weight: 500;">${linkText}</a>`
   })

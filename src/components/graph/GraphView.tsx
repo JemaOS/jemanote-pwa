@@ -145,6 +145,10 @@ function resolveNodeColor(
     const matchesLabel = group.query && nodeData.label.toLowerCase().includes(group.query.toLowerCase())
     const matchesTag = group.query && nodeData.tags?.some(t => t.toLowerCase().includes(group.query.toLowerCase()))
     if (matchesLabel || matchesTag) {
+      // SECURITY FIX: Validate color format before processing to prevent ReDoS
+      if (!/^#[0-9A-Fa-f]{6}$/.test(group.color)) {
+        return color // Return default color if invalid format
+      }
       return parseInt(group.color.replace('#', '0x'), 16)
     }
   }

@@ -149,6 +149,11 @@ function calculateCyclomaticComplexity(content) {
  */
 function matchesKeyword(trimmed, keywords) {
   for (const keyword of keywords) {
+    // SECURITY FIX: Validate keyword to prevent ReDoS in dynamic regex
+    // Only allow valid JavaScript identifier characters
+    if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(keyword)) {
+      continue; // Skip invalid keywords
+    }
     if (new RegExp(`\\b${keyword}\\b`).test(trimmed)) return true;
   }
   return false;

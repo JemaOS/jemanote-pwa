@@ -14,13 +14,13 @@ import { linkDetectionService, type LinkSuggestion } from '@/services/linkDetect
 import type { Note } from '@/types'
 
 interface AIPanelProps {
-  currentNote: Note | null
-  notes: Note[]
-  onClose: () => void
-  onCreateNote: (title: string, content: string) => Promise<void>
-  onUpdateNoteTags: (noteId: string, tags: string[]) => void
-  onUpdateNoteContent?: (noteId: string, content: string) => Promise<void>
-  onNavigateToNote: (noteId: string) => void
+  readonly currentNote: Note | null
+  readonly notes: readonly Note[]
+  readonly onClose: () => void
+  readonly onCreateNote: (title: string, content: string) => Promise<void>
+  readonly onUpdateNoteTags: (noteId: string, tags: string[]) => void
+  readonly onUpdateNoteContent?: (noteId: string, content: string) => Promise<void>
+  readonly onNavigateToNote: (noteId: string) => void
 }
 
 type TabType = 'summary' | 'tags' | 'links' | 'brainstorm' | 'synthesis'
@@ -222,7 +222,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
   }
 
   // Fonction: Détecter les liens automatiques
-  const handleDetectLinks = () => {
+  const handleDetectLinks = async () => {
     if (!currentNote?.content) {
       setError('Aucune note sélectionnée ou note vide')
       return
@@ -393,13 +393,11 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                 <h3 className="text-sm font-medium mb-2">Historique récent</h3>
                 <div className="space-y-2">
                   {summaryHistory.slice(0, 5).map(entry => (
-                    <div
+                    <button
                       key={entry.id}
-                      className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      type="button"
+                      className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 w-full"
                       onClick={() => { setSummary(entry.summary); }}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSummary(entry.summary); } }}
-                      role="button"
-                      tabIndex={0}
                       aria-label={`Voir le résumé: ${entry.noteTitle}`}
                     >
                       <div className="font-medium text-xs text-gray-500 mb-1">
@@ -408,7 +406,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       <div className="text-gray-700 dark:text-gray-300 line-clamp-2">
                         {entry.summary}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -476,7 +474,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
             </div>
 
             <button
-              onClick={() => { void handleDetectLinks(); }}
+              onClick={() => { handleDetectLinks().catch(console.error); }}
               disabled={loadingLinks || !currentNote}
               type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

@@ -111,7 +111,7 @@ class MistralAIService {
       // Fallback: utiliser un hash simple si btoa échoue
       let hash = 0
       for (let i = 0; i < key.length; i++) {
-        const char = key.charCodeAt(i)
+        const char = key.codePointAt(i) ?? 0
         hash = ((hash << 5) - hash) + char
         hash = hash & hash // Convert to 32bit integer
       }

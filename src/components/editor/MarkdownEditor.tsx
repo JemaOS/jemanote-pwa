@@ -42,9 +42,9 @@ import { audioWidgetPlugin } from '@/lib/audioWidgetExtension';
 import { wikiLinksPlugin } from '@/lib/wikiLinks';
 
 interface MarkdownEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  onWikiLinkClick?: (noteTitle: string) => void;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly onWikiLinkClick?: (noteTitle: string) => void;
 }
 
 export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: MarkdownEditorProps) {

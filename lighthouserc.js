@@ -73,10 +73,10 @@ module.exports = {
       assertions: {
         // Performance globale
         'categories:performance': ['error', { minScore: 0.85 }],
-        'categories:accessibility': ['error', { minScore: 0.90 }],
-        'categories:best-practices': ['error', { minScore: 0.90 }],
-        'categories:seo': ['error', { minScore: 0.90 }],
-        'categories:pwa': ['warn', { minScore: 0.70 }],
+        'categories:accessibility': ['error', { minScore: 0.9 }],
+        'categories:best-practices': ['error', { minScore: 0.9 }],
+        'categories:seo': ['error', { minScore: 0.9 }],
+        'categories:pwa': ['warn', { minScore: 0.7 }],
         
         // Core Web Vitals
         'largest-contentful-paint': ['error', { maxNumericValue: 2500 }], // < 2.5s

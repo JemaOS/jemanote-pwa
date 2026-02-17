@@ -4,13 +4,13 @@
 import { CheckCircle, AlertCircle, Clock, Cloud, HardDrive, RefreshCw } from 'lucide-react'
 
 interface StatusBarProps {
-  userId?: string | null
-  activeNoteId?: string | null
-  syncing?: boolean
-  syncEnabled?: boolean
-  onShowAuth: () => void
-  onEnableSync?: () => void
-  onManualSync?: () => void
+  readonly userId?: string | null
+  readonly activeNoteId?: string | null
+  readonly syncing?: boolean
+  readonly syncEnabled?: boolean
+  readonly onShowAuth: () => void
+  readonly onEnableSync?: () => void
+  readonly onManualSync?: () => void
 }
 
 // Helper functions to get sync status text

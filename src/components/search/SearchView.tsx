@@ -7,11 +7,11 @@ import { useState } from 'react'
 import { Note } from '@/types'
 
 interface SearchViewProps {
-  userId?: string | null
-  notes: Note[]
-  searchQuery?: string
-  onSearchQueryChange?: (query: string) => void
-  onSelectNote?: (noteId: string) => void
+  readonly userId?: string | null
+  readonly notes: readonly Note[]
+  readonly searchQuery?: string
+  readonly onSearchQueryChange?: (query: string) => void
+  readonly onSelectNote?: (noteId: string) => void
 }
 
 // Helper function to get result count text

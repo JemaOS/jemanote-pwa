@@ -12,10 +12,10 @@ import React, { useState, useEffect } from 'react'
 import { aiService } from '@/services/ai/mistralService'
 
 interface AIContextMenuProps {
-  position: { x: number; y: number }
-  selectedText: string
-  onClose: () => void
-  onInsert: (text: string) => void
+  readonly position: { readonly x: number; readonly y: number }
+  readonly selectedText: string
+  readonly onClose: () => void
+  readonly onInsert: (text: string) => void
 }
 
 export default function AIContextMenu({ position, selectedText, onClose, onInsert }: AIContextMenuProps) {

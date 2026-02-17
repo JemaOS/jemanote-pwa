@@ -257,23 +257,23 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
 // --- End sub-components ---
 
 interface SidebarProps {
-  side: 'left' | 'right'
-  userId?: string | null
-  activeNoteId?: string | null
-  onNoteSelect?: (noteId: string) => void
-  notes?: Note[]
-  folders?: Folder[]
-  trashNotes?: Note[]
-  trashFolders?: Folder[]
-  createNote?: (title: string, content?: string, folderId?: string) => Promise<any>
-  updateNote?: (noteId: string, updates: Partial<Note>) => Promise<any>
-  deleteNote?: (noteId: string) => Promise<any>
-  restoreNote?: (noteId: string) => Promise<any>
-  permanentlyDeleteNote?: (noteId: string) => Promise<any>
-  deleteFolder?: (folderId: string) => Promise<any>
-  restoreFolder?: (folderId: string) => Promise<any>
-  permanentlyDeleteFolder?: (folderId: string) => Promise<any>
-  reloadFolders?: () => Promise<void>
+  readonly side: 'left' | 'right'
+  readonly userId?: string | null
+  readonly activeNoteId?: string | null
+  readonly onNoteSelect?: (noteId: string) => void
+  readonly notes?: readonly Note[]
+  readonly folders?: readonly Folder[]
+  readonly trashNotes?: readonly Note[]
+  readonly trashFolders?: readonly Folder[]
+  readonly createNote?: (title: string, content?: string, folderId?: string) => Promise<any>
+  readonly updateNote?: (noteId: string, updates: Partial<Note>) => Promise<any>
+  readonly deleteNote?: (noteId: string) => Promise<any>
+  readonly restoreNote?: (noteId: string) => Promise<any>
+  readonly permanentlyDeleteNote?: (noteId: string) => Promise<any>
+  readonly deleteFolder?: (folderId: string) => Promise<any>
+  readonly restoreFolder?: (folderId: string) => Promise<any>
+  readonly permanentlyDeleteFolder?: (folderId: string) => Promise<any>
+  readonly reloadFolders?: () => Promise<void>
 }
 
 /** Props passed to LeftSidebarContent */

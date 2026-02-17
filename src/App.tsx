@@ -226,19 +226,8 @@ function App() {
           />
         )
       case 'graph':
-        // Graph view uses workspace as base with graph overlay
-        return (
-          <WorkspaceView
-            userId={user?.id ?? null}
-            activeNoteId={activeNoteId}
-            onNoteChange={setActiveNoteId}
-            rightSidebarOpen={rightSidebarOpen}
-            notes={notes}
-            updateNote={updateNote}
-            createNote={handleCreateNoteFromAI}
-          />
-        )
       default:
+        // Graph view uses workspace as base with graph overlay
         return (
           <WorkspaceView
             userId={user?.id ?? null}
@@ -274,12 +263,10 @@ function App() {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile & Tablet overlay backdrop */}
         {isMobile && leftSidebarOpen && (
-          <div
+          <button
+            type="button"
             className="fixed inset-0 bg-black/50 z-30 laptop-sm:hidden"
             onClick={() => { setLeftSidebarOpen(false); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setLeftSidebarOpen(false); } }}
-            role="button"
-            tabIndex={0}
             aria-label="Fermer le menu"
           />
         )}

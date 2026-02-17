@@ -25,16 +25,16 @@ import { ViewMode } from '@/types'
 
 
 interface NavigationProps {
-  currentView: ViewMode
-  onViewChange: (view: ViewMode) => void
-  onToggleLeftSidebar: () => void
-  onToggleRightSidebar: () => void
-  leftSidebarOpen: boolean
-  rightSidebarOpen: boolean
-  user: User | null
-  onShowAuth: () => void
-  searchQuery?: string
-  onSearchQueryChange?: (query: string) => void
+  readonly currentView: ViewMode
+  readonly onViewChange: (view: ViewMode) => void
+  readonly onToggleLeftSidebar: () => void
+  readonly onToggleRightSidebar: () => void
+  readonly leftSidebarOpen: boolean
+  readonly rightSidebarOpen: boolean
+  readonly user: User | null
+  readonly onShowAuth: () => void
+  readonly searchQuery?: string
+  readonly onSearchQueryChange?: (query: string) => void
 }
 
 export default function Navigation({

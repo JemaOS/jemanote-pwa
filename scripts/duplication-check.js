@@ -349,7 +349,7 @@ function generateHTMLReport(summary, report) {
       <tbody>
         ${Object.entries(summary.formats).map(([format, stats]) => {
           const pct = stats.total?.lines ? ((stats.total?.duplicatedLines || 0) / stats.total.lines * 100).toFixed(2) : 0;
-          const cellClass = getDuplicationClass(parseFloat(pct), CONFIG.threshold);
+          const cellClass = getDuplicationClass(Number.parseFloat(pct), CONFIG.threshold);
           return `
             <tr>
               <td>${format}</td>
@@ -416,7 +416,7 @@ async function main() {
   }
   
   // Run jscpd
-  const result = runJscpd();
+  runJscpd();
   
   // Parse report
   const report = parseReport();

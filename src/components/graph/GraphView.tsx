@@ -21,9 +21,9 @@ import type { GraphNode, GraphEdge } from '@/services/graphIndexer'
 import { Note } from '@/types'
 
 interface GraphViewProps {
-  userId?: string | null
-  notes: Note[]
-  onNoteSelect?: (noteId: string) => void
+  readonly userId?: string | null
+  readonly notes: readonly Note[]
+  readonly onNoteSelect?: (noteId: string) => void
 }
 
 interface NodeData {
@@ -847,12 +847,15 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 <h4 className="text-xs font-medium text-neutral-300 uppercase tracking-wide border-b border-neutral-700 pb-1">Filtres</h4>
                 
                 <div className="flex items-center justify-between">
-                  <label className="text-xs text-neutral-400">Notes isolées</label>
+                  <label htmlFor="show-orphans-toggle" className="text-xs text-neutral-400">Notes isolées</label>
                   <button
+                    id="show-orphans-toggle"
+                    type="button"
                     onClick={() => { setGraphSettings(prev => ({ ...prev, showOrphans: !prev.showOrphans })); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       graphSettings.showOrphans ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
+                    aria-pressed={graphSettings.showOrphans}
                   >
                     <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
                       graphSettings.showOrphans ? 'translate-x-4' : 'translate-x-0'
@@ -946,12 +949,15 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 <h4 className="text-xs font-medium text-neutral-300 uppercase tracking-wide border-b border-neutral-700 pb-1">Affichage</h4>
                 
                 <div className="flex items-center justify-between">
-                  <label className="text-xs text-neutral-400">Flèches</label>
+                  <label htmlFor="show-arrows-toggle" className="text-xs text-neutral-400">Flèches</label>
                   <button
+                    id="show-arrows-toggle"
+                    type="button"
                     onClick={() => { setShowArrows(!showArrows); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       showArrows ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
+                    aria-pressed={showArrows}
                   >
                     <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
                       showArrows ? 'translate-x-4' : 'translate-x-0'
@@ -960,12 +966,15 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <label className="text-xs text-neutral-400">Étiquettes</label>
+                  <label htmlFor="show-labels-toggle" className="text-xs text-neutral-400">Étiquettes</label>
                   <button
+                    id="show-labels-toggle"
+                    type="button"
                     onClick={() => { setGraphSettings(prev => ({ ...prev, showLabels: !prev.showLabels })); }}
                     className={`w-8 h-4 rounded-full transition-colors relative ${
                       graphSettings.showLabels ? 'bg-blue-600' : 'bg-neutral-600'
                     }`}
+                    aria-pressed={graphSettings.showLabels}
                   >
                     <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
                       graphSettings.showLabels ? 'translate-x-4' : 'translate-x-0'

@@ -672,7 +672,7 @@ async function main() {
   console.log(`  - ${path.join(CONFIG.outputDir, 'dependency-report.html')}`);
   
   // Exit code
-  if (cycles.length > 0 || violations.filter(v => v.severity === 'error').length > 0) {
+  if (cycles.length > 0 || violations.some(v => v.severity === 'error')) {
     console.log(`\n${colors.red}❌ Analysis failed due to critical issues${colors.reset}`);
     process.exit(1);
   } else {

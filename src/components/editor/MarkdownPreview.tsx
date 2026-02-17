@@ -13,8 +13,8 @@ import { LocalStorage } from '@/lib/localStorage'
 import 'katex/dist/katex.min.css'
 
 interface MarkdownPreviewProps {
-  content: string
-  onWikiLinkClick?: (noteTitle: string) => void
+  readonly content: string
+  readonly onWikiLinkClick?: (noteTitle: string) => void
 }
 
 // Composant lecteur audio autonome

@@ -13,7 +13,7 @@ function getButtonText(loading: boolean, isLogin: boolean): string {
 }
 
 interface AuthModalProps {
-  onClose: () => void
+  readonly onClose: () => void
 }
 
 export default function AuthModal({ onClose }: AuthModalProps) {
@@ -47,7 +47,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   }
 
   return (
-    <div 
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -67,7 +70,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </button>
 
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+            <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
               Synchronisation Cloud
             </h2>
             <p className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">

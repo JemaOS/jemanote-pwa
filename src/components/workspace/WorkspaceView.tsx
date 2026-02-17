@@ -20,13 +20,13 @@ const EditorFallback = () => (
 )
 
 interface WorkspaceViewProps {
-  userId?: string | null
-  activeNoteId: string | null
-  onNoteChange: (noteId: string | null) => void
-  rightSidebarOpen: boolean
-  notes: Note[]
-  updateNote: (noteId: string, updates: Partial<Note>) => Promise<{ data: Note | null; error: Error | null }>
-  createNote?: (title: string, content: string, folderId?: string) => Promise<Note | null>
+  readonly userId?: string | null
+  readonly activeNoteId: string | null
+  readonly onNoteChange: (noteId: string | null) => void
+  readonly rightSidebarOpen: boolean
+  readonly notes: readonly Note[]
+  readonly updateNote: (noteId: string, updates: Partial<Note>) => Promise<{ data: Note | null; error: Error | null }>
+  readonly createNote?: (title: string, content: string, folderId?: string) => Promise<Note | null>
 }
 
 type ViewMode = 'edit' | 'split' | 'preview'

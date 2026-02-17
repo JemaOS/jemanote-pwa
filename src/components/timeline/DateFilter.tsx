@@ -10,8 +10,8 @@ import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 
 interface DateFilterProps {
-  selectedDate: Date | undefined
-  onSelectDate: (date: Date | undefined) => void
+  readonly selectedDate: Date | undefined
+  readonly onSelectDate: (date: Date | undefined) => void
 }
 
 export default function DateFilter({ selectedDate, onSelectDate }: DateFilterProps) {

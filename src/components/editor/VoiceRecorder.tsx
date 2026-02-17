@@ -5,9 +5,9 @@
 import { useState, useEffect, useRef } from 'react'
 
 interface VoiceRecorderProps {
-  onTranscriptChange: (transcript: string) => void
-  initialTranscript?: string
-  onSave?: (blob: Blob, duration: number) => void
+  readonly onTranscriptChange: (transcript: string) => void
+  readonly initialTranscript?: string
+  readonly onSave?: (blob: Blob, duration: number) => void
 }
 
 export default function VoiceRecorder({ onTranscriptChange, initialTranscript = '', onSave }: VoiceRecorderProps) {
@@ -39,10 +39,10 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     startRecording()
     return () => {
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop() } catch (e) {}
+        try { recognitionRef.current.stop() } catch (e) { console.error(e); }
       }
       if (mediaRecorderRef.current?.state === 'recording') {
-        try { mediaRecorderRef.current.stop() } catch (e) {}
+        try { mediaRecorderRef.current.stop() } catch (e) { console.error(e); }
       }
       if (timerRef.current) {
         clearInterval(timerRef.current)
@@ -96,13 +96,13 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
 
     recognition.onerror = (event: any) => {
       if (event.error === 'no-speech') {
-        try { recognition.start() } catch (e) {}
+        try { recognition.start() } catch (e) { console.error(e); }
       }
     }
 
     recognition.onend = () => {
       if (mediaRecorderRef.current?.state === 'recording') {
-        try { recognition.start() } catch (e) {}
+        try { recognition.start() } catch (e) { console.error(e); }
       }
     }
 
@@ -284,7 +284,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
 
   const stopRecording = () => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop() } catch (e) {}
+      try { recognitionRef.current.stop() } catch (e) { console.error(e); }
     }
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop()
@@ -446,7 +446,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             ) : (
               recordingWaveform.map((value, i) => (
                 <div
-                  key={`waveform-${i}`}
+                  key={`waveform-${value}-${i}`}
                   className="flex-1 bg-red-400 dark:bg-red-500 rounded-full transition-all"
                   style={{ height: `${Math.max(4, value * 100)}%` }}
                 />
@@ -501,7 +501,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           </div>
 
           {/* Waveform interactive style Apple avec drag */}
-          <div 
+          <div
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
             role="slider"
@@ -509,6 +509,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             aria-valuemin={0}
             aria-valuemax={Math.round(audioDuration)}
             aria-valuenow={Math.round(audioCurrentTime)}
+            aria-valuetext={`${Math.round(audioCurrentTime)} secondes sur ${Math.round(audioDuration)}`}
             tabIndex={0}
             onMouseDown={(e) => {
               e.preventDefault()
@@ -576,12 +577,12 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
                 
                 return (
                   <div
-                    key={`waveform-sample-${index}`}
+                    key={`waveform-sample-${value}-${index}`}
                     className="flex-1 transition-all pointer-events-none rounded-full"
-                    style={{ 
+                    style={{
                       height: `${Math.max(8, value * 100)}%`,
-                      backgroundColor: isPassed 
-                        ? '#5a63e9' 
+                      backgroundColor: isPassed
+                        ? '#5a63e9'
                         : 'rgb(212, 212, 212)',
                     }}
                   />

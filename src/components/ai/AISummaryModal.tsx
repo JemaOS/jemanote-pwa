@@ -7,12 +7,12 @@ import React, { useState, useEffect } from 'react'
 import { aiService, type SummaryHistoryEntry } from '@/services/ai/mistralService'
 
 interface AISummaryModalProps {
-  content: string
-  noteId?: string
-  noteTitle?: string
-  onClose: () => void
-  onApply: (summary: string, mode: 'replace' | 'prepend' | 'append') => void
-  onCreateNote?: (title: string, content: string) => void
+  readonly content: string
+  readonly noteId?: string
+  readonly noteTitle?: string
+  readonly onClose: () => void
+  readonly onApply: (summary: string, mode: 'replace' | 'prepend' | 'append') => void
+  readonly onCreateNote?: (title: string, content: string) => void
 }
 
 type SummaryType = 'short' | 'detailed' | 'bullets'

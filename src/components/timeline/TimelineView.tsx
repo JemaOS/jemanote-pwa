@@ -11,8 +11,8 @@ import { Note } from '@/types'
 import DateFilter from './DateFilter'
 
 interface TimelineViewProps {
-  notes: Note[]
-  onOpenNote: (noteId: string) => void
+  readonly notes: readonly Note[]
+  readonly onOpenNote: (noteId: string) => void
 }
 
 export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {

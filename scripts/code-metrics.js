@@ -654,7 +654,14 @@ function generateHTMLReport(results, summary) {
               <td class="${r.maintainabilityIndex < CONFIG.thresholds.maintainabilityIndex ? 'warning' : 'good'}">${r.maintainabilityIndex}</td>
               <td class="${r.debt.ratio > CONFIG.thresholds.technicalDebtRatio ? 'danger' : 'good'}">${r.debt.ratio}%</td>
               <td>${hasViolations ? r.violations.map(v => {
-                const badgeClass = v.severity === 'high' ? 'danger' : v.severity === 'medium' ? 'warning' : 'success';
+                let badgeClass;
+                if (v.severity === 'high') {
+                  badgeClass = 'danger';
+                } else if (v.severity === 'medium') {
+                  badgeClass = 'warning';
+                } else {
+                  badgeClass = 'success';
+                }
                 return `<span class="badge badge-${badgeClass}">${v.type}</span>`;
               }).join(' ') : '-'}</td>
             </tr>

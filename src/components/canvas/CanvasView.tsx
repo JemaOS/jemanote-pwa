@@ -8,11 +8,11 @@ import { LocalStorage } from '@/lib/localStorage'
 import { Note } from '@/types'
 
 interface CanvasViewProps {
-  userId?: string | null
-  notes?: Note[]
-  onOpenNote?: (noteId: string) => void
-  deleteNote?: (noteId: string) => Promise<any>
-  createNote?: (title: string, content: string) => Promise<any>
+  readonly userId?: string | null
+  readonly notes?: readonly Note[]
+  readonly onOpenNote?: (noteId: string) => void
+  readonly deleteNote?: (noteId: string) => Promise<unknown>
+  readonly createNote?: (title: string, content: string) => Promise<unknown>
 }
 
 interface CanvasNode {
@@ -579,6 +579,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       {/* Canvas */}
       <div
         ref={canvasRef}
+        role="application"
+        aria-label="Canvas de visualisation du graphe"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -636,6 +638,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             // Helper function to get border class based on selection state
             <div
               key={node.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Nœud ${node.title || 'sans titre'}`}
               className={`absolute bg-white dark:bg-neutral-800 border-2 rounded-lg shadow-lg overflow-hidden transition-shadow touch-none select-none ${getNodeBorderClass(isSelected, isInMultiSelection)} ${getCursorClass(draggedNode === node.id, isMultiSelectMode)}`}
               style={{
                 left: node.x,
@@ -652,6 +657,14 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                   setEditingNodeId(node.id)
                 } else if (node.type === 'note' && onOpenNote) {
                   onOpenNote(node.id)
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  if (node.type === 'note' && onOpenNote) {
+                    onOpenNote(node.id)
+                  }
                 }
               }}
             >

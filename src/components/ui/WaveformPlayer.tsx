@@ -5,10 +5,10 @@ import { Play, Pause } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
 interface WaveformPlayerProps {
-  blob: Blob
-  height?: number
-  color?: string
-  progressColor?: string
+  readonly blob: Blob
+  readonly height?: number
+  readonly color?: string
+  readonly progressColor?: string
 }
 
 export default function WaveformPlayer({ 

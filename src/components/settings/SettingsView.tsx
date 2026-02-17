@@ -8,7 +8,7 @@ import AISettingsSection from '@/components/ai/AISettingsSection'
 import { useTheme } from '@/contexts/ThemeContext'
 
 interface SettingsViewProps {
-  userId?: string | null
+  readonly userId?: string | null
 }
 
 export default function SettingsView({ userId }: SettingsViewProps) {

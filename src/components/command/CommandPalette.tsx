@@ -22,16 +22,16 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { ViewMode, Note } from '@/types'
 
 interface CommandPaletteProps {
-  open: boolean
-  onClose: () => void
-  notes: Note[]
-  currentView: ViewMode
-  onViewChange: (view: ViewMode) => void
-  onNoteSelect: (noteId: string) => void
-  onCreateNote: () => void
-  onShowAuth: () => void
-  user: any
-  onSignOut: () => void
+  readonly open: boolean
+  readonly onClose: () => void
+  readonly notes: readonly Note[]
+  readonly currentView: ViewMode
+  readonly onViewChange: (view: ViewMode) => void
+  readonly onNoteSelect: (noteId: string) => void
+  readonly onCreateNote: () => void
+  readonly onShowAuth: () => void
+  readonly user: unknown
+  readonly onSignOut: () => void
 }
 
 export default function CommandPalette({
@@ -75,12 +75,10 @@ export default function CommandPalette({
   }
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-fade-in"
+    <button
+      type="button"
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-fade-in w-full h-full"
       onClick={onClose}
-      onKeyDown={(e) => { if (e.key === 'Escape') { onClose(); } }}
-      role="button"
-      tabIndex={-1}
       aria-label="Fermer la palette de commandes"
     >
       <div className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-2xl">
@@ -226,6 +224,6 @@ export default function CommandPalette({
           </Command.List>
         </Command>
       </div>
-    </div>
+    </button>
   )
 }

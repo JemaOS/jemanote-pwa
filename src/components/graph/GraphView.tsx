@@ -220,7 +220,6 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
   const edgesRef = useRef<PIXI.Graphics | null>(null)
   
   const [showLegend, setShowLegend] = useState(true)
-  const [showControls, setShowControls] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [hoveredNode, setHoveredNode] = useState<string | null>(null)
@@ -440,46 +439,6 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
       )
     }
   }, [zoom, pan])
-
-  // Fonction pour centrer la vue sur un nœud
-  const centerOnNode = useCallback((nodeId: string) => {
-    const node = nodesRef.current.get(nodeId)
-    if (node && appRef.current) {
-      const targetX = -node.data.x * zoom
-      const targetY = -node.data.y * zoom
-      
-      // Animation fluide vers la cible
-      const startPan = { ...pan }
-      const startTime = performance.now()
-      const duration = 500 // ms
-      
-      const animate = (currentTime: number) => {
-        const elapsed = currentTime - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const ease = 1 - Math.pow(1 - progress, 3) // Cubic ease out
-        
-        setPan({
-          x: startPan.x + (targetX - startPan.x) * ease,
-          y: startPan.y + (targetY - startPan.y) * ease
-        })
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate)
-        }
-      }
-      
-      requestAnimationFrame(animate)
-    }
-  }, [zoom, pan])
-
-  // Centrer quand un nœud est sélectionné (optionnel, peut être désactivé si gênant)
-  /*
-  useEffect(() => {
-    if (selectedNode) {
-      centerOnNode(selectedNode)
-    }
-  }, [selectedNode, centerOnNode])
-  */
 
   // Créer un nœud PixiJS avec meilleur style
   const createNode = useCallback((nodeData: NodeData) => {

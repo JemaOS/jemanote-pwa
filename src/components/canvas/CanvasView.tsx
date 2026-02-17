@@ -54,7 +54,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [canvasNodes, setCanvasNodes] = useState<CanvasNode[]>([])
-  const [connections, setConnections] = useState<CanvasConnection[]>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set()) // Multi-selection
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false) // Multi-select mode toggle
@@ -188,13 +187,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       setIsDragging(true)
       setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
     }
-  }
-
-  // Helper for pinch zoom distance
-  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
-    const dx = touch1.clientX - touch2.clientX
-    const dy = touch1.clientY - touch2.clientY
-    return Math.hypot(dx, dy)
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -610,7 +602,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         >
           {/* Render connections */}
           <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%' }}>
-            {connections.map((conn) => {
+            {([] as CanvasConnection[]).map((conn) => {
               const fromNode = canvasNodes.find((n) => n.id === conn.from)
               const toNode = canvasNodes.find((n) => n.id === conn.to)
               if (!fromNode || !toNode) {return null}

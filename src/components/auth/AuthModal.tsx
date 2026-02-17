@@ -24,12 +24,12 @@ export default function AuthModal({ onClose }: AuthModalProps) {
     setLoading(true)
 
     try {
-      const { error } = isLogin
+      const { error: authError } = isLogin
         ? await signIn(email, password)
         : await signUp(email, password)
 
-      if (error) {
-        setError(error.message)
+      if (authError) {
+        setError(authError.message)
       } else {
         onClose()
       }
@@ -145,11 +145,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               disabled={loading}
               className="w-full h-11 sm:h-12 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-touch"
             >
-              {(() => {
-                if (loading) {return 'Chargement...'}
-                if (isLogin) {return 'Se connecter'}
-                return "S'inscrire"
-              })()}
+              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire")}
             </button>
 
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 text-center px-2">

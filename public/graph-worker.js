@@ -40,7 +40,7 @@ function initGraph(data) {
       y: Math.sin(angle) * radius,
       vx: 0,
       vy: 0,
-      mass: nodeData.type === 'main' ? 2 : nodeData.type === 'secondary' ? 1.5 : 1,
+      mass: nodeData.type === 'main' ? 2 : (nodeData.type === 'secondary' ? 1.5 : 1),
       type: nodeData.type,
     })
   })
@@ -58,7 +58,7 @@ function applyRepulsion() {
       
       const dx = nodeB.x - nodeA.x
       const dy = nodeB.y - nodeA.y
-      const distance = Math.sqrt(dx * dx + dy * dy) || 1
+      const distance = Math.hypot(dx, dy) || 1
       
       // Force de répulsion inversement proportionnelle au carré de la distance
       const force = params.repulsion / (distance * distance)
@@ -84,7 +84,7 @@ function applyAttraction() {
     
     const dx = target.x - source.x
     const dy = target.y - source.y
-    const distance = Math.sqrt(dx * dx + dy * dy) || 1
+    const distance = Math.hypot(dx, dy) || 1
     
     // Force de ressort (Spring force)
     // F = k * (current_length - rest_length)
@@ -117,7 +117,7 @@ function updatePositions() {
     node.vy *= params.damping
     
     // Limiter la vitesse maximale
-    const speed = Math.sqrt(node.vx * node.vx + node.vy * node.vy)
+    const speed = Math.hypot(node.vx, node.vy)
     if (speed > params.maxSpeed) {
       node.vx = (node.vx / speed) * params.maxSpeed
       node.vy = (node.vy / speed) * params.maxSpeed
@@ -202,7 +202,7 @@ self.onmessage = (e) => {
       data.forEach((nodeData) => {
         const existing = nodes.get(nodeData.id)
         if (existing) {
-          existing.mass = nodeData.type === 'main' ? 2 : nodeData.type === 'secondary' ? 1.5 : 1
+          existing.mass = nodeData.type === 'main' ? 2 : (nodeData.type === 'secondary' ? 1.5 : 1)
           existing.type = nodeData.type
         }
       })

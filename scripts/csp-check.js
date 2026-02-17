@@ -348,7 +348,9 @@ async function main() {
   console.log('✅ CSP check completed\n');
 }
 
-main().catch(error => {
+try {
+  await main();
+} catch (error) {
   console.error('❌ CSP check failed:', error);
   process.exit(1);
-});
+}

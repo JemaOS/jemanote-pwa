@@ -460,7 +460,11 @@ process.on('unhandledRejection', (error) => {
 })
 
 // Exécuter
-main().catch((error) => {
-  log(`Erreur: ${error.message}`, 'red')
-  process.exit(1)
-})
+(async () => {
+  try {
+    await main()
+  } catch (error) {
+    log(`Erreur: ${error.message}`, 'red')
+    process.exit(1)
+  }
+})()

@@ -686,11 +686,13 @@ async function main() {
 
 // Run if executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(error => {
+  try {
+    await main();
+  } catch (error) {
     console.error(`${colors.red}Error: ${error.message}${colors.reset}`);
     console.error(error.stack);
     process.exit(1);
-  });
+  }
 }
 
 export { main, buildDependencyGraph, detectCycles, calculateMetrics };

@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+
 import escomplex from 'typhonjs-escomplex';
 import glob from 'glob';
 
@@ -490,10 +490,12 @@ async function main() {
 
 // Run if executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(error => {
+  try {
+    await main();
+  } catch (error) {
     console.error(`${colors.red}Error: ${error.message}${colors.reset}`);
     process.exit(1);
-  });
+  }
 }
 
 export { main, getSourceFiles, analyzeFile, generateSummary };

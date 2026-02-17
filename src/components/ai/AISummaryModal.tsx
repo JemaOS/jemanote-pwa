@@ -188,7 +188,7 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
-          {activeTab === 'generate' ? (
+          {activeTab === 'generate' && (
             <>
               {/* Type de résumé */}
               <div>
@@ -291,7 +291,8 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
                 </div>
               )}
             </>
-          ) : (
+          )}
+          {activeTab === 'history' && (
             <>
               {/* Historique */}
               {history.length === 0 ? (

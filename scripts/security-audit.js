@@ -285,7 +285,9 @@ async function main() {
   process.exit(exitCode);
 }
 
-main().catch(error => {
+try {
+  await main();
+} catch (error) {
   console.error('❌ Security audit failed:', error);
   process.exit(1);
-});
+}

@@ -441,7 +441,11 @@ async function main() {
 }
 
 // Lancer le script
-main().catch((error) => {
-  console.error(color('red', '\n❌ Erreur fatale :'), error)
-  process.exit(1)
-})
+(async () => {
+  try {
+    await main()
+  } catch (error) {
+    console.error(color('red', '\n❌ Erreur fatale :'), error)
+    process.exit(1)
+  }
+})()

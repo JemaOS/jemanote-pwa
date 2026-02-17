@@ -83,6 +83,87 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
     }
   }
 
+  const getSecondaryMenu = () => {
+    if (showToneMenu) {
+      return (
+        <>
+          <button
+            onClick={() => { setShowToneMenu(false); }}
+            className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          >
+            ← Retour
+          </button>
+          <button
+            onClick={() => handleAction('tone', 'formal')}
+            disabled={loading}
+            className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Formel
+          </button>
+          <button
+            onClick={() => handleAction('tone', 'informal')}
+            disabled={loading}
+            className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Décontracté
+          </button>
+          <button
+            onClick={() => handleAction('tone', 'professional')}
+            disabled={loading}
+            className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Professionnel
+          </button>
+          <button
+            onClick={() => handleAction('tone', 'persuasive')}
+            disabled={loading}
+            className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            Persuasif
+          </button>
+        </>
+      )
+    }
+    return (
+      <>
+        <button
+          onClick={() => { setShowTranslateMenu(false); }}
+          className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        >
+          ← Retour
+        </button>
+        <button
+          onClick={() => handleAction('translate', 'anglais')}
+          disabled={loading}
+          className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+        >
+          Anglais
+        </button>
+        <button
+          onClick={() => handleAction('translate', 'espagnol')}
+          disabled={loading}
+          className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+        >
+          Espagnol
+        </button>
+        <button
+          onClick={() => handleAction('translate', 'allemand')}
+          disabled={loading}
+          className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+        >
+          Allemand
+        </button>
+        <button
+          onClick={() => handleAction('translate', 'italien')}
+          disabled={loading}
+          className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+        >
+          Italien
+        </button>
+      </>
+    )
+  }
+
   return (
     <div
       className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 min-w-[280px] max-w-[400px]"
@@ -143,81 +224,7 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
                 <span>Traduire</span>
               </button>
             </>
-          ) : showToneMenu ? (
-            <>
-              <button
-                onClick={() => { setShowToneMenu(false); }}
-                className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              >
-                ← Retour
-              </button>
-              <button
-                onClick={() => handleAction('tone', 'formal')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Formel
-              </button>
-              <button
-                onClick={() => handleAction('tone', 'informal')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Décontracté
-              </button>
-              <button
-                onClick={() => handleAction('tone', 'professional')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Professionnel
-              </button>
-              <button
-                onClick={() => handleAction('tone', 'persuasive')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Persuasif
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => { setShowTranslateMenu(false); }}
-                className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              >
-                ← Retour
-              </button>
-              <button
-                onClick={() => handleAction('translate', 'anglais')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Anglais
-              </button>
-              <button
-                onClick={() => handleAction('translate', 'espagnol')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Espagnol
-              </button>
-              <button
-                onClick={() => handleAction('translate', 'allemand')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Allemand
-              </button>
-              <button
-                onClick={() => handleAction('translate', 'italien')}
-                disabled={loading}
-                className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                Italien
-              </button>
-            </>
-          )}
+          ) : getSecondaryMenu()}
 
           {loading && (
             <div className="px-3 py-2 text-sm text-gray-500 flex items-center gap-2">

@@ -49,7 +49,7 @@ function App() {
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showCommandPalette, setShowCommandPalette] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
+  const [isMobile, setIsMobile] = useState(globalThis.innerWidth < 1024)
   const [hasUserToggledSidebar, setHasUserToggledSidebar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -76,7 +76,7 @@ function App() {
   // Responsive: Detect mobile/desktop
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 1024
+      const mobile = globalThis.innerWidth < 1024
       setIsMobile(mobile)
       
       // Only auto-manage sidebar if user hasn't manually toggled it
@@ -90,10 +90,10 @@ function App() {
       }
     }
 
-    window.addEventListener('resize', handleResize)
+    globalThis.addEventListener('resize', handleResize)
     // Initial check
     handleResize()
-    return () => { window.removeEventListener('resize', handleResize); }
+    return () => { globalThis.removeEventListener('resize', handleResize); }
   }, [leftSidebarOpen, hasUserToggledSidebar])
 
   // Keyboard shortcuts
@@ -111,8 +111,8 @@ function App() {
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => { window.removeEventListener('keydown', handleKeyDown); }
+    globalThis.addEventListener('keydown', handleKeyDown)
+    return () => { globalThis.removeEventListener('keydown', handleKeyDown); }
   }, [])
 
   // Sauvegarder avant de fermer l'application (F5, fermeture onglet, etc.)
@@ -126,12 +126,17 @@ function App() {
       const hasUnsavedChanges = document.querySelector('[data-save-status="unsaved"]')
       if (hasUnsavedChanges) {
         e.preventDefault()
-        e.returnValue = ''
+        // Modern browsers require returnValue to be set for the beforeunload event
+        // This is intentional and not deprecated in this context
+        Object.defineProperty(e, 'returnValue', {
+          value: '',
+          writable: false
+        })
       }
     }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => { window.removeEventListener('beforeunload', handleBeforeUnload); }
+    globalThis.addEventListener('beforeunload', handleBeforeUnload)
+    return () => { globalThis.removeEventListener('beforeunload', handleBeforeUnload); }
   }, [])
 
   // Manual sync function - just toggle sync to trigger a refresh

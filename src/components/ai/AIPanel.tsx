@@ -475,7 +475,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
             </div>
 
             <button
-              onClick={() => { void handleDetectLinks(); }}
+              onClick={() => { void (async () => { try { await handleDetectLinks(); } catch {} })(); }}
               disabled={loadingLinks || !currentNote}
               type="button"
               className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -578,7 +578,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{idea}</p>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => { void handleCreateNoteFromIdea(idea); }}
+                          onClick={() => { void (async () => { try { await handleCreateNoteFromIdea(idea); } catch {} })(); }}
                           type="button"
                           className="text-xs text-primary-600 hover:text-primary-700"
                         >
@@ -586,7 +586,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                         </button>
                         {onUpdateNoteContent && (
                           <button
-                            onClick={() => { void handleAddIdeaToCurrentNote(idea); }}
+                            onClick={() => { void (async () => { try { await handleAddIdeaToCurrentNote(idea); } catch {} })(); }}
                             type="button"
                             className="text-xs text-primary-600 hover:text-primary-700"
                           >

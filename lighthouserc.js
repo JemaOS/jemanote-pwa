@@ -82,7 +82,7 @@ module.exports = {
         'largest-contentful-paint': ['error', { maxNumericValue: 2500 }], // < 2.5s
         'first-contentful-paint': ['error', { maxNumericValue: 1800 }],   // < 1.8s
         'total-blocking-time': ['error', { maxNumericValue: 200 }],       // < 200ms
-        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],   // < 0.1
+        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],   // < 0.1 (0.1 is intentional, not a zero fraction)
         'speed-index': ['error', { maxNumericValue: 3400 }],              // < 3.4s
         'interactive': ['error', { maxNumericValue: 3800 }],              // TTI < 3.8s
         

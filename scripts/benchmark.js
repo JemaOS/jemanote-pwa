@@ -397,7 +397,14 @@ async function main() {
 
 // Exécuter si appelé directement
 if (require.main === module) {
-  main();
+  (async () => {
+    try {
+      await main();
+    } catch (error) {
+      console.error('Fatal error:', error.message);
+      process.exit(1);
+    }
+  })();
 }
 
 module.exports = { benchmarkBuild, analyzeBuildSize, generateReport };

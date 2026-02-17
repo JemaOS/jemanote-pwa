@@ -20,12 +20,12 @@ export default function AuthView() {
     setLoading(true)
 
     try {
-      const { error } = isLogin
+      const { error: authError } = isLogin
         ? await signIn(email, password)
         : await signUp(email, password)
 
-      if (error) {
-        setError(error.message)
+      if (authError) {
+        setError(authError.message)
       }
     } catch (err) {
       setError('Une erreur est survenue')
@@ -121,11 +121,7 @@ export default function AuthView() {
               disabled={loading}
               className="w-full h-12 bg-primary-500 text-white font-semibold rounded-md hover:bg-primary-600 active:bg-primary-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {(() => {
-                if (loading) {return 'Chargement...'}
-                if (isLogin) {return 'Se connecter'}
-                return "S'inscrire"
-              })()}
+              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire")}
             </button>
           </form>
         </div>

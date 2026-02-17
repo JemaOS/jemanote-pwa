@@ -181,7 +181,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
     const dx = touch1.clientX - touch2.clientX
     const dy = touch1.clientY - touch2.clientY
-    return Math.sqrt(dx * dx + dy * dy)
+    return Math.hypot(dx, dy)
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -317,7 +317,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     const noteNodes = canvasNodes.filter(n => selectedNodes.has(n.id) && n.type === 'note')
     
     if (noteNodes.length > 0 && deleteNote) {
-      const confirmed = window.confirm(
+      const confirmed = globalThis.confirm(
         `Voulez-vous supprimer ${selectedNodes.size} élément(s) du canvas et mettre les ${noteNodes.length} note(s) à la corbeille ?`
       )
       if (confirmed) {

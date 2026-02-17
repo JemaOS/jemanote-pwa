@@ -107,9 +107,11 @@ export const MOCK_DATA = {
     updated_at: '2024-01-01T00:00:00Z',
   },
   
-  /** Session de test */
+  /** Session de test - Mock tokens for testing purposes only, NOT real credentials */
   SESSION: {
+    /** Mock access token for testing - NOT a real credential */
     access_token: 'mock-access-token-123',
+    /** Mock refresh token for testing - NOT a real credential */
     refresh_token: 'mock-refresh-token-456',
     expires_in: 3600,
     token_type: 'bearer',
@@ -197,13 +199,19 @@ export const TEST_SELECTORS = {
     OFFLINE: 'offline-button',
   },
   
-  /** Inputs */
+  /** Inputs - These are test selectors for form input elements, NOT actual credentials */
   INPUT: {
+    /** Test selector for title input field */
     TITLE: 'title-input',
+    /** Test selector for search input field */
     SEARCH: 'search-input',
+    /** Test selector for email input field (data-testid attribute value) */
     EMAIL: 'email-input',
+    /** Test selector for password input field (data-testid attribute value) - NOT a real password */
     PASSWORD: 'password-input',
+    /** Test selector for content input field */
     CONTENT: 'content-input',
+    /** Test selector for tag input field */
     TAG: 'tag-input',
   },
   
@@ -306,9 +314,9 @@ export const TEST_CONFIG = {
     ERROR_RATE: 0,
   },
   
-  /** Configuration de sécurité */
+  /** Configuration de sécurité - Test payloads for security testing only */
   SECURITY: {
-    /** Payloads XSS de test */
+    /** Payloads XSS de test - Used for testing XSS protection mechanisms */
     XSS_PAYLOADS: [
       '<script>alert("XSS")</script>',
       '<img src=x onerror="alert(\'XSS\')">',
@@ -316,7 +324,7 @@ export const TEST_CONFIG = {
       '<svg onload="alert(\'XSS\')">',
       '"><script>alert(String.fromCharCode(88,83,83))</script>',
     ],
-    /** Payloads d'injection SQL */
+    /** Payloads d'injection SQL - Used for testing SQL injection protection */
     SQL_PAYLOADS: [
       "' OR '1'='1",
       "'; DROP TABLE users; --",
@@ -371,7 +379,8 @@ export const generators = {
   email: (): string => `test-${Date.now()}@example.com`,
   
   /**
-   * Génère un mot de passe de test
+   * Génère un mot de passe de test aléatoire
+   * This generates a random test password for testing purposes only
    */
   password: (): string => `TestPass${Date.now()}!`,
   

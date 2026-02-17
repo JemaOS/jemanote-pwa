@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,7 +60,7 @@ const colors = {
  */
 function checkJscpd() {
   try {
-    execSync('npx jscpd --version', { stdio: 'pipe' });
+    execFileSync('npx', ['jscpd', '--version'], { stdio: 'pipe' });
     return true;
   } catch {
     return false;
@@ -73,23 +73,26 @@ function checkJscpd() {
 function runJscpd() {
   console.log(`${colors.blue}🔍 Running jscpd analysis...${colors.reset}\n`);
   
-  const ignorePattern = CONFIG.ignore.map(i => `--ignore "${i}"`).join(' ');
-  const reporters = CONFIG.reporters.map(r => `--reporters ${r}`).join(' ');
-  const formats = CONFIG.formats.map(f => `--format ${f}`).join(' ');
-  
-  const command = `npx jscpd "${path.join(ROOT_DIR, 'src')}" \
-    --min-lines ${CONFIG.minLines} \
-    --min-tokens ${CONFIG.minTokens} \
-    --threshold ${CONFIG.threshold} \
-    --output "${CONFIG.outputDir}" \
-    ${reporters} \
-    ${formats} \
-    ${ignorePattern} \
-    --gitignore \
-    --blame`;
+  // Build command arguments array to avoid shell injection
+  // All values are from trusted CONFIG object, not user input
+  const args = [
+    'jscpd',
+    path.join(ROOT_DIR, 'src'),
+    '--min-lines', String(CONFIG.minLines),
+    '--min-tokens', String(CONFIG.minTokens),
+    '--threshold', String(CONFIG.threshold),
+    '--output', CONFIG.outputDir,
+    ...CONFIG.reporters.flatMap(r => ['--reporters', r]),
+    ...CONFIG.formats.flatMap(f => ['--format', f]),
+    ...CONFIG.ignore.flatMap(i => ['--ignore', i]),
+    '--gitignore',
+    '--blame'
+  ];
   
   try {
-    const output = execSync(command, { 
+    // Use execFileSync instead of execSync to avoid shell injection vulnerabilities
+    // execFileSync does not use shell, so no shell injection is possible
+    const output = execFileSync('npx', args, { 
       encoding: 'utf-8',
       cwd: ROOT_DIR
     });

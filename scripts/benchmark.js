@@ -345,8 +345,8 @@ function compareWithPrevious(currentReport) {
  * Point d'entrée principal
  */
 async function main() {
-  const args = process.argv.slice(2);
-  const shouldCompare = args.includes('--compare');
+  const args = new Set(process.argv.slice(2));
+  const shouldCompare = args.has('--compare');
 
   log('=== Performance Benchmark ===\n');
 
@@ -396,14 +396,7 @@ async function main() {
 
 // Exécuter si appelé directement
 if (require.main === module) {
-  (async () => {
-    try {
-      await main();
-    } catch (error) {
-      console.error('Fatal error:', error.message);
-      process.exit(1);
-    }
-  })();
+  await main();
 }
 
 module.exports = { benchmarkBuild, analyzeBuildSize, generateReport };

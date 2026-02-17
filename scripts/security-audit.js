@@ -224,7 +224,6 @@ function applyExceptions(report, exceptions) {
  */
 async function main() {
   const args = process.argv.slice(2);
-  const minSeverity = args.find(arg => arg.startsWith('--severity='))?.split('=')[1] || 'low';
   const saveToFile = args.includes('--save');
   const failOnCritical = args.includes('--fail-on-critical');
   const failOnHigh = args.includes('--fail-on-high');

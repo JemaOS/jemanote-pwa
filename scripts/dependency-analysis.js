@@ -69,7 +69,6 @@ function getSourceFiles() {
  */
 function parseImports(filePath, content) {
   const imports = [];
-  const relativePath = path.relative(CONFIG.sourceDir, filePath);
   const dirName = path.dirname(filePath);
   
   // ES6 imports - simplified regex to avoid SonarQube warning
@@ -145,12 +144,10 @@ function isExternalDependency(importPath) {
  */
 function buildDependencyGraph(files) {
   const graph = new Map();
-  const fileMap = new Map();
-  
+
   // First pass: index all files
   for (const file of files) {
     const relativePath = path.relative(CONFIG.sourceDir, file).replace(/\.(ts|tsx)$/, '');
-    fileMap.set(relativePath, file);
     graph.set(relativePath, {
       path: relativePath,
       fullPath: file,
@@ -340,7 +337,6 @@ function checkLayerViolations(graph, layers) {
 function generateHTMLReport(graph, cycles, metrics, layers, violations) {
   const highInstability = metrics.filter(m => m.instability > CONFIG.thresholds.instabilityThreshold);
   const highDependencies = metrics.filter(m => m.ce > CONFIG.thresholds.maxDependencies);
-  const highDependents = metrics.filter(m => m.ca > CONFIG.thresholds.maxDependents);
   
   const html = `<!DOCTYPE html>
 <html lang="en">

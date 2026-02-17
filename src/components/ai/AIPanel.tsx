@@ -572,7 +572,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                 <div className="space-y-2">
                   {ideas.map((idea, index) => (
                     <div
-                      key={`idea-${  index}`}
+                      key={`idea-${idea.substring(0, 20)}-${index}`}
                       className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md group"
                     >
                       <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{idea}</p>

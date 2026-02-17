@@ -330,9 +330,9 @@ const updateBaselines = () => {
 
 // Fonction principale
 const main = async () => {
-  const args = process.argv.slice(2)
-  const shouldUpdate = args.includes('--update')
-  const shouldReport = args.includes('--report')
+  const args = new Set(process.argv.slice(2))
+  const shouldUpdate = args.has('--update')
+  const shouldReport = args.has('--report')
   
   ensureDir(CONFIG.diffDir)
   

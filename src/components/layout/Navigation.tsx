@@ -61,7 +61,6 @@ export default function Navigation({
   const handleViewChange = (view: ViewMode) => {
     onViewChange(view)
     setMobileMenuOpen(false)
-    setShowMobileSearch(false)
   }
 
   const viewButtonClass = (view: ViewMode) =>

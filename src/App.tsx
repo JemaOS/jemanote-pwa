@@ -264,6 +264,10 @@ function App() {
           <div
             className="fixed inset-0 bg-black/50 z-30 laptop-sm:hidden"
             onClick={() => { setLeftSidebarOpen(false); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setLeftSidebarOpen(false); } }}
+            role="button"
+            tabIndex={0}
+            aria-label="Fermer le menu"
           />
         )}
 

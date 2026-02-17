@@ -446,7 +446,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             ) : (
               recordingWaveform.map((value, i) => (
                 <div
-                  key={i}
+                  key={`waveform-${i}`}
                   className="flex-1 bg-red-400 dark:bg-red-500 rounded-full transition-all"
                   style={{ height: `${Math.max(4, value * 100)}%` }}
                 />
@@ -504,6 +504,12 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           <div 
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
+            role="slider"
+            aria-label="Waveform de lecture audio"
+            aria-valuemin={0}
+            aria-valuemax={Math.round(audioDuration)}
+            aria-valuenow={Math.round(audioCurrentTime)}
+            tabIndex={0}
             onMouseDown={(e) => {
               e.preventDefault()
               const container = waveformContainerRef.current
@@ -570,7 +576,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
                 
                 return (
                   <div
-                    key={index}
+                    key={`waveform-sample-${index}`}
                     className="flex-1 transition-all pointer-events-none rounded-full"
                     style={{ 
                       height: `${Math.max(8, value * 100)}%`,

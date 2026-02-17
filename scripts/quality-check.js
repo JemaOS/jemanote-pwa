@@ -331,11 +331,4 @@ async function main() {
   }
 }
 
-(async () => {
-  try {
-    await main();
-  } catch (error) {
-    console.error(colors.red + 'Fatal error:' + colors.reset, error);
-    process.exit(1);
-  }
-})();
+await main();

@@ -78,6 +78,10 @@ export default function CommandPalette({
     <div 
       className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
+      onKeyDown={(e) => { if (e.key === 'Escape') { onClose(); } }}
+      role="button"
+      tabIndex={-1}
+      aria-label="Fermer la palette de commandes"
     >
       <div className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-2xl">
         <Command 

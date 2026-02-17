@@ -653,7 +653,10 @@ function generateHTMLReport(results, summary) {
               <td class="${r.complexity.cognitive > CONFIG.thresholds.cognitiveComplexity ? 'warning' : 'good'}">${r.complexity.cognitive}</td>
               <td class="${r.maintainabilityIndex < CONFIG.thresholds.maintainabilityIndex ? 'warning' : 'good'}">${r.maintainabilityIndex}</td>
               <td class="${r.debt.ratio > CONFIG.thresholds.technicalDebtRatio ? 'danger' : 'good'}">${r.debt.ratio}%</td>
-              <td>${hasViolations ? r.violations.map(v => `<span class="badge badge-${v.severity === 'high' ? 'danger' : v.severity === 'medium' ? 'warning' : 'success'}">${v.type}</span>`).join(' ') : '-'}</td>
+              <td>${hasViolations ? r.violations.map(v => {
+                const badgeClass = v.severity === 'high' ? 'danger' : v.severity === 'medium' ? 'warning' : 'success';
+                return `<span class="badge badge-${badgeClass}">${v.type}</span>`;
+              }).join(' ') : '-'}</td>
             </tr>
           `;
         }).join('')}

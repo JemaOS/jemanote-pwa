@@ -68,14 +68,7 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
     }
   }
 
-  const handleInsert = () => {
-    if (result) {
-      onInsert(result)
-      onClose()
-    }
-  }
-
-  const handleReplace = () => {
+  const handleInsertAction = () => {
     if (result) {
       // La logique de remplacement sera gérée par le parent
       onInsert(result)
@@ -249,13 +242,13 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
 
           <div className="flex gap-2">
             <button
-              onClick={handleInsert}
+              onClick={handleInsertAction}
               className="flex-1 px-3 py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
             >
               Insérer après
             </button>
             <button
-              onClick={handleReplace}
+              onClick={handleInsertAction}
               className="flex-1 px-3 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Remplacer

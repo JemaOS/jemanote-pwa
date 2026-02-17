@@ -143,7 +143,7 @@ function simulationStep() {
     y: node.y,
   }))
   
-  self.postMessage({
+  globalThis.postMessage({
     type: 'positions',
     data: positions,
   })
@@ -176,7 +176,7 @@ function stopSimulation() {
 }
 
 // Gestionnaire de messages
-self.onmessage = (e) => {
+globalThis.onmessage = (e) => {
   const { type, data } = e.data
   
   switch (type) {

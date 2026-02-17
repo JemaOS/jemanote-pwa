@@ -55,6 +55,11 @@ const colors = {
   cyan: '\x1b[36m'
 };
 
+// Utility to safely create regex patterns from keywords
+function createSafeKeywordRegex(keyword) {
+  return String.raw`\b${keyword}\b`;
+}
+
 /**
  * Get all source files
  */

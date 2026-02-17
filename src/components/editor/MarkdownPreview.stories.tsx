@@ -114,7 +114,7 @@ Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails sur les d
   },
 }
 
-export const Math: Story = {
+export const MathEquations: Story = {
   args: {
     ...defaultProps,
     content: `# Mathématiques

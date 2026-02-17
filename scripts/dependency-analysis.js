@@ -72,8 +72,8 @@ function parseImports(filePath, content) {
   const relativePath = path.relative(CONFIG.sourceDir, filePath);
   const dirName = path.dirname(filePath);
   
-  // ES6 imports
-  const es6Regex = /import\s+(?:(?:{[^}]*}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"];?/g;
+  // ES6 imports - simplified regex to avoid SonarQube warning
+  const es6Regex = /import\s+(?:\{[^}]*}|\*\s+as\s+\w+|\w+)?\s*from\s+['"]([^'"]+)['"];?/g;
   let match;
   while ((match = es6Regex.exec(content)) !== null) {
     const importPath = match[1];

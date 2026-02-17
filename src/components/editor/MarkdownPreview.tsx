@@ -102,7 +102,7 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
   const processWikiLinks = (text: string) => {
     const MAX_TEXT_LENGTH = 500000 // 500KB max
     const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
-    return safeText.replace(/\[\[([^\]]{1,200})\]\]/g, (match, noteTitle) => {
+    return safeText.replaceAll(/\[\[([^\]]{1,200})\]\]/g, (match, noteTitle) => {
       return `<span class="wiki-link" data-note="${noteTitle}">${noteTitle}</span>`
     })
   }

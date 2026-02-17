@@ -79,7 +79,7 @@ Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails.
   },
 }
 
-export const WithMath: Story = {
+export const WithMathEquations: Story = {
   args: {
     ...defaultProps,
     value: `# Mathématiques

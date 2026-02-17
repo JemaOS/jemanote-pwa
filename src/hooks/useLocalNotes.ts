@@ -141,7 +141,7 @@ export function useLocalNotes(userId?: string | null) {
           .from('notes')
           .select('*')
           .eq('user_id', userId)
-          .is('deleted_at', null)
+          .filter('deleted_at', 'is', null)
 
         if (error) {throw error}
 
@@ -150,7 +150,7 @@ export function useLocalNotes(userId?: string | null) {
           .from('folders')
           .select('*')
           .eq('user_id', userId)
-          .is('deleted_at', null)
+          .filter('deleted_at', 'is', null)
 
         if (foldersError) {throw foldersError}
 

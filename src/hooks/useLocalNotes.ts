@@ -32,6 +32,32 @@ async function uploadLocalFolders(localOnlyFolders: Folder[], userId: string) {
   }
 }
 
+// Helper: find items that exist in both local and cloud but have been modified locally (e.g., soft-deleted)
+function findLocallyModifiedItems<T extends { id: string; updated_at: string }>(
+  localItems: T[],
+  cloudItems: T[] | null
+): T[] {
+  return localItems.filter(local => {
+    const cloudItem = cloudItems?.find(cloud => cloud.id === local.id)
+    if (!cloudItem) {return false}
+    const localTime = new Date(local.updated_at).getTime()
+    const cloudTime = new Date(cloudItem.updated_at).getTime()
+    return localTime > cloudTime
+  })
+}
+
+async function syncModifiedNotes(modifiedNotes: Note[], userId: string) {
+  for (const note of modifiedNotes) {
+    await supabase.from('notes').update(note).eq('id', note.id)
+  }
+}
+
+async function syncModifiedFolders(modifiedFolders: Folder[], userId: string) {
+  for (const folder of modifiedFolders) {
+    await supabase.from('folders').update(folder).eq('id', folder.id)
+  }
+}
+
 async function handleNoteRealtimeEvent(
   payload: { eventType: string; new: any; old: any },
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>
@@ -143,20 +169,28 @@ export function useLocalNotes(userId?: string | null) {
         const localOnlyNotes = findLocalOnlyItems(localNotes, cloudNotes)
         await uploadLocalNotes(localOnlyNotes, userId)
 
+        // Sync locally modified notes (e.g., soft-deleted notes) to cloud
+        const modifiedNotes = findLocallyModifiedItems(localNotes, cloudNotes)
+        await syncModifiedNotes(modifiedNotes, userId)
+
         // Merge local and cloud folders (cloud takes precedence for conflicts)
         const localFolders = await LocalStorage.getFolders()
         const mergedFolders = mergeFolders(localFolders, cloudFolders || [], userId)
-        
+
         setFolders(mergedFolders)
-        
+
         // Save all merged folders to local storage
         for (const folder of mergedFolders) {
           await LocalStorage.saveFolder(folder)
         }
-        
+
         // Upload local folders that don't exist in cloud
         const localOnlyFolders = findLocalOnlyItems(localFolders, cloudFolders)
         await uploadLocalFolders(localOnlyFolders, userId)
+
+        // Sync locally modified folders (e.g., soft-deleted folders) to cloud
+        const modifiedFolders = findLocallyModifiedItems(localFolders, cloudFolders)
+        await syncModifiedFolders(modifiedFolders, userId)
       } catch (error) {
         console.error('Sync error:', error)
       } finally {
@@ -436,12 +470,22 @@ export function useLocalNotes(userId?: string | null) {
       const notesInFolder = notes.filter((n) => n.folder_id === folderId)
       for (const note of notesInFolder) {
         await LocalStorage.deleteNote(note.id)
+
+        // Sync note deletion to cloud if user is logged in
+        if (userId && syncEnabled) {
+          await supabase.from('notes').delete().eq('id', note.id)
+        }
       }
       setNotes((prev) => prev.filter((n) => n.folder_id !== folderId))
 
       // Delete the folder
       await LocalStorage.deleteFolder(folderId)
       setFolders((prev) => prev.filter((f) => f.id !== folderId))
+
+      // Sync folder deletion to cloud if user is logged in
+      if (userId && syncEnabled) {
+        await supabase.from('folders').delete().eq('id', folderId)
+      }
 
       return { error: null }
     } catch (error) {

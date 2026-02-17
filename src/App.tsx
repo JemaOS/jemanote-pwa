@@ -71,6 +71,7 @@ function App() {
       }, 100)
       return () => { clearTimeout(timer); }
     }
+    return undefined
   }, [user?.id])
 
   // Responsive: Detect mobile/desktop

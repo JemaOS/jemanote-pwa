@@ -344,6 +344,7 @@ export function useLocalNotes(userId?: string | null) {
       if (!folder) {return { error: new Error('Folder not found') }}
 
       const deletedAt = new Date().toISOString()
+      const updates = { deleted_at: deletedAt }
       
       // Soft delete the folder
       const updatedFolder: Folder = {
@@ -355,6 +356,11 @@ export function useLocalNotes(userId?: string | null) {
       setFolders((prev) =>
         prev.map((f) => (f.id === folderId ? updatedFolder : f))
       )
+
+      // Sync folder deletion to cloud if user is logged in
+      if (userId && syncEnabled) {
+        await supabase.from('folders').update(updates).eq('id', folderId)
+      }
 
       // Soft delete all notes in this folder
       const notesInFolder = notes.filter((n) => n.folder_id === folderId && !n.deleted_at)
@@ -368,6 +374,11 @@ export function useLocalNotes(userId?: string | null) {
         setNotes((prev) =>
           prev.map((n) => (n.id === note.id ? updatedNote : n))
         )
+
+        // Sync note deletion to cloud if user is logged in
+        if (userId && syncEnabled) {
+          await supabase.from('notes').update(updates).eq('id', note.id)
+        }
       }
 
       return { error: null }
@@ -473,34 +484,64 @@ export function useLocalNotes(userId?: string | null) {
 
 // Helper function to merge local and cloud notes
 function mergeNotes(localNotes: Note[], cloudNotes: Note[], userId: string): Note[] {
-  const merged = [...cloudNotes]
-  const cloudIds = new Set(cloudNotes.map((n) => n.id))
+  const merged = new Map<string, Note>()
 
-  // Add local notes that don't exist in cloud
-  for (const localNote of localNotes) {
-    if (!cloudIds.has(localNote.id)) {
-      merged.push({ ...localNote, user_id: userId })
-    }
+  // Add all cloud notes to the map
+  for (const cloudNote of cloudNotes) {
+    merged.set(cloudNote.id, { ...cloudNote, user_id: userId })
   }
 
-  return merged.sort((a, b) =>
-    new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-  )
+  // Merge with local notes, respecting timestamps and deletions
+  for (const localNote of localNotes) {
+    const cloudNote = merged.get(localNote.id)
+    const localTime = new Date(localNote.updated_at).getTime()
+    const cloudTime = cloudNote ? new Date(cloudNote.updated_at).getTime() : 0
+
+    if (!cloudNote) {
+      // Local note doesn't exist in cloud - add it
+      merged.set(localNote.id, { ...localNote, user_id: userId })
+    } else if (localTime > cloudTime) {
+      // Local note is newer - use local version (includes deletions)
+      merged.set(localNote.id, { ...localNote, user_id: userId })
+    }
+    // If cloud is newer or same, keep cloud version (already in map)
+  }
+
+  // Convert map to array and sort by updated_at
+  // Note: We include soft-deleted notes so cloud deletions are synced locally
+  // The UI will filter them out using notes.filter(n => !n.deleted_at)
+  return Array.from(merged.values())
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
 }
 
 // Helper function to merge local and cloud folders
 function mergeFolders(localFolders: Folder[], cloudFolders: Folder[], userId: string): Folder[] {
-  const merged = [...cloudFolders]
-  const cloudIds = new Set(cloudFolders.map((f) => f.id))
+  const merged = new Map<string, Folder>()
 
-  // Add local folders that don't exist in cloud
-  for (const localFolder of localFolders) {
-    if (!cloudIds.has(localFolder.id)) {
-      merged.push({ ...localFolder, user_id: userId })
-    }
+  // Add all cloud folders to the map
+  for (const cloudFolder of cloudFolders) {
+    merged.set(cloudFolder.id, { ...cloudFolder, user_id: userId })
   }
 
-  return merged.sort((a, b) =>
-    new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-  )
+  // Merge with local folders, respecting timestamps and deletions
+  for (const localFolder of localFolders) {
+    const cloudFolder = merged.get(localFolder.id)
+    const localTime = new Date(localFolder.updated_at).getTime()
+    const cloudTime = cloudFolder ? new Date(cloudFolder.updated_at).getTime() : 0
+
+    if (!cloudFolder) {
+      // Local folder doesn't exist in cloud - add it
+      merged.set(localFolder.id, { ...localFolder, user_id: userId })
+    } else if (localTime > cloudTime) {
+      // Local folder is newer - use local version (includes deletions)
+      merged.set(localFolder.id, { ...localFolder, user_id: userId })
+    }
+    // If cloud is newer or same, keep cloud version (already in map)
+  }
+
+  // Convert map to array and sort by updated_at
+  // Note: We include soft-deleted folders so cloud deletions are synced locally
+  // The UI will filter them out using folders.filter(f => !f.deleted_at)
+  return Array.from(merged.values())
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
 }

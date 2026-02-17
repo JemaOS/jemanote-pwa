@@ -192,9 +192,9 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
             <>
               {/* Type de résumé */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                <p className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                   Type de résumé
-                </label>
+                </p>
                 <div className="grid grid-cols-3 gap-2">
                   {(Object.keys(summaryTypeLabels) as SummaryType[]).map((type) => (
                     <button
@@ -272,9 +272,9 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
               {/* Résultat */}
               {summary && !loading && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  <p className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     Résumé généré
-                  </label>
+                  </p>
                   <div className="p-3 sm:p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700">
                     <p className="text-xs sm:text-sm text-neutral-700 dark:text-white whitespace-pre-wrap">
                       {summary}

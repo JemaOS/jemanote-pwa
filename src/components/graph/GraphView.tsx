@@ -122,6 +122,33 @@ function findNeighborNodes(
   return neighbors
 }
 
+// Helper function to get text alpha based on visibility and node type
+function getTextAlpha(labelVisible: boolean, nodeType: string): number {
+  if (!labelVisible) return 0
+  return nodeType === 'main' ? 0.95 : 0.75
+}
+
+// Helper function to get edge base alpha
+function getEdgeBaseAlpha(isConnectedToSelected: boolean, isConnectedToHovered: boolean): number {
+  if (isConnectedToSelected) return 0.8
+  if (isConnectedToHovered) return 0.6
+  return 0.5
+}
+
+// Helper function to get edge base width
+function getEdgeBaseWidth(isConnectedToSelected: boolean, isConnectedToHovered: boolean): number {
+  if (isConnectedToSelected) return 2.5
+  if (isConnectedToHovered) return 2
+  return 1.5
+}
+
+// Helper function to get node type based on degree
+function getNodeType(degree: number): 'main' | 'secondary' | 'isolated' {
+  if (degree >= 3) return 'main'
+  if (degree >= 1) return 'secondary'
+  return 'isolated'
+}
+
 // Helper: resolve node color based on color scheme and groups
 function resolveNodeColor(
   baseColor: number,
@@ -500,7 +527,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
     })
     text.anchor.set(0.5, -1.8)
     text.position.set(0, 0)
-    text.alpha = labelVisible ? (nodeData.type === 'main' ? 0.95 : 0.75) : 0
+    text.alpha = getTextAlpha(labelVisible, nodeData.type)
     graphics.addChild(text)
     
     // Events améliorés
@@ -560,8 +587,8 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
   const computeEdgeStyle = useCallback((edge: EdgeData) => {
     const isConnectedToSelected = selectedNode === edge.source || selectedNode === edge.target
     const isConnectedToHovered = hoveredNode === edge.source || hoveredNode === edge.target
-    const baseAlpha = isConnectedToSelected ? 0.8 : isConnectedToHovered ? 0.6 : 0.5
-    const baseWidth = isConnectedToSelected ? 2.5 : isConnectedToHovered ? 2 : 1.5
+    const baseAlpha = getEdgeBaseAlpha(isConnectedToSelected, isConnectedToHovered)
+    const baseWidth = getEdgeBaseWidth(isConnectedToSelected, isConnectedToHovered)
     return {
       width: baseWidth * graphSettings.linkThickness,
       color: (isConnectedToSelected || isConnectedToHovered) ? 0x5a63e9 : 0x9CA3AF,
@@ -674,7 +701,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
         const nodeDataArray: NodeData[] = filteredNodes.map(node => ({
           id: node.id,
           label: node.title,
-          type: (node.degree || 0) >= 3 ? 'main' : (node.degree || 0) >= 1 ? 'secondary' : 'isolated',
+          type: getNodeType(node.degree || 0),
           links: node.degree || 0,
           x: node.x || 0,
           y: node.y || 0,

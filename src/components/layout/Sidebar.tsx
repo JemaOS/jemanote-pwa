@@ -8,6 +8,29 @@ import React, { useState, useEffect } from 'react'
 import { LocalStorage } from '@/lib/localStorage'
 import { Note, Folder } from '@/types'
 
+// Helper function to get selection icon based on state
+function getSelectionIcon(isAllSelected: boolean, isSomeSelected: boolean) {
+  if (isAllSelected) {
+    return <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  }
+  if (isSomeSelected) {
+    return <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+  }
+  return <Square className="h-4 w-4" />
+}
+
+// Helper function to get note background class
+function getNoteBackgroundClass(selectedNoteIds: Set<string>, noteId: string | undefined, activeNoteId: string | null | undefined): string {
+  if (!noteId) return 'hover:bg-neutral-200 dark:hover:bg-neutral-800'
+  if (selectedNoteIds.has(noteId)) {
+    return 'bg-primary-50 dark:bg-primary-900/20'
+  }
+  if (activeNoteId === noteId) {
+    return 'bg-primary-100 dark:bg-primary-900/30 border-l-4 border-primary-500'
+  }
+  return 'hover:bg-neutral-200 dark:hover:bg-neutral-800'
+}
+
 // --- Sub-components extracted to reduce cognitive complexity ---
 
 /** Trash folder item in the trash section */
@@ -84,7 +107,7 @@ function NoteMultiSelectHeader({ folderId, noteMultiSelectMode, toggleNoteMultiS
           className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
           title={isAllSelected ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected ? "Tout désélectionner" : "Tout sélectionner"}
         >
-          {isAllSelected ? <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : isSomeSelected ? <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" /> : <Square className="h-4 w-4" />}
+          {getSelectionIcon(isAllSelected, isSomeSelected)}
         </button>
       )}
       <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">Notes</span>
@@ -1265,13 +1288,7 @@ export default function Sidebar({
         draggedNoteId === note.id
           ? 'opacity-50'
           : ''
-      } ${
-        selectedNoteIds.has(note.id)
-          ? 'bg-primary-50 dark:bg-primary-900/20'
-          : activeNoteId === note.id
-            ? 'bg-primary-100 dark:bg-primary-900/30 border-l-4 border-primary-500'
-            : 'hover:bg-neutral-200 dark:hover:bg-neutral-800'
-      } cursor-move`}
+      } ${getNoteBackgroundClass(selectedNoteIds, note.id, activeNoteId)} cursor-move`}
     >
       {editingNoteId === note.id ? (
         // Edit mode

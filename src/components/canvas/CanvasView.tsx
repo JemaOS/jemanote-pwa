@@ -177,7 +177,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   useEffect(() => {
     if (canvasNodes.length > 0) {
       LocalStorage.setItem('canvas-nodes', canvasNodes).catch(err => 
-        { console.error('Error saving canvas nodes:', err); }
+        console.error('Error saving canvas nodes:', err)
       )
     }
   }, [canvasNodes])

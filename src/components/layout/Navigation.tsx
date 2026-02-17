@@ -51,7 +51,6 @@ export default function Navigation({
 }: NavigationProps) {
   const { signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [showMobileSearch, setShowMobileSearch] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()

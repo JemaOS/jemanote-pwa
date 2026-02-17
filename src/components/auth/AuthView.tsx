@@ -50,21 +50,23 @@ export default function AuthView() {
           <div className="mb-6 flex gap-2">
             <button
               onClick={() => { setIsLogin(true); }}
-              className={`flex-1 py-2 px-4 rounded-md font-semibold transition-colors ${
-                isLogin
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
+              className={(() => {
+                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors'
+                const activeClasses = 'bg-primary-500 text-white'
+                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
+                return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`
+              })()}
             >
               Connexion
             </button>
             <button
               onClick={() => { setIsLogin(false); }}
-              className={`flex-1 py-2 px-4 rounded-md font-semibold transition-colors ${
-                !isLogin
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
+              className={(() => {
+                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors'
+                const activeClasses = 'bg-primary-500 text-white'
+                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
+                return `${baseClasses} ${!isLogin ? activeClasses : inactiveClasses}`
+              })()}
             >
               Inscription
             </button>
@@ -72,12 +74,13 @@ export default function AuthView() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="email" className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                 Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); }}
@@ -89,12 +92,13 @@ export default function AuthView() {
             </div>
 
             <div>
-              <label className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="password" className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                 Mot de passe
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
                 <input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); }}
@@ -117,7 +121,11 @@ export default function AuthView() {
               disabled={loading}
               className="w-full h-12 bg-primary-500 text-white font-semibold rounded-md hover:bg-primary-600 active:bg-primary-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Chargement...' : isLogin ? 'Se connecter' : "S'inscrire"}
+              {(() => {
+                if (loading) {return 'Chargement...'}
+                if (isLogin) {return 'Se connecter'}
+                return "S'inscrire"
+              })()}
             </button>
           </form>
         </div>

@@ -201,11 +201,14 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
                       key={type}
                       onClick={() => { setSummaryType(type); }}
                       disabled={loading}
-                      className={`flex flex-col items-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-lg border-2 transition-all ${
-                        summaryType === type
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                          : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 text-neutral-700 dark:text-neutral-300'
-                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={(() => {
+                        const baseClasses = 'flex flex-col items-center gap-1 sm:gap-2 p-2 sm:p-3 rounded-lg border-2 transition-all'
+                        const selectedClasses = 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
+                        const unselectedClasses = 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 text-neutral-700 dark:text-neutral-300'
+                        const disabledClasses = loading ? 'opacity-50 cursor-not-allowed' : ''
+                        const stateClasses = summaryType === type ? selectedClasses : unselectedClasses
+                        return `${baseClasses} ${stateClasses} ${disabledClasses}`
+                      })()}
                     >
                       {type === 'short' && <FileText className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />}
                       {type === 'detailed' && <AlignLeft className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />}
@@ -235,18 +238,19 @@ export default function AISummaryModal({ content, noteId, noteTitle, onClose, on
               {/* Mode d'application */}
               {summary && !loading && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  <label htmlFor="apply-mode-group" className="block text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     Mode d'application
                   </label>
                   <div className="space-y-2">
                     {(Object.keys(applyModeLabels) as ApplyMode[]).map((mode) => (
                       <label
                         key={mode}
-                        className={`flex items-center gap-3 p-2 sm:p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                          applyMode === mode
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                            : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
-                        }`}
+                        className={(() => {
+                          const baseClasses = 'flex items-center gap-3 p-2 sm:p-3 rounded-lg border-2 cursor-pointer transition-all'
+                          const selectedClasses = 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                          const unselectedClasses = 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
+                          return `${baseClasses} ${applyMode === mode ? selectedClasses : unselectedClasses}`
+                        })()}
                       >
                         <input
                           type="radio"

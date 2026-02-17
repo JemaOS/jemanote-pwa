@@ -2,9 +2,9 @@
 // Copyright (c) 2025 Jema Technology.
 // Security audit script for dependency vulnerability scanning
 
-import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const AUDIT_REPORT_FILE = 'security-audit-report.json';
 const SEVERITY_LEVELS = ['critical', 'high', 'moderate', 'low', 'info'];

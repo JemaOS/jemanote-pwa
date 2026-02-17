@@ -277,11 +277,12 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         <button
           onClick={() => { setActiveTab('summary'); }}
           type="button"
-          className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-            activeTab === 'summary'
-              ? 'text-primary-600 border-b-2 border-primary-600'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-          }`}
+          className={(() => {
+            const baseClasses = 'flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap'
+            const activeClasses = 'text-primary-600 border-b-2 border-primary-600'
+            const inactiveClasses = 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            return `${baseClasses} ${activeTab === 'summary' ? activeClasses : inactiveClasses}`
+          })()}
         >
           <FileText className="w-4 h-4 inline mr-1" />
           Résumés
@@ -289,11 +290,12 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         <button
           onClick={() => { setActiveTab('tags'); }}
           type="button"
-          className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-            activeTab === 'tags'
-              ? 'text-primary-600 border-b-2 border-primary-600'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-          }`}
+          className={(() => {
+            const baseClasses = 'flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap'
+            const activeClasses = 'text-primary-600 border-b-2 border-primary-600'
+            const inactiveClasses = 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            return `${baseClasses} ${activeTab === 'tags' ? activeClasses : inactiveClasses}`
+          })()}
         >
           <Tag className="w-4 h-4 inline mr-1" />
           Tags
@@ -301,11 +303,12 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         <button
           onClick={() => { setActiveTab('links'); }}
           type="button"
-          className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-            activeTab === 'links'
-              ? 'text-primary-600 border-b-2 border-primary-600'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-          }`}
+          className={(() => {
+            const baseClasses = 'flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap'
+            const activeClasses = 'text-primary-600 border-b-2 border-primary-600'
+            const inactiveClasses = 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            return `${baseClasses} ${activeTab === 'links' ? activeClasses : inactiveClasses}`
+          })()}
         >
           <LinkIcon className="w-4 h-4 inline mr-1" />
           Liens
@@ -313,11 +316,12 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         <button
           onClick={() => { setActiveTab('brainstorm'); }}
           type="button"
-          className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-            activeTab === 'brainstorm'
-              ? 'text-primary-600 border-b-2 border-primary-600'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-          }`}
+          className={(() => {
+            const baseClasses = 'flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap'
+            const activeClasses = 'text-primary-600 border-b-2 border-primary-600'
+            const inactiveClasses = 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            return `${baseClasses} ${activeTab === 'brainstorm' ? activeClasses : inactiveClasses}`
+          })()}
         >
           <Lightbulb className="w-4 h-4 inline mr-1" />
           Idées
@@ -325,11 +329,12 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
         <button
           onClick={() => { setActiveTab('synthesis'); }}
           type="button"
-          className={`flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
-            activeTab === 'synthesis'
-              ? 'text-primary-600 border-b-2 border-primary-600'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-          }`}
+          className={(() => {
+            const baseClasses = 'flex-none sm:flex-1 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap'
+            const activeClasses = 'text-primary-600 border-b-2 border-primary-600'
+            const inactiveClasses = 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+            return `${baseClasses} ${activeTab === 'synthesis' ? activeClasses : inactiveClasses}`
+          })()}
         >
           <FileText className="w-4 h-4 inline mr-1" />
           Synthèse
@@ -426,9 +431,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
               <div>
                 <h3 className="text-sm font-medium mb-2">Tags suggérés</h3>
                 <div className="flex flex-wrap gap-2">
-                  {suggestedTags.map((tag, idx) => (
+                  {suggestedTags.map((tag) => (
                     <span
-                      key={idx}
+                      key={tag}
                       className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm"
                     >
                       #{tag}
@@ -448,9 +453,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
               <div>
                 <h3 className="text-sm font-medium mb-2">Tags actuels</h3>
                 <div className="flex flex-wrap gap-2">
-                  {selectedTags.map((tag, idx) => (
+                  {selectedTags.map((tag) => (
                     <span
-                      key={idx}
+                      key={tag}
                       className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
                     >
                       #{tag}
@@ -482,9 +487,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
               <div>
                 <h3 className="text-sm font-medium mb-2">Notes liées suggérées</h3>
                 <div className="space-y-2">
-                  {linkSuggestions.map((suggestion, idx) => (
+                  {linkSuggestions.map((suggestion) => (
                     <div
-                      key={idx}
+                      key={suggestion.targetNoteId}
                       className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-start justify-between mb-2">
@@ -504,9 +509,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       </p>
                       {suggestion.keywords.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {suggestion.keywords.slice(0, 5).map((keyword, kidx) => (
+                          {suggestion.keywords.slice(0, 5).map((keyword) => (
                             <span
-                              key={kidx}
+                              key={keyword}
                               className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded"
                             >
                               {keyword}
@@ -565,9 +570,9 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
               <div>
                 <h3 className="text-sm font-medium mb-2">Idées générées</h3>
                 <div className="space-y-2">
-                  {ideas.map((idea, idx) => (
+                  {ideas.map((idea, index) => (
                     <div
-                      key={idx}
+                      key={`idea-${  index}`}
                       className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md group"
                     >
                       <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{idea}</p>

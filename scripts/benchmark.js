@@ -7,10 +7,10 @@
  * Usage: node scripts/benchmark.js [--compare] [--verbose]
  */
 
-const { execSync, execFileSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const http = require('http');
+const { execSync, execFileSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const http = require('node:http');
 
 // Configuration
 const CONFIG = {

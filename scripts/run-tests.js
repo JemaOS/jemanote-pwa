@@ -20,9 +20,9 @@
  *   node scripts/run-tests.js --type=all --coverage
  */
 
-import { spawn } from 'child_process'
-import readline from 'readline'
-import process from 'process'
+import { spawn } from 'node:child_process'
+import readline from 'node:readline'
+import process from 'node:process'
 
 // Configuration des types de tests
 const TEST_TYPES = {

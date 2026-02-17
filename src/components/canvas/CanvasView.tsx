@@ -47,7 +47,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false) // Multi-select mode toggle
   const [draggedNode, setDraggedNode] = useState<string | null>(null)
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null)
-  const lastTouchDistance = useRef<number | null>(null)
   const lastTap = useRef<number>(0)
   const justCreatedIds = useRef<Set<string>>(new Set()) // Track locally created notes to prevent sync race conditions
 
@@ -267,7 +266,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   }
 
   const handleTouchEnd = () => {
-    lastTouchDistance.current = null
     handleMouseUp()
   }
 

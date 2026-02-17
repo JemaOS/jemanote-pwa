@@ -2,8 +2,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Content Security Policy validation script
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * Default CSP directives for Jemanote

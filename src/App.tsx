@@ -27,7 +27,6 @@ function App() {
   const {
     notes,
     folders,
-    allNotes,
     syncing,
     syncEnabled,
     createNote,

@@ -73,22 +73,24 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <button
               onClick={() => { setIsLogin(true); }}
               type="button"
-              className={`flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch ${
-                isLogin
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-              }`}
+              className={(() => {
+                const baseClasses = 'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch'
+                const activeClasses = 'bg-primary-500 text-white'
+                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`
+              })()}
             >
               Connexion
             </button>
             <button
               onClick={() => { setIsLogin(false); }}
               type="button"
-              className={`flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch ${
-                !isLogin
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-              }`}
+              className={(() => {
+                const baseClasses = 'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch'
+                const activeClasses = 'bg-primary-500 text-white'
+                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                return `${baseClasses} ${!isLogin ? activeClasses : inactiveClasses}`
+              })()}
             >
               Inscription
             </button>
@@ -96,12 +98,13 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
                 Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); }}
@@ -113,12 +116,13 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
                 Mot de passe
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
                 <input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); }}
@@ -141,7 +145,11 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               disabled={loading}
               className="w-full h-11 sm:h-12 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-touch"
             >
-              {loading ? 'Chargement...' : isLogin ? 'Se connecter' : "S'inscrire"}
+              {(() => {
+                if (loading) {return 'Chargement...'}
+                if (isLogin) {return 'Se connecter'}
+                return "S'inscrire"
+              })()}
             </button>
 
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 text-center px-2">

@@ -558,8 +558,8 @@ export default function WorkspaceView({
               updateNote(noteId, { content: newContent })
             }
           }}
-          onUpdateNoteContent={(noteId, newContent) => {
-            updateNote(noteId, { content: newContent })
+          onUpdateNoteContent={async (noteId, newContent) => {
+            await updateNote(noteId, { content: newContent })
             setContent(newContent) // Mettre à jour l'état local pour refléter le changement immédiatement
           }}
           onNavigateToNote={(noteId) => {

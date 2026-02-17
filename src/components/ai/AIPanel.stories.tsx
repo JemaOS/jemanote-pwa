@@ -85,7 +85,7 @@ const defaultProps = {
   onClose: () => {},
   onCreateNote: async () => {},
   onUpdateNoteTags: () => {},
-  onUpdateNoteContent: () => {},
+  onUpdateNoteContent: async () => {},
   onNavigateToNote: () => {},
 }
 

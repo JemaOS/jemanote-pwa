@@ -43,6 +43,136 @@ const AudioPlayer = ({ attachmentId }: { attachmentId: string }) => {
 // Mermaid is dynamically imported only when diagrams are detected
 let mermaidInitialized = false
 
+// Extracted Markdown components to avoid nested function declarations
+const MarkdownImg = ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { src?: string; alt?: string }) => {
+  // SECURITY FIX: Validate attachment URL format
+  if (src?.startsWith('attachment:')) {
+    const attachmentId = src.replace('attachment:', '')
+    // Validate attachmentId format to prevent injection
+    if (!/^[a-zA-Z0-9-_]{1,100}$/.test(attachmentId)) {
+      return <span className="text-red-500">Invalid attachment</span>
+    }
+    return <AudioPlayer attachmentId={attachmentId} />
+  }
+  return <img src={src} alt={alt} {...props} />
+}
+
+const MarkdownAudio = (props: React.AudioHTMLAttributes<HTMLAudioElement>) => {
+  // @ts-ignore - data-attachment-id peut être dans props
+  const attachmentId = props['data-attachment-id']
+  if (attachmentId) {
+    return <AudioPlayer attachmentId={attachmentId as string} />
+  }
+  return <audio {...props} />
+}
+
+interface CodeProps extends React.HTMLAttributes<HTMLElement> {
+  className?: string
+  children?: React.ReactNode
+}
+
+const MarkdownCode = ({ className, children, ...props }: CodeProps) => {
+  const match = /language-(\w+)/.exec(className || '')
+  const language = match ? match[1] : ''
+  const isInline = !className
+
+  // Pour Mermaid, retourner un code block simple qui sera traité par useEffect
+  if (language === 'mermaid') {
+    return (
+      <pre className="mermaid-container">
+        <code className={className} {...props}>
+          {children}
+        </code>
+      </pre>
+    )
+  }
+
+  // Code inline
+  if (isInline) {
+    return (
+      <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+        {children}
+      </code>
+    )
+  }
+
+  // Code block normal
+  return (
+    <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
+      <code className={className} {...props}>
+        {children}
+      </code>
+    </pre>
+  )
+}
+
+const MarkdownH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h1 className="text-4xl font-bold mb-4 mt-8 text-gray-900 dark:text-gray-100" {...props}>{children}</h1>
+)
+
+const MarkdownH2 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h2 className="text-3xl font-semibold mb-3 mt-6 text-gray-900 dark:text-gray-100" {...props}>{children}</h2>
+)
+
+const MarkdownH3 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3 className="text-2xl font-semibold mb-2 mt-4 text-gray-900 dark:text-gray-100" {...props}>{children}</h3>
+)
+
+const MarkdownP = ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed" {...props}>{children}</p>
+)
+
+interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  href?: string
+  children?: React.ReactNode
+}
+
+const MarkdownA = ({ href, children, ...props }: LinkProps) => (
+  <a 
+    href={href}
+    className="text-primary hover:text-primary/80 underline"
+    target="_blank"
+    rel="noopener noreferrer"
+    {...props}
+  >
+    {children}
+  </a>
+)
+
+const MarkdownUl = ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+  <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props}>{children}</ul>
+)
+
+const MarkdownOl = ({ children, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
+  <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props}>{children}</ol>
+)
+
+const MarkdownBlockquote = ({ children, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
+  <blockquote className="border-l-4 border-primary pl-4 italic my-4 text-gray-600 dark:text-gray-400" {...props}>
+    {children}
+  </blockquote>
+)
+
+const MarkdownTable = ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+  <div className="overflow-x-auto my-4" {...props}>
+    <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
+      {children}
+    </table>
+  </div>
+)
+
+const MarkdownTh = ({ children, ...props }: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
+  <th className="border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left font-semibold" {...props}>
+    {children}
+  </th>
+)
+
+const MarkdownTd = ({ children, ...props }: React.TdHTMLAttributes<HTMLTableDataCellElement>) => (
+  <td className="border border-gray-300 dark:border-gray-700 px-4 py-2" {...props}>
+    {children}
+  </td>
+)
+
 export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
 
@@ -70,9 +200,7 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
       // Nettoyer les anciens SVG
       mermaidElements.forEach((element) => {
         const parent = element.parentElement
-        if (parent && parent.querySelector('svg')) {
-          parent.querySelector('svg')?.remove()
-        }
+        parent?.querySelector('svg')?.remove()
       })
 
       // Rendre les nouveaux diagrammes
@@ -141,113 +269,20 @@ export default function MarkdownPreview({ content, onWikiLinkClick }: MarkdownPr
         rehypePlugins={[rehypeKatex, rehypeRaw]}
         urlTransform={(url) => url} // Autoriser tous les protocoles (dont attachment:)
         components={{
-          // Gérer les images spéciales (comme les mémos vocaux)
-          img: ({ src, alt, ...props }) => {
-            // SECURITY FIX: Validate attachment URL format
-            if (src?.startsWith('attachment:')) {
-              const attachmentId = src.replace('attachment:', '')
-              // Validate attachmentId format to prevent injection
-              if (!/^[a-zA-Z0-9-_]{1,100}$/.test(attachmentId)) {
-                return <span className="text-red-500">Invalid attachment</span>
-              }
-              return <AudioPlayer attachmentId={attachmentId} />
-            }
-            return <img src={src} alt={alt} {...props} />
-          },
-          // Gérer les balises audio HTML existantes
-          audio: ({ node, ...props }) => {
-            // @ts-ignore - data-attachment-id peut être dans props
-            const attachmentId = props['data-attachment-id']
-            if (attachmentId) {
-              return <AudioPlayer attachmentId={attachmentId as string} />
-            }
-            return <audio {...props} />
-          },
-          code({ className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || '')
-            const language = match ? match[1] : ''
-            const isInline = !className
-
-            // Pour Mermaid, retourner un code block simple qui sera traité par useEffect
-            if (language === 'mermaid') {
-              return (
-                <pre className="mermaid-container">
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                </pre>
-              )
-            }
-
-            // Code inline
-            if (isInline) {
-              return (
-                <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
-                  {children}
-                </code>
-              )
-            }
-
-            // Code block normal
-            return (
-              <pre className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 overflow-x-auto">
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              </pre>
-            )
-          },
-          // Personnaliser les autres éléments si nécessaire
-          h1: ({ children }) => (
-            <h1 className="text-4xl font-bold mb-4 mt-8 text-gray-900 dark:text-gray-100">{children}</h1>
-          ),
-          h2: ({ children }) => (
-            <h2 className="text-3xl font-semibold mb-3 mt-6 text-gray-900 dark:text-gray-100">{children}</h2>
-          ),
-          h3: ({ children }) => (
-            <h3 className="text-2xl font-semibold mb-2 mt-4 text-gray-900 dark:text-gray-100">{children}</h3>
-          ),
-          p: ({ children }) => (
-            <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">{children}</p>
-          ),
-          a: ({ href, children }) => (
-            <a 
-              href={href}
-              className="text-primary hover:text-primary/80 underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {children}
-            </a>
-          ),
-          ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-4 space-y-2 text-gray-700 dark:text-gray-300">{children}</ol>
-          ),
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary pl-4 italic my-4 text-gray-600 dark:text-gray-400">
-              {children}
-            </blockquote>
-          ),
-          table: ({ children }) => (
-            <div className="overflow-x-auto my-4">
-              <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
-                {children}
-              </table>
-            </div>
-          ),
-          th: ({ children }) => (
-            <th className="border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left font-semibold">
-              {children}
-            </th>
-          ),
-          td: ({ children }) => (
-            <td className="border border-gray-300 dark:border-gray-700 px-4 py-2">
-              {children}
-            </td>
-          ),
+          img: MarkdownImg,
+          audio: MarkdownAudio,
+          code: MarkdownCode,
+          h1: MarkdownH1,
+          h2: MarkdownH2,
+          h3: MarkdownH3,
+          p: MarkdownP,
+          a: MarkdownA,
+          ul: MarkdownUl,
+          ol: MarkdownOl,
+          blockquote: MarkdownBlockquote,
+          table: MarkdownTable,
+          th: MarkdownTh,
+          td: MarkdownTd,
         }}
       >
         {processedContent}

@@ -400,6 +400,7 @@ export default function AIPanel({ currentNote, notes, onClose, onCreateNote, onU
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSummary(entry.summary); } }}
                       role="button"
                       tabIndex={0}
+                      aria-label={`Voir le résumé: ${entry.noteTitle}`}
                     >
                       <div className="font-medium text-xs text-gray-500 mb-1">
                         {entry.noteTitle} - {new Date(entry.timestamp).toLocaleDateString()}

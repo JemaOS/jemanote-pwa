@@ -91,7 +91,6 @@ export default function Navigation({
 
         <button
           onClick={() => {
-            setShowMobileSearch(true)
             onViewChange('search')
           }}
           className="p-1.5 xs:p-2 sm:p-2 md:p-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors min-w-[40px] min-h-[40px] xs:min-w-[44px] xs:min-h-[44px] flex items-center justify-center"

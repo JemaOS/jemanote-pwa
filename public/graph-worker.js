@@ -20,6 +20,13 @@ let params = {
 let isRunning = false
 let animationId = null
 
+// Helper function to get node mass based on type
+function getNodeMass(type) {
+  if (type === 'main') return 2;
+  if (type === 'secondary') return 1.5;
+  return 1;
+}
+
 // Initialiser le graphe
 function initGraph(data) {
   nodes.clear()
@@ -40,7 +47,7 @@ function initGraph(data) {
       y: Math.sin(angle) * radius,
       vx: 0,
       vy: 0,
-      mass: nodeData.type === 'main' ? 2 : (nodeData.type === 'secondary' ? 1.5 : 1),
+      mass: getNodeMass(nodeData.type),
       type: nodeData.type,
     })
   })
@@ -202,7 +209,7 @@ globalThis.onmessage = (e) => {
       data.forEach((nodeData) => {
         const existing = nodes.get(nodeData.id)
         if (existing) {
-          existing.mass = nodeData.type === 'main' ? 2 : (nodeData.type === 'secondary' ? 1.5 : 1)
+          existing.mass = getNodeMass(nodeData.type)
           existing.type = nodeData.type
         }
       })

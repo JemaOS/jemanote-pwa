@@ -50,13 +50,13 @@ const REQUIRED_DIRECTIVES = [
 /**
  * Dangerous values that should not be in CSP
  */
-const DANGEROUS_VALUES = [
+const DANGEROUS_VALUES = new Set([
   "'*'", // Wildcard
   "'unsafe-eval'", // Unless absolutely necessary
   'http:', // Insecure protocol
   'https://*', // Too broad
   'data:', // In script-src (XSS risk)
-];
+]);
 
 /**
  * Parse CSP string into object
@@ -116,7 +116,7 @@ function checkDangerousValues(directives) {
   const issues = [];
   for (const [directive, values] of Object.entries(directives)) {
     for (const value of values) {
-      if (DANGEROUS_VALUES.includes(value) && !isDangerousValueAllowed(directive, value)) {
+      if (DANGEROUS_VALUES.has(value) && !isDangerousValueAllowed(directive, value)) {
         issues.push({ type: 'error', message: `Dangerous value "${value}" found in ${directive}` });
       }
     }

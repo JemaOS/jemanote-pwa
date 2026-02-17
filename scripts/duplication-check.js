@@ -45,6 +45,15 @@ const CONFIG = {
   ]
 };
 
+/**
+ * Get CSS class for duplication percentage
+ */
+function getDuplicationClass(percentage, threshold) {
+  if (percentage > threshold) return 'danger';
+  if (percentage > 1) return 'warning';
+  return 'good';
+}
+
 // ANSI colors
 const colors = {
   reset: '\x1b[0m',
@@ -308,10 +317,10 @@ function generateHTMLReport(summary, report) {
       </div>
       <div class="card">
         <h3>Duplication %</h3>
-        <div class="value ${summary.duplicationPercentage > CONFIG.threshold ? 'danger' : summary.duplicationPercentage > 1 ? 'warning' : 'good'}">${summary.duplicationPercentage}%</div>
+        <div class="value ${getDuplicationClass(summary.duplicationPercentage, CONFIG.threshold)}">${summary.duplicationPercentage}%</div>
         <div class="subtext">${summary.duplicationPercentage > CONFIG.threshold ? 'EXCEEDS THRESHOLD' : 'Within threshold'}</div>
         <div class="progress-bar">
-          <div class="progress-fill ${summary.duplicationPercentage > CONFIG.threshold ? 'danger' : summary.duplicationPercentage > 1 ? 'warning' : ''}" style="width: ${Math.min(summary.duplicationPercentage * 10, 100)}%"></div>
+          <div class="progress-fill ${getDuplicationClass(summary.duplicationPercentage, CONFIG.threshold)}" style="width: ${Math.min(summary.duplicationPercentage * 10, 100)}%"></div>
         </div>
       </div>
       <div class="card">
@@ -340,13 +349,14 @@ function generateHTMLReport(summary, report) {
       <tbody>
         ${Object.entries(summary.formats).map(([format, stats]) => {
           const pct = stats.total?.lines ? ((stats.total?.duplicatedLines || 0) / stats.total.lines * 100).toFixed(2) : 0;
+          const cellClass = getDuplicationClass(parseFloat(pct), CONFIG.threshold);
           return `
             <tr>
               <td>${format}</td>
               <td>${stats.total?.sources || 0}</td>
               <td>${(stats.total?.lines || 0).toLocaleString()}</td>
               <td>${(stats.total?.duplicatedLines || 0).toLocaleString()}</td>
-              <td class="${pct > CONFIG.threshold ? 'danger' : pct > 1 ? 'warning' : 'good'}">${pct}%</td>
+              <td class="${cellClass}">${pct}%</td>
             </tr>
           `;
         }).join('') || '<tr><td colspan="5" style="text-align: center;">No data available</td></tr>'}

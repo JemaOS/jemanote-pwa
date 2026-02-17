@@ -6,6 +6,12 @@ import { useState } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
 
+// Helper function to get button text based on state
+function getButtonText(loading: boolean, isLogin: boolean): string {
+  if (loading) return 'Chargement...';
+  return isLogin ? 'Se connecter' : "S'inscrire";
+}
+
 interface AuthModalProps {
   onClose: () => void
 }
@@ -145,7 +151,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               disabled={loading}
               className="w-full h-11 sm:h-12 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-touch"
             >
-              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire")}
+              {getButtonText(loading, isLogin)}
             </button>
 
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 text-center px-2">

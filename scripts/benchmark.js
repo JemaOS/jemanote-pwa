@@ -175,7 +175,7 @@ async function benchmarkStartup() {
     const startTime = Date.now();
 
     // Démarrer le serveur preview
-    const server = execSync('npm run preview', {
+    execSync('npm run preview', {
       cwd: process.cwd(),
       timeout: CONFIG.serverStartupTimeout,
     });
@@ -347,7 +347,6 @@ function compareWithPrevious(currentReport) {
 async function main() {
   const args = process.argv.slice(2);
   const shouldCompare = args.includes('--compare');
-  const verbose = args.includes('--verbose');
 
   log('=== Performance Benchmark ===\n');
 

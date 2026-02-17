@@ -65,16 +65,18 @@ export default function SettingsView({ userId }: SettingsViewProps) {
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label className="text-body text-neutral-700 dark:text-neutral-300">Numéros de ligne</label>
+                <label htmlFor="lineNumbers" className="text-body text-neutral-700 dark:text-neutral-300">Numéros de ligne</label>
                 <input
+                  id="lineNumbers"
                   type="checkbox"
                   defaultChecked
                   className="h-5 w-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-body text-neutral-700 dark:text-neutral-300">Sauvegarde automatique</label>
+                <label htmlFor="autoSave" className="text-body text-neutral-700 dark:text-neutral-300">Sauvegarde automatique</label>
                 <input
+                  id="autoSave"
                   type="checkbox"
                   defaultChecked
                   className="h-5 w-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"

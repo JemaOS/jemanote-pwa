@@ -6,6 +6,12 @@ import { useState } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
 
+// Helper function to get button text based on state
+function getButtonText(loading: boolean, isLogin: boolean): string {
+  if (loading) return 'Chargement...';
+  return isLogin ? 'Se connecter' : "S'inscrire";
+}
+
 export default function AuthView() {
   const { signIn, signUp } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
@@ -121,7 +127,7 @@ export default function AuthView() {
               disabled={loading}
               className="w-full h-12 bg-primary-500 text-white font-semibold rounded-md hover:bg-primary-600 active:bg-primary-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire")}
+              {getButtonText(loading, isLogin)}
             </button>
           </form>
         </div>

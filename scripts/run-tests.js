@@ -377,7 +377,7 @@ async function interactiveMode() {
   
   try {
     const answer = await askQuestion(color('cyan', 'Choisissez un type de test (0-11) : '))
-    const choice = parseInt(answer.trim())
+    const choice = Number.parseInt(answer.trim())
     
     if (choice === 0) {
       console.log(color('yellow', '\n👋 Au revoir !\n'))

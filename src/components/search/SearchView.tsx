@@ -14,6 +14,12 @@ interface SearchViewProps {
   onSelectNote?: (noteId: string) => void
 }
 
+// Helper function to get result count text
+function getResultCountText(count: number): string {
+  const suffix = count > 1 ? 's' : '';
+  return `${count} résultat${suffix} trouvé${suffix}`;
+}
+
 export default function SearchView({ userId, notes, searchQuery = '', onSearchQueryChange, onSelectNote }: SearchViewProps) {
   // Use controlled query from props if provided, otherwise use local state
   const [localQuery, setLocalQuery] = useState('')
@@ -60,7 +66,7 @@ export default function SearchView({ userId, notes, searchQuery = '', onSearchQu
           {filteredNotes.length > 0 ? (
             <>
               <div className="text-body-small text-neutral-700 dark:text-neutral-300 mb-4">
-                {filteredNotes.length} résultat{filteredNotes.length > 1 ? 's' : ''} trouvé{filteredNotes.length > 1 ? 's' : ''}
+                {getResultCountText(filteredNotes.length)}
               </div>
               {filteredNotes.map((note) => (
                 <div

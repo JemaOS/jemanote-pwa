@@ -33,6 +33,19 @@ interface CanvasConnection {
   to: string
 }
 
+// Helper functions to avoid nested ternary operations
+function getNodeBorderClass(isSelected: boolean, isInMultiSelection: boolean): string {
+  if (!isSelected) return 'border-neutral-200 dark:border-neutral-700';
+  if (isInMultiSelection) return 'border-primary-400 shadow-xl ring-2 ring-primary-300 ring-opacity-50';
+  return 'border-primary-500 shadow-xl';
+}
+
+function getCursorClass(isDragging: boolean, isMultiSelectMode: boolean): string {
+  if (isDragging) return 'cursor-grabbing';
+  if (isMultiSelectMode) return 'cursor-pointer';
+  return 'cursor-grab';
+}
+
 export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote, createNote }: CanvasViewProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
   const [zoom, setZoom] = useState(1)
@@ -628,15 +641,10 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             const isInMultiSelection = selectedNodes.has(node.id) && selectedNodes.size > 1
             
             return (
+            // Helper function to get border class based on selection state
             <div
               key={node.id}
-              className={`absolute bg-white dark:bg-neutral-800 border-2 rounded-lg shadow-lg overflow-hidden transition-shadow touch-none select-none ${
-                isSelected
-                  ? isInMultiSelection
-                    ? 'border-primary-400 shadow-xl ring-2 ring-primary-300 ring-opacity-50'
-                    : 'border-primary-500 shadow-xl'
-                  : 'border-neutral-200 dark:border-neutral-700'
-              } ${draggedNode === node.id ? 'cursor-grabbing' : isMultiSelectMode ? 'cursor-pointer' : 'cursor-grab'}`}
+              className={`absolute bg-white dark:bg-neutral-800 border-2 rounded-lg shadow-lg overflow-hidden transition-shadow touch-none select-none ${getNodeBorderClass(isSelected, isInMultiSelection)} ${getCursorClass(draggedNode === node.id, isMultiSelectMode)}`}
               style={{
                 left: node.x,
                 top: node.y,

@@ -13,6 +13,17 @@ interface StatusBarProps {
   onManualSync?: () => void
 }
 
+// Helper functions to get sync status text
+function getSyncStatusText(syncing: boolean, syncEnabled: boolean): string {
+  if (syncing) return 'Synchronisation...';
+  return syncEnabled ? 'Synchronisé' : 'Déconnecté';
+}
+
+function getSyncStatusShortText(syncing: boolean, syncEnabled: boolean): string {
+  if (syncing) return 'Sync';
+  return syncEnabled ? 'OK' : 'Off';
+}
+
 export default function StatusBar({ 
   userId, 
   activeNoteId, 
@@ -30,10 +41,10 @@ export default function StatusBar({
             <div className="flex items-center gap-0.5 xs:gap-1 min-w-0">
               <Cloud className="h-2.5 w-2.5 xs:h-3 xs:w-3 text-primary-500 flex-shrink-0" />
               <span className="hidden sm:inline truncate">
-                {syncing ? 'Synchronisation...' : syncEnabled ? 'Synchronisé' : 'Déconnecté'}
+                {getSyncStatusText(!!syncing, !!syncEnabled)}
               </span>
               <span className="sm:hidden truncate">
-                {syncing ? 'Sync' : syncEnabled ? 'OK' : 'Off'}
+                {getSyncStatusShortText(!!syncing, !!syncEnabled)}
               </span>
             </div>
             

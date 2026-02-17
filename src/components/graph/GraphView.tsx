@@ -945,14 +945,19 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                 </div>
 
                 <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {groups.map((group, idx) => (
-                    <div key={`group-${group.query}-${idx}`} className="flex items-center gap-2 bg-neutral-900 p-1.5 rounded border border-neutral-800">
+                  {groups.map((group) => (
+                    <div key={`group-${group.query}`} className="flex items-center gap-2 bg-neutral-900 p-1.5 rounded border border-neutral-800">
+                      <label htmlFor={`group-color-${group.query}`} className="sr-only">
+                        Couleur du groupe {group.query}
+                      </label>
                       <input 
                         type="color" 
+                        id={`group-color-${group.query}`}
                         value={group.color}
                         aria-label={`Couleur du groupe ${group.query}`}
                         onChange={(e) => {
                           const newGroups = [...groups]
+                          const idx = groups.indexOf(group)
                           newGroups[idx].color = e.target.value
                           setGroups(newGroups)
                         }}
@@ -960,7 +965,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                       />
                       <span className="text-xs text-neutral-300 flex-1 truncate">{group.query}</span>
                       <button 
-                        onClick={() => { setGroups(groups.filter((_, i) => i !== idx)); }}
+                        onClick={() => { setGroups(groups.filter((g) => g.query !== group.query)); }}
                         className="text-neutral-500 hover:text-red-400"
                         aria-label={`Supprimer le groupe ${group.query}`}
                       >

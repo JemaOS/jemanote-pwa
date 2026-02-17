@@ -450,7 +450,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               </button>
             )}
             
-            <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <span role="heading" aria-level={3} className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
               Dossiers
             </span>
             
@@ -474,6 +474,9 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           return (
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
+                role="treeitem"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { toggleFolder(folder.id); } }}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}

@@ -273,8 +273,9 @@ export function useLocalNotes(userId?: string | null) {
       const note = notes.find((n) => n.id === noteId)
       if (!note) {return { error: new Error('Note not found') }}
 
-      const updates = { deleted_at: new Date().toISOString() }
-      const updatedNote = { ...note, ...updates, updated_at: new Date().toISOString() }
+      const deletedAt = new Date().toISOString()
+      const updates = { deleted_at: deletedAt, updated_at: deletedAt }
+      const updatedNote = { ...note, ...updates }
 
       // Update in local storage (soft delete)
       await LocalStorage.saveNote(updatedNote)
@@ -344,7 +345,7 @@ export function useLocalNotes(userId?: string | null) {
       if (!folder) {return { error: new Error('Folder not found') }}
 
       const deletedAt = new Date().toISOString()
-      const updates = { deleted_at: deletedAt }
+      const updates = { deleted_at: deletedAt, updated_at: deletedAt }
       
       // Soft delete the folder
       const updatedFolder: Folder = {

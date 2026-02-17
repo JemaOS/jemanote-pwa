@@ -54,12 +54,24 @@ function App() {
   const [hasUserToggledSidebar, setHasUserToggledSidebar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Auto-enable sync when user logs in
+  // Auto-enable sync when user logs in and trigger immediate sync
   React.useEffect(() => {
     if (user?.id && !syncEnabled) {
       enableSync()
     }
   }, [user?.id, syncEnabled, enableSync])
+
+  // Force a manual sync when user transitions from logged out to logged in
+  React.useEffect(() => {
+    if (user?.id && syncEnabled) {
+      // Small delay to ensure the sync effect in useLocalNotes has run
+      const timer = setTimeout(() => {
+        disableSync()
+        setTimeout(() => { enableSync(); }, 50)
+      }, 100)
+      return () => { clearTimeout(timer); }
+    }
+  }, [user?.id])
 
   // Responsive: Detect mobile/desktop
   useEffect(() => {

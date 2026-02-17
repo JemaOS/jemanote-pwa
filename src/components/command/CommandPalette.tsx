@@ -13,7 +13,6 @@ import {
   Plus,
   LogIn,
   LogOut,
-  History
 } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 

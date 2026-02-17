@@ -33,7 +33,7 @@ interface CacheEntry {
   expiresIn: number
 }
 
-interface SummaryHistoryEntry {
+type SummaryHistoryEntry = {
   id: string
   noteId?: string
   noteTitle?: string
@@ -58,7 +58,7 @@ const summaryHistory = localforage.createInstance({
 
 class MistralAIService {
   private config: AIConfig
-  private readonly CACHE_DURATION = 1000 * 60 * 60 * 24 // 24 heures
+  private readonly CACHE_DURATION = 86_400_000 // 24 hours in milliseconds
   private readonly MAX_CACHE_SIZE = 100
   private readonly MAX_HISTORY_SIZE = 50
   private abortController: AbortController | null = null
@@ -107,8 +107,9 @@ class MistralAIService {
     // Utiliser encodeURIComponent au lieu de btoa pour supporter Unicode
     try {
       return btoa(encodeURIComponent(key)).substring(0, 64)
-    } catch (e) {
+    } catch (cacheKeyError) {
       // Fallback: utiliser un hash simple si btoa échoue
+      console.warn('Cache key generation failed:', cacheKeyError)
       let hash = 0
       for (let i = 0; i < key.length; i++) {
         const char = key.codePointAt(i) ?? 0
@@ -413,7 +414,7 @@ class MistralAIService {
     // Parser les idées
     const ideas = response.content
       .split('\n')
-      .map(idea => idea.trim().replace(/^[\d\-\*\.]+\s*/, ''))
+      .map(idea => idea.trim().replaceAll(/^[\d\-*\.]+\s*/g, ''))
       .filter(idea => idea.length > 0)
 
     return ideas

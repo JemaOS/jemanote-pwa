@@ -306,7 +306,7 @@ export default function WorkspaceView({
       // SECURITY FIX: Limit filename length and sanitize date string to prevent ReDoS
       const dateStr = new Date().toISOString()
       const safeDateStr = dateStr.length > 100 ? dateStr.substring(0, 100) : dateStr
-      const fileName = `recording-${safeDateStr.replace(/[:.]/g, '-')}.webm`
+      const fileName = `recording-${safeDateStr.replaceAll(':', '-').replaceAll('.', '-')}.webm`
       
       const attachment: Attachment = {
         id: attachmentId,
@@ -554,7 +554,8 @@ export default function WorkspaceView({
             // Ajouter les tags au contenu de la note
             const note = notes.find(n => n.id === noteId)
             if (note) {
-              const newContent = `${note.content  }\n\n${  tags.map(t => `#${t}`).join(' ')}`
+              const tagString = tags.map(t => `#${t}`).join(' ')
+              const newContent = `${note.content}\n\n${tagString}`
               updateNote(noteId, { content: newContent })
             }
           }}

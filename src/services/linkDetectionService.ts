@@ -43,7 +43,7 @@ class LinkDetectionService {
     // SECURITY FIX: Using a safer character class regex with length limits
     const words = safeText
       .toLowerCase()
-      .replace(/[^\w\sàâäéèêëïîôùûüÿæœç-]+/g, ' ')
+      .replaceAll(/[^\w\sàâäéèêëïîôùûüÿæœç-]+/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 3 && !stopWords.has(word))
 
@@ -55,7 +55,7 @@ class LinkDetectionService {
 
     // Retourner les 15 mots les plus fréquents
     return Array.from(wordFreq.entries())
-      .sort((a, b) => b[1] - a[1])
+      .toSorted((a, b) => b[1] - a[1])
       .slice(0, 15)
       .map(([word]) => word)
   }
@@ -158,10 +158,10 @@ Format de réponse:
 
       for (const line of lines) {
         // SECURITY FIX: Use safer regex with length limits for AI response parsing
-        const match = line.match(/^\d{1,3}\.\s*\[?(\d{1,5})\]?:\s*(.{1,500})$/)
-        if (match) {
-          const noteIndex = Number.parseInt(match[1], 10) - 1
-          const reason = match[2].trim()
+        const matchResult = /^\d{1,3}\.\s*\[?(\d{1,5})\]?:\s*(.{1,500})$/.exec(line)
+        if (matchResult) {
+          const noteIndex = Number.parseInt(matchResult[1], 10) - 1
+          const reason = matchResult[2].trim()
 
           if (noteIndex >= 0 && noteIndex < allNotes.length) {
             const targetNote = allNotes[noteIndex]

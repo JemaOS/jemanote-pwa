@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { CheckCircle, AlertCircle, Cloud, HardDrive, RefreshCw } from 'lucide-react'
+import { Cloud, HardDrive, RefreshCw } from 'lucide-react'
 
 interface StatusBarProps {
   readonly userId?: string | null

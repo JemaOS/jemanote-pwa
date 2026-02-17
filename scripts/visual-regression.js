@@ -287,7 +287,7 @@ const generateReport = (results) => {
             ${result.passed ? '✓ Passé' : '✗ Échoué'}
           </div>
         </div>
-        ${!result.passed ? `
+        ${result.passed ? '' : `
           <div class="test-details">
             <div class="comparison">
               <div class="image-box">

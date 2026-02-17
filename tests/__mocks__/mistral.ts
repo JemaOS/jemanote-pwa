@@ -33,7 +33,7 @@ export const mockMistralService = {
   generateEmbedding: vi.fn().mockResolvedValue({
     // SECURITY NOTE: Math.random() is acceptable here for mock embedding generation
     // This is test code generating fake embedding vectors, not used for cryptography
-    embedding: Array(384).fill(0).map(() => Math.random()),
+    embedding: Array.from({ length: 384 }, () => Math.random()),
   }),
 
   streamCompletion: vi.fn().mockImplementation(async function* () {

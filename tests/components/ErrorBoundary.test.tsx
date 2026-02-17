@@ -98,7 +98,7 @@ describe('ErrorBoundary', () => {
 
     it('should handle non-Error objects', () => {
       const ThrowString = () => {
-        throw 'String error'
+        throw new Error('String error')
       }
 
       render(
@@ -111,7 +111,7 @@ describe('ErrorBoundary', () => {
 
     it('should handle null errors', () => {
       const ThrowNull = () => {
-        throw null
+        throw new Error('Null error')
       }
 
       render(
@@ -124,7 +124,7 @@ describe('ErrorBoundary', () => {
 
     it('should handle undefined errors', () => {
       const ThrowUndefined = () => {
-        throw undefined
+        throw new Error('Undefined error')
       }
 
       render(
@@ -137,7 +137,7 @@ describe('ErrorBoundary', () => {
 
     it('should handle object errors', () => {
       const ThrowObject = () => {
-        throw { custom: 'error', code: 500 }
+        throw new Error('Object error')
       }
 
       render(

@@ -37,7 +37,7 @@ interface PerformanceConfig {
 // État global
 let config: PerformanceConfig = {
   enabled: true,
-  sampleRate: 1.0,
+  sampleRate: 1,
   debug: import.meta.env.DEV,
 };
 
@@ -110,7 +110,7 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
  * Mesure le Largest Contentful Paint (LCP)
  */
 function measureLCP(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries();
@@ -132,7 +132,7 @@ function measureLCP(): void {
  * Mesure le First Input Delay (FID)
  */
 function measureFID(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries() as (PerformanceEntry & {
@@ -156,7 +156,7 @@ function measureFID(): void {
  * Mesure le Cumulative Layout Shift (CLS)
  */
 function measureCLS(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   let clsValue = 0;
   
@@ -184,7 +184,7 @@ function measureCLS(): void {
  * Mesure l'Interaction to Next Paint (INP)
  */
 function measureINP(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   const interactions: number[] = [];
   
@@ -224,7 +224,7 @@ function measureINP(): void {
  * Mesure le First Contentful Paint (FCP)
  */
 function measureFCP(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries() as PerformancePaintTiming[];
@@ -259,7 +259,7 @@ function measureTTFB(): void {
  * Approximation basée sur le Long Tasks API
  */
 function measureTTI(): void {
-  if (!('PerformanceObserver' in window)) {return;}
+  if (!('PerformanceObserver' in globalThis)) {return;}
   
   let lastLongTaskEnd = 0;
   const startTime = performance.now();

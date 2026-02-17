@@ -106,6 +106,14 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
                   <div
                     key={note.id}
                     onClick={() => { onOpenNote(note.id); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        onOpenNote(note.id)
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                     className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-start gap-3">

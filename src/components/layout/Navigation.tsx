@@ -14,7 +14,6 @@ import {
   LayoutTemplate,
   Menu,
   X,
-  History,
 } from 'lucide-react'
 import { useState } from 'react'
 

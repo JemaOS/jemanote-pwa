@@ -164,14 +164,20 @@ export default function WaveformPlayer({
           const index = Math.floor(percentage * waveformData.length)
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)))
         }}
+        role="slider"
+        aria-label="Audio waveform"
+        aria-valuemin={0}
+        aria-valuemax={waveformData.length}
+        aria-valuenow={Math.floor((currentTime / duration) * waveformData.length)}
+        tabIndex={0}
       >
-        {waveformData.map((value, index) => {
+        {waveformData.map((value, idx) => {
           const progress = duration > 0 ? currentTime / duration : 0
-          const isPassed = index / waveformData.length <= progress
+          const isPassed = idx / waveformData.length <= progress
           
           return (
             <div
-              key={index}
+              key={`waveform-${idx}`}
               className="flex-1 rounded-full transition-all pointer-events-none"
               style={{ 
                 height: `${Math.max(20, value * 100)}%`,

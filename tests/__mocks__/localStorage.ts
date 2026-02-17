@@ -48,7 +48,7 @@ export class MockLocalStorage {
 export function setupLocalStorageMock(): MockLocalStorage {
   const mockStorage = new MockLocalStorage()
 
-  Object.defineProperty(window, 'localStorage', {
+  Object.defineProperty(globalThis, 'localStorage', {
     value: mockStorage,
     writable: true,
   })

@@ -510,7 +510,6 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             aria-valuemax={Math.round(audioDuration)}
             aria-valuenow={Math.round(audioCurrentTime)}
             aria-valuetext={`${Math.round(audioCurrentTime)} secondes sur ${Math.round(audioDuration)}`}
-            tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'ArrowLeft') {
                 e.preventDefault()

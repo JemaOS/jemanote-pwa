@@ -8,7 +8,7 @@ import { Note, Folder, Tag, Link, Attachment } from '@/types'
 // Configure localforage for better performance
 localforage.config({
   name: 'ObsidianPWA',
-  version: 1.0,
+  version: 1,
   storeName: 'notes_store',
   description: 'Local storage for Obsidian PWA notes',
 })
@@ -413,8 +413,9 @@ export class LocalStorage {
       try {
         localStorage.removeItem(SYNC_KEYS.NOTES)
         localStorage.removeItem(SYNC_KEYS.PENDING_WRITES)
-      } catch (e) {
+      } catch (storageError) {
         // Ignore localStorage errors
+        console.warn('LocalStorage clear error:', storageError)
       }
     } catch (error) {
       console.error('Error clearing storage:', error)

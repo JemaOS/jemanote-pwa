@@ -10,13 +10,13 @@ import {
   Play,
   Pause,
   SlidersHorizontal,
-  Target
+  Target,
+  Circle
 } from 'lucide-react'
 import * as PIXI from 'pixi.js'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-import { graphIndexer } from '@/services/graphIndexer'
-import type { GraphNode, GraphEdge } from '@/services/graphIndexer'
+import { graphIndexer, type GraphNode, type GraphEdge } from '@/services/graphIndexer'
 import { Note } from '@/types'
 
 interface GraphViewProps {
@@ -875,7 +875,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="10"
                     step="1"
                     value={graphSettings.minLinks}
-                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, minLinks: parseInt(e.target.value) })); }}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, minLinks: Number.parseInt(e.target.value, 10) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -994,7 +994,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="1"
                     step="0.1"
                     value={textFadeThreshold}
-                    onChange={(e) => { setTextFadeThreshold(parseFloat(e.target.value)); }}
+                    onChange={(e) => { setTextFadeThreshold(Number.parseFloat(e.target.value)); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1024,7 +1024,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="3"
                     step="0.1"
                     value={graphSettings.linkThickness}
-                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, linkThickness: parseFloat(e.target.value) })); }}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, linkThickness: Number.parseFloat(e.target.value) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1044,7 +1044,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="0.1"
                     step="0.001"
                     value={physicsParams.centerForce}
-                    onChange={(e) => { setPhysicsParams({ ...physicsParams, centerForce: parseFloat(e.target.value) }); }}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, centerForce: Number.parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1059,7 +1059,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="1000"
                     step="10"
                     value={physicsParams.repulsion}
-                    onChange={(e) => { setPhysicsParams({ ...physicsParams, repulsion: parseFloat(e.target.value) }); }}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, repulsion: Number.parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1074,7 +1074,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="0.05"
                     step="0.001"
                     value={physicsParams.attraction}
-                    onChange={(e) => { setPhysicsParams({ ...physicsParams, attraction: parseFloat(e.target.value) }); }}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, attraction: Number.parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
@@ -1089,7 +1089,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="200"
                     step="5"
                     value={physicsParams.linkDistance}
-                    onChange={(e) => { setPhysicsParams({ ...physicsParams, linkDistance: parseFloat(e.target.value) }); }}
+                    onChange={(e) => { setPhysicsParams({ ...physicsParams, linkDistance: Number.parseFloat(e.target.value) }); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>

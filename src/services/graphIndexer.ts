@@ -35,14 +35,14 @@ class GraphIndexer {
   // (Regular Expression Denial of Service) attacks. These patterns limit the
   // maximum match length and avoid nested quantifiers that could cause
   // catastrophic backtracking on malicious input.
-  private wikilinkRegex = /\[\[([^\]|#]{1,200})(?:#[^\]|]{0,100})?(?:\|[^\]]{0,100})?\]\]/g
-  private mdLinkRegex = /\[[^\]]{0,200}\]\(([^)]{1,500})\)/g
-  private tagRegex = /#[\w-]{1,50}/g
+  private readonly wikilinkRegex = /\[\[([^\]|#]{1,200})(?:#[^\]|]{0,100})?(?:\|[^\]]{0,100})?\]\]/g
+  private readonly mdLinkRegex = /\[[^\]]{0,200}\]\(([^)]{1,500})\)/g
+  private readonly tagRegex = /#[\w-]{1,50}/g
 
   /**
    * Indexer toutes les notes et construire le graphe
    */
-  indexGraph(notes: Note[]): GraphData {
+  indexGraph(notes: readonly Note[]): GraphData {
     console.log(`🔍 [GraphIndexer] Indexation de ${notes.length} notes...`)
     console.log(`📋 [GraphIndexer] Première note:`, notes[0]?.title, notes[0]?.id)
 
@@ -74,18 +74,11 @@ class GraphIndexer {
         
         if (targetId && targetId !== note.id) {
           // Lien forward
-          edges.push({
-            from: note.id,
-            to: targetId,
-            type: link.type
-          })
-          
-          // Backlink (bidirectionnel comme Obsidian)
-          edges.push({
-            from: targetId,
-            to: note.id,
-            type: 'backlink'
-          })
+          // Add both forward link and backlink in single push operation
+          edges.push(
+            { from: note.id, to: targetId, type: link.type },
+            { from: targetId, to: note.id, type: 'backlink' }
+          )
           
           // Incrémenter les degrés
           nodeDegree.set(note.id, (nodeDegree.get(note.id) || 0) + 1)
@@ -192,8 +185,9 @@ class GraphIndexer {
    * Extraire les tags #tag d'un contenu
    */
   private extractTags(content: string): string[] {
-    const tags = content.match(this.tagRegex) || []
-    return [...new Set(tags.map(t => t.substring(1)))] // dédupliquer
+    const matches = content.match(this.tagRegex)
+    if (!matches) return []
+    return [...new Set(matches.map(t => t.substring(1)))] // dédupliquer
   }
 
   /**

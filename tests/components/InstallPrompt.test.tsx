@@ -9,7 +9,7 @@ import InstallPrompt from '@/components/InstallPrompt'
 import { render, screen, waitFor } from '@/tests/utils/test-utils'
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(globalThis, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
     matches: false,

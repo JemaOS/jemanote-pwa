@@ -1,7 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { File, Folder as FolderIcon, Plus, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
+import { File, Folder as FolderIcon, Plus, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, RotateCcw, Trash, Square, CheckSquare, MinusSquare, FolderInput } from 'lucide-react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import React, { useState, useEffect } from 'react'
 
 import { LocalStorage } from '@/lib/localStorage'
@@ -34,8 +35,8 @@ function getNoteBackgroundClass(selectedNoteIds: Set<string>, noteId: string | u
 
 /** Trash folder item in the trash section */
 function TrashFolderItem({ folder, notesInFolder, isSelected, onToggleSelection, onRestore, onPermanentlyDelete }: {
-  folder: Folder; notesInFolder: Note[]; isSelected: boolean;
-  onToggleSelection: () => void; onRestore: (e: React.MouseEvent) => void; onPermanentlyDelete: (e: React.MouseEvent) => void;
+  readonly folder: Folder; readonly notesInFolder: readonly Note[]; readonly isSelected: boolean;
+  readonly onToggleSelection: () => void; readonly onRestore: (e: React.MouseEvent) => void; readonly onPermanentlyDelete: (e: React.MouseEvent) => void;
 }) {
   return (
     <div className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}>
@@ -63,8 +64,8 @@ function TrashFolderItem({ folder, notesInFolder, isSelected, onToggleSelection,
 
 /** Trash note item in the trash section */
 function TrashNoteItem({ note, isSelected, onToggleSelection, onRestore, onPermanentlyDelete }: {
-  note: Note; isSelected: boolean;
-  onToggleSelection: () => void; onRestore: (e: React.MouseEvent) => void; onPermanentlyDelete: (e: React.MouseEvent) => void;
+  readonly note: Note; readonly isSelected: boolean;
+  readonly onToggleSelection: () => void; readonly onRestore: (e: React.MouseEvent) => void; readonly onPermanentlyDelete: (e: React.MouseEvent) => void;
 }) {
   return (
     <div className={`flex items-center w-full min-h-[40px] gap-1 group px-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 ${isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}>
@@ -89,9 +90,9 @@ function TrashNoteItem({ note, isSelected, onToggleSelection, onRestore, onPerma
 
 /** Multi-select header bar for notes within a folder or unfiled */
 function NoteMultiSelectHeader({ folderId, noteMultiSelectMode, toggleNoteMultiSelectMode, isAllSelected, isSomeSelected, onSelectAll, onDeselectAll, selectedCount, hasSelectedInView, onDeleteSelected }: {
-  folderId: string | undefined; noteMultiSelectMode: boolean; toggleNoteMultiSelectMode: () => void;
-  isAllSelected: boolean; isSomeSelected: boolean; onSelectAll: () => void; onDeselectAll: () => void;
-  selectedCount: number; hasSelectedInView: boolean; onDeleteSelected: () => void;
+  readonly folderId: string | undefined; readonly noteMultiSelectMode: boolean; readonly toggleNoteMultiSelectMode: () => void;
+  readonly isAllSelected: boolean; readonly isSomeSelected: boolean; readonly onSelectAll: () => void; readonly onDeselectAll: () => void;
+  readonly selectedCount: number; readonly hasSelectedInView: boolean; readonly onDeleteSelected: () => void;
 }) {
   return (
     <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-200 dark:border-neutral-700 mb-1">
@@ -123,7 +124,7 @@ function NoteMultiSelectHeader({ folderId, noteMultiSelectMode, toggleNoteMultiS
 }
 
 /** Three-state checkbox icon helper */
-function ThreeStateCheckbox({ allSelected, someSelected }: { allSelected: boolean; someSelected: boolean }) {
+function ThreeStateCheckbox({ allSelected, someSelected }: { readonly allSelected: boolean; readonly someSelected: boolean }) {
   if (allSelected) {return <CheckSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
   if (someSelected) {return <MinusSquare className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
   return <Square className="h-4 w-4" />
@@ -135,17 +136,17 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
   handleRestoreSelected, handleDeleteSelected, handleEmptyTrash, toggleTrashItemSelection,
   handleRestoreFolder, handlePermanentlyDeleteFolder, handleRestoreNote, handlePermanentlyDeleteNote,
 }: {
-  trashOpen: boolean; setTrashOpen: (v: boolean) => void;
-  trashNotes: Note[]; trashFolders: Folder[];
-  isAllSelected: () => boolean; isSomeSelected: () => boolean;
-  deselectAllTrashItems: () => void; selectAllTrashItems: () => void;
-  setSelectionMode: (v: boolean) => void; selectedTrashItems: Set<string>;
-  handleRestoreSelected: () => void; handleDeleteSelected: () => void; handleEmptyTrash: () => void;
-  toggleTrashItemSelection: (id: string) => void;
-  handleRestoreFolder: (id: string, e: React.MouseEvent) => void;
-  handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void;
-  handleRestoreNote: (id: string, e: React.MouseEvent) => void;
-  handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void;
+  readonly trashOpen: boolean; readonly setTrashOpen: (v: boolean) => void;
+  readonly trashNotes: readonly Note[]; readonly trashFolders: readonly Folder[];
+  readonly isAllSelected: () => boolean; readonly isSomeSelected: () => boolean;
+  readonly deselectAllTrashItems: () => void; readonly selectAllTrashItems: () => void;
+  readonly setSelectionMode: (v: boolean) => void; readonly selectedTrashItems: Set<string>;
+  readonly handleRestoreSelected: () => void; readonly handleDeleteSelected: () => void; readonly handleEmptyTrash: () => void;
+  readonly toggleTrashItemSelection: (id: string) => void;
+  readonly handleRestoreFolder: (id: string, e: React.MouseEvent) => void;
+  readonly handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void;
+  readonly handleRestoreNote: (id: string, e: React.MouseEvent) => void;
+  readonly handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void;
 }) {
   const totalTrashItems = trashNotes.length + trashFolders.length
 
@@ -277,64 +278,64 @@ interface SidebarProps {
 
 /** Props passed to LeftSidebarContent */
 interface LeftSidebarContentProps {
-  handleCreateNote: () => void
-  creatingFolder: boolean
-  setCreatingFolder: (v: boolean) => void
-  newFolderName: string
-  setNewFolderName: (v: string) => void
-  handleCreateFolder: () => void
-  folders: Folder[]
-  notes: Note[]
-  folderMultiSelectMode: boolean
-  toggleFolderMultiSelectMode: () => void
-  isAllFoldersSelected: () => boolean
-  isSomeFoldersSelected: () => boolean
-  selectAllFolders: () => void
-  deselectAllFolders: () => void
-  selectedFolderIds: Set<string>
-  handleDeleteSelectedFolders: () => void
-  toggleFolderSelection: (id: string) => void
-  expandedFolders: Set<string>
-  dropTargetFolderId: string | null
-  handleDragOver: (e: React.DragEvent) => void
-  handleDrop: (folderId: string | undefined, e: React.DragEvent) => void
-  handleDragEnter: (folderId: string | undefined, e: React.DragEvent) => void
-  handleDragLeave: (e: React.DragEvent) => void
-  toggleFolder: (id: string) => void
-  editingFolderId: string | null
-  editingFolderName: string
-  setEditingFolderName: (v: string) => void
-  setEditingFolderId: (v: string | null) => void
-  handleRenameFolder: (id: string) => void
-  handleCreateNoteInFolder: (folderId: string | undefined) => void
-  handleDeleteFolder: (id: string, e: React.MouseEvent) => void
-  noteMultiSelectMode: boolean
-  toggleNoteMultiSelectMode: () => void
-  isAllNotesSelectedInFolder: (folderId: string | undefined) => boolean
-  isSomeNotesSelectedInFolder: (folderId: string | undefined) => boolean
-  selectAllNotesInFolder: (folderId: string | undefined) => void
-  deselectAllNotesInFolder: () => void
-  selectedNoteIds: Set<string>
-  handleDeleteSelectedNotes: () => void
-  renderNote: (note: Note, showCheckbox?: boolean, isInSelectionMode?: boolean) => React.ReactNode
-  trashOpen: boolean
-  setTrashOpen: (v: boolean) => void
-  trashNotes: Note[]
-  trashFolders: Folder[]
-  isAllSelected: () => boolean
-  isSomeSelected: () => boolean
-  deselectAllTrashItems: () => void
-  selectAllTrashItems: () => void
-  setSelectionMode: (v: boolean) => void
-  selectedTrashItems: Set<string>
-  handleRestoreSelected: () => void
-  handleDeleteSelected: () => void
-  handleEmptyTrash: () => void
-  toggleTrashItemSelection: (id: string) => void
-  handleRestoreFolder: (id: string, e: React.MouseEvent) => void
-  handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void
-  handleRestoreNote: (id: string, e: React.MouseEvent) => void
-  handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void
+  readonly handleCreateNote: () => void
+  readonly creatingFolder: boolean
+  readonly setCreatingFolder: (v: boolean) => void
+  readonly newFolderName: string
+  readonly setNewFolderName: (v: string) => void
+  readonly handleCreateFolder: () => void
+  readonly folders: readonly Folder[]
+  readonly notes: readonly Note[]
+  readonly folderMultiSelectMode: boolean
+  readonly toggleFolderMultiSelectMode: () => void
+  readonly isAllFoldersSelected: () => boolean
+  readonly isSomeFoldersSelected: () => boolean
+  readonly selectAllFolders: () => void
+  readonly deselectAllFolders: () => void
+  readonly selectedFolderIds: Set<string>
+  readonly handleDeleteSelectedFolders: () => void
+  readonly toggleFolderSelection: (id: string) => void
+  readonly expandedFolders: Set<string>
+  readonly dropTargetFolderId: string | null
+  readonly handleDragOver: (e: React.DragEvent) => void
+  readonly handleDrop: (folderId: string | undefined, e: React.DragEvent) => void
+  readonly handleDragEnter: (folderId: string | undefined, e: React.DragEvent) => void
+  readonly handleDragLeave: (e: React.DragEvent) => void
+  readonly toggleFolder: (id: string) => void
+  readonly editingFolderId: string | null
+  readonly editingFolderName: string
+  readonly setEditingFolderName: (v: string) => void
+  readonly setEditingFolderId: (v: string | null) => void
+  readonly handleRenameFolder: (id: string) => void
+  readonly handleCreateNoteInFolder: (folderId: string | undefined) => void
+  readonly handleDeleteFolder: (id: string, e: React.MouseEvent) => void
+  readonly noteMultiSelectMode: boolean
+  readonly toggleNoteMultiSelectMode: () => void
+  readonly isAllNotesSelectedInFolder: (folderId: string | undefined) => boolean
+  readonly isSomeNotesSelectedInFolder: (folderId: string | undefined) => boolean
+  readonly selectAllNotesInFolder: (folderId: string | undefined) => void
+  readonly deselectAllNotesInFolder: () => void
+  readonly selectedNoteIds: Set<string>
+  readonly handleDeleteSelectedNotes: () => void
+  readonly renderNote: (note: Note, showCheckbox?: boolean, isInSelectionMode?: boolean) => React.ReactNode
+  readonly trashOpen: boolean
+  readonly setTrashOpen: (v: boolean) => void
+  readonly trashNotes: readonly Note[]
+  readonly trashFolders: readonly Folder[]
+  readonly isAllSelected: () => boolean
+  readonly isSomeSelected: () => boolean
+  readonly deselectAllTrashItems: () => void
+  readonly selectAllTrashItems: () => void
+  readonly setSelectionMode: (v: boolean) => void
+  readonly selectedTrashItems: Set<string>
+  readonly handleRestoreSelected: () => void
+  readonly handleDeleteSelected: () => void
+  readonly handleEmptyTrash: () => void
+  readonly toggleTrashItemSelection: (id: string) => void
+  readonly handleRestoreFolder: (id: string, e: React.MouseEvent) => void
+  readonly handlePermanentlyDeleteFolder: (id: string, e: React.MouseEvent) => void
+  readonly handleRestoreNote: (id: string, e: React.MouseEvent) => void
+  readonly handlePermanentlyDeleteNote: (id: string, e: React.MouseEvent) => void
 }
 
 /** Left sidebar content — notes list, folders, create note button, trash */
@@ -373,15 +374,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
       <div className="flex-1 overflow-y-auto p-1.5 xs:p-2 sm:p-2.5 md:p-3 laptop-sm:p-3 laptop:p-4">
         {/* Bouton créer un dossier */}
         <div className="mb-2 xs:mb-2.5 sm:mb-3">
-          {!creatingFolder ? (
-            <button
-              onClick={() => { setCreatingFolder(true); }}
-              className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
-            >
-              <FolderPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
-              <span>Nouveau dossier</span>
-            </button>
-          ) : (
+          {creatingFolder ? (
             <div className="flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 py-1 xs:py-1.5">
               <FolderIcon className="h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 text-neutral-500" />
               <input
@@ -415,6 +408,14 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                 <X className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
               </button>
             </div>
+          ) : (
+            <button
+              onClick={() => { setCreatingFolder(true); }}
+              className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors"
+            >
+              <FolderPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5" />
+              <span>Nouveau dossier</span>
+            </button>
           )}
         </div>
 
@@ -568,12 +569,14 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                         setEditingFolderName(folder.name)
                       }}
                       className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded text-blue-600"
+                      title="Renommer le dossier" aria-label="Renommer le dossier"
                     >
                       <Edit2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                     </button>
                     <button
                       onClick={(e) => { handleDeleteFolder(folder.id, e); }}
                       className="opacity-0 group-hover:opacity-100 p-0.5 xs:p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-600"
+                      title="Supprimer le dossier" aria-label="Supprimer le dossier"
                     >
                       <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
                     </button>
@@ -687,8 +690,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
 }
 
 /** Right sidebar content — metadata inspector */
-function RightSidebarContent({ activeNoteId }: { activeNoteId?: string | null }) {
-  const noteIdRef = activeNoteId
+function RightSidebarContent({ activeNoteId }: { readonly activeNoteId?: string | null }) {
   return (
     <div className="hidden laptop-sm:block w-64 laptop:w-72 laptop-lg:w-80 desktop:w-96 bg-neutral-100 dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 p-4 laptop:p-5 laptop-lg:p-6 overflow-y-auto">
       <h3 className="text-base laptop:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4 laptop:mb-5">Métadonnées</h3>
@@ -737,7 +739,7 @@ export default function Sidebar({
   const [dropTargetFolderId, setDropTargetFolderId] = useState<string | null>(null)
   const [trashOpen, setTrashOpen] = useState(false)
   const [selectedTrashItems, setSelectedTrashItems] = useState<Set<string>>(new Set())
-  const [, setSelectionMode] = useState(false)
+  const [_selectionMode, setSelectionMode] = useState(false)
   
   // Multi-select state for folder/unfiled notes
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set())
@@ -795,13 +797,13 @@ export default function Sidebar({
       ? `Supprimer ce dossier ? Les ${notesInFolder.length} note(s) seront déplacées vers la corbeille.`
       : 'Supprimer ce dossier vide ?'
     
-    if (!window.confirm(message)) {return}
-
-    try {
-      await deleteFolderById(folderId)
-      if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
-    } catch (error) {
-      console.error('Erreur lors de la suppression du dossier:', error)
+    if (globalThis.confirm(message)) {
+      try {
+        await deleteFolderById(folderId)
+        if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
+      } catch (error) {
+        console.error('Erreur lors de la suppression du dossier:', error)
+      }
     }
   }
 
@@ -825,11 +827,12 @@ export default function Sidebar({
       ? `Cette action est irréversible. Le dossier "${folder?.name}" et ses ${notesInFolder.length} note(s) seront supprimés définitivement.`
       : `Cette action est irréversible. Supprimer définitivement le dossier "${folder?.name}" ?`
     
-    if (!window.confirm(message)) {return}
-    try {
-      await permanentlyDeleteFolder(folderId)
-    } catch {
-      console.error('Erreur lors de la suppression définitive du dossier:', error)
+    if (globalThis.confirm(message)) {
+      try {
+        await permanentlyDeleteFolder(folderId)
+      } catch (err) {
+        console.error('Erreur lors de la suppression définitive du dossier:', err)
+      }
     }
   }
 
@@ -894,17 +897,17 @@ export default function Sidebar({
       ? `Supprimer ${selectedFolderIds.size} dossier(s) sélectionné(s) ? Les ${totalNotes} note(s) seront déplacées vers la corbeille.`
       : `Supprimer ${selectedFolderIds.size} dossier(s) vide(s) sélectionné(s) ?`
     
-    if (!window.confirm(message)) {return}
-
-    try {
-      for (const folderId of selectedFolderIds) {
-        await deleteFolderById(folderId)
+    if (globalThis.confirm(message)) {
+      try {
+        for (const folderId of selectedFolderIds) {
+          await deleteFolderById(folderId)
+        }
+        if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
+        setSelectedFolderIds(new Set())
+        setFolderMultiSelectMode(false)
+      } catch (error) {
+        console.error('Erreur lors de la suppression des dossiers sélectionnés:', error)
       }
-      if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
-      setSelectedFolderIds(new Set())
-      setFolderMultiSelectMode(false)
-    } catch (error) {
-      console.error('Erreur lors de la suppression des dossiers sélectionnés:', error)
     }
   }
 
@@ -961,22 +964,22 @@ export default function Sidebar({
   const handleDeleteSelectedNotes = async () => {
     if (selectedNoteIds.size === 0) {return}
     
-    const confirmed = window.confirm(
+    const confirmed = globalThis.confirm(
       `Supprimer ${selectedNoteIds.size} note(s) sélectionnée(s) ?`
     )
-    if (!confirmed) {return}
-
-    try {
-      for (const noteId of selectedNoteIds) {
-        if (deleteNote) {
-          await deleteNote(noteId)
+    if (confirmed) {
+      try {
+        for (const noteId of selectedNoteIds) {
+          if (deleteNote) {
+            await deleteNote(noteId)
+          }
         }
+        setSelectedNoteIds(new Set())
+        setFolderSelectionMode(false)
+        setNoteMultiSelectMode(false)
+      } catch (error) {
+        console.error('Erreur lors de la suppression des notes sélectionnées:', error)
       }
-      setSelectedNoteIds(new Set())
-      setFolderSelectionMode(false)
-      setNoteMultiSelectMode(false)
-    } catch (error) {
-      console.error('Erreur lors de la suppression des notes sélectionnées:', error)
     }
   }
 
@@ -1029,20 +1032,20 @@ export default function Sidebar({
 
   const handleEmptyTrash = async () => {
     const totalItems = trashNotes.length + trashFolders.length
-    if (!window.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {return}
-
-    try {
-      for (const folder of trashFolders) {
-        if (permanentlyDeleteFolder) {await permanentlyDeleteFolder(folder.id)}
+    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {
+      try {
+        for (const folder of trashFolders) {
+          if (permanentlyDeleteFolder) {await permanentlyDeleteFolder(folder.id)}
+        }
+        const orphanNotes = trashNotes.filter(n => !trashFolders.some(f => f.id === n.folder_id))
+        for (const note of orphanNotes) {
+          if (permanentlyDeleteNote) {await permanentlyDeleteNote(note.id)}
+        }
+        setSelectedTrashItems(new Set())
+        setSelectionMode(false)
+      } catch (error) {
+        console.error('Erreur lors du vidage de la corbeille:', error)
       }
-      const orphanNotes = trashNotes.filter(n => !trashFolders.some(f => f.id === n.folder_id))
-      for (const note of orphanNotes) {
-        if (permanentlyDeleteNote) {await permanentlyDeleteNote(note.id)}
-      }
-      setSelectedTrashItems(new Set())
-      setSelectionMode(false)
-    } catch (error) {
-      console.error('Erreur lors du vidage de la corbeille:', error)
     }
   }
 
@@ -1060,16 +1063,16 @@ export default function Sidebar({
 
   const handleDeleteSelected = async () => {
     if (selectedTrashItems.size === 0) {return}
-    if (!window.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {return}
-
-    try {
-      for (const itemId of selectedTrashItems) {
-        await permanentlyDeleteTrashItem(itemId)
+    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {
+      try {
+        for (const itemId of selectedTrashItems) {
+          await permanentlyDeleteTrashItem(itemId)
+        }
+        setSelectedTrashItems(new Set())
+        setSelectionMode(false)
+      } catch (error) {
+        console.error('Erreur lors de la suppression des éléments sélectionnés:', error)
       }
-      setSelectedTrashItems(new Set())
-      setSelectionMode(false)
-    } catch (error) {
-      console.error('Erreur lors de la suppression des éléments sélectionnés:', error)
     }
   }
 
@@ -1256,11 +1259,12 @@ export default function Sidebar({
     e.stopPropagation()
     if (!deleteNote) {return}
 
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {return}
-    try {
-      await deleteNote(noteId)
-    } catch (err) {
-      console.error('Erreur lors de la suppression:', err)
+    if (globalThis.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
+      try {
+        await deleteNote(noteId)
+      } catch (err) {
+        console.error('Erreur lors de la suppression:', err)
+      }
     }
   }
 
@@ -1278,11 +1282,12 @@ export default function Sidebar({
     e.stopPropagation()
     if (!permanentlyDeleteNote) {return}
     
-    if (!window.confirm('Cette action est irréversible. Supprimer définitivement ?')) {return}
-    try {
-      await permanentlyDeleteNote(noteId)
-    } catch (err) {
-      console.error('Erreur lors de la suppression définitive:', err)
+    if (globalThis.confirm('Cette action est irréversible. Supprimer définitivement ?')) {
+      try {
+        await permanentlyDeleteNote(noteId)
+      } catch (err) {
+        console.error('Erreur lors de la suppression définitive:', err)
+      }
     }
   }
 
@@ -1379,7 +1384,7 @@ export default function Sidebar({
                     className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 min-w-[160px] xs:min-w-[180px] py-1"
                     sideOffset={5}
                     align="end"
-                    onClick={(e) => { e.stopPropagation(); }}
+                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}
                   >
                     <DropdownMenu.Item 
                       className="w-full px-2.5 xs:px-3 py-1.5 xs:py-2 text-left text-xs xs:text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-1.5 xs:gap-2 outline-none cursor-pointer text-neutral-700 dark:text-neutral-300"

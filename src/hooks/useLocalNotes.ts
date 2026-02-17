@@ -135,22 +135,20 @@ export function useLocalNotes(userId?: string | null) {
     const syncWithCloud = async () => {
       try {
         setSyncing(true)
-        
-        // Get cloud notes
+
+        // Get cloud notes (without deleted_at filter - column may not exist)
         const { data: cloudNotes, error } = await supabase
           .from('notes')
           .select('*')
           .eq('user_id', userId)
-          .filter('deleted_at', 'is', null)
 
         if (error) {throw error}
 
-        // Get cloud folders
+        // Get cloud folders (without deleted_at filter - column may not exist)
         const { data: cloudFolders, error: foldersError } = await supabase
           .from('folders')
           .select('*')
           .eq('user_id', userId)
-          .filter('deleted_at', 'is', null)
 
         if (foldersError) {throw foldersError}
 

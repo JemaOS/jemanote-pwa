@@ -160,7 +160,7 @@ Format de réponse:
         // SECURITY FIX: Use safer regex with length limits for AI response parsing
         const match = line.match(/^\d{1,3}\.\s*\[?(\d{1,5})\]?:\s*(.{1,500})$/)
         if (match) {
-          const noteIndex = parseInt(match[1]) - 1
+          const noteIndex = parseInt(match[1], 10) - 1
           const reason = match[2].trim()
 
           if (noteIndex >= 0 && noteIndex < allNotes.length) {

@@ -19,11 +19,12 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
   const [sortBy, setSortBy] = useState<'updated' | 'created'>('updated')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
 
-  // Filter notes by date if selected
+  // Filter notes by date if selected, and exclude deleted notes
   const filteredNotes = useMemo(() => {
-    if (!selectedDate) {return notes}
+    const activeNotes = notes.filter(n => !n.deleted_at)
+    if (!selectedDate) {return activeNotes}
     
-    return notes.filter(note => {
+    return activeNotes.filter(note => {
       const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at
       return isSameDay(parseISO(dateStr), selectedDate)
     })

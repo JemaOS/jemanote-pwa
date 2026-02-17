@@ -57,17 +57,20 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
 
   // Helper: create initial canvas nodes from notes
   const createInitialNodes = useCallback((notesList: Note[]): CanvasNode[] =>
-    notesList.slice(0, 5).map((note, index) => ({
-      id: note.id,
-      type: 'note' as const,
-      x: 100 + (index % 3) * 300,
-      y: 100 + Math.floor(index / 3) * 250,
-      width: 250,
-      height: 200,
-      content: note.content,
-      title: note.title,
-      color: '#5a63e9',
-    })), [])
+    notesList
+      .filter(note => !note.deleted_at)
+      .slice(0, 5)
+      .map((note, index) => ({
+        id: note.id,
+        type: 'note' as const,
+        x: 100 + (index % 3) * 300,
+        y: 100 + Math.floor(index / 3) * 250,
+        width: 250,
+        height: 200,
+        content: note.content,
+        title: note.title,
+        color: '#5a63e9',
+      })), [])
 
   // Helper: process saved or initial canvas data
   const processCanvasData = useCallback(async (savedNodes: CanvasNode[] | null) => {
@@ -101,7 +104,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     let hasChanges = false
     for (let i = nextNodes.length - 1; i >= 0; i--) {
       const node = nextNodes[i]
-      if (!node || node.type !== 'note') {continue}
+      if (node?.type !== 'note') {continue}
       
       const inNotes = currentNoteIds.has(node.id)
       if (inNotes) {

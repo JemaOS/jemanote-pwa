@@ -223,10 +223,10 @@ function applyExceptions(report, exceptions) {
  * Main function
  */
 async function main() {
-  const args = process.argv.slice(2);
-  const saveToFile = args.includes('--save');
-  const failOnCritical = args.includes('--fail-on-critical');
-  const failOnHigh = args.includes('--fail-on-high');
+  const args = new Set(process.argv.slice(2));
+  const saveToFile = args.has('--save');
+  const failOnCritical = args.has('--fail-on-critical');
+  const failOnHigh = args.has('--fail-on-high');
   
   console.log('🛡️  Jemanote Security Audit Tool\n');
   

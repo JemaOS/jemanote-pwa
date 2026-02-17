@@ -82,12 +82,12 @@ Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails.
 export const WithMathEquations: Story = {
   args: {
     ...defaultProps,
-    value: `# Mathématiques
+    value: String.raw`# Mathématiques
 
 Voici une équation: $E = mc^2$
 
 $$
-\\int_{a}^{b} f(x) dx = F(b) - F(a)
+\int_{a}^{b} f(x) dx = F(b) - F(a)
 $$
 `,
   },

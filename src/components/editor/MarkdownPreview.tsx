@@ -58,11 +58,12 @@ const MarkdownImg = ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageEl
 }
 
 const MarkdownAudio = (props: React.AudioHTMLAttributes<HTMLAudioElement>) => {
-  // @ts-ignore - data-attachment-id peut être dans props
-  const attachmentId = props['data-attachment-id']
+  // data-attachment-id peut être dans props
+  const attachmentId = props['data-attachment-id' as keyof typeof props] as string | undefined
   if (attachmentId) {
-    return <AudioPlayer attachmentId={attachmentId as string} />
+    return <AudioPlayer attachmentId={attachmentId} />
   }
+  // eslint-disable-next-line jsx-a11y/media-has-caption
   return <audio {...props} />
 }
 
@@ -161,13 +162,13 @@ const MarkdownTable = ({ children, ...props }: React.HTMLAttributes<HTMLTableEle
   </div>
 )
 
-const MarkdownTh = ({ children, ...props }: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
+const MarkdownTh = ({ children, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
   <th className="border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-left font-semibold" {...props}>
     {children}
   </th>
 )
 
-const MarkdownTd = ({ children, ...props }: React.TdHTMLAttributes<HTMLTableDataCellElement>) => (
+const MarkdownTd = ({ children, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
   <td className="border border-gray-300 dark:border-gray-700 px-4 py-2" {...props}>
     {children}
   </td>

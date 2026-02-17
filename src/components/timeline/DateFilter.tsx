@@ -14,6 +14,12 @@ interface DateFilterProps {
   readonly onSelectDate: (date: Date | undefined) => void
 }
 
+// IconLeft component extracted to avoid nested function declaration
+const IconLeftComponent = () => <ChevronLeft className="h-4 w-4" />
+
+// IconRight component extracted to avoid nested function declaration
+const IconRightComponent = () => <ChevronRight className="h-4 w-4" />
+
 export default function DateFilter({ selectedDate, onSelectDate }: DateFilterProps) {
   // Custom styling for DayPicker to match the app theme
   const css = `
@@ -99,8 +105,8 @@ export default function DateFilter({ selectedDate, onSelectDate }: DateFilterPro
               showOutsideDays
               fixedWeeks
               components={{
-                IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-                IconRight: () => <ChevronRight className="h-4 w-4" />,
+                IconLeft: IconLeftComponent,
+                IconRight: IconRightComponent,
               }}
             />
             <Popover.Arrow className="fill-white dark:fill-neutral-900 stroke-neutral-200 dark:stroke-neutral-700" />

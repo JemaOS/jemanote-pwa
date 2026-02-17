@@ -2,14 +2,13 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { Command } from 'cmdk'
-import { 
-  FileText, 
-  Search, 
-  Settings, 
-  Network, 
-  Paintbrush, 
-  Moon, 
-  Sun, 
+import {
+  FileText,
+  Search,
+  Settings,
+  Network,
+  Moon,
+  Sun,
   Trash2,
   Plus,
   LogIn,

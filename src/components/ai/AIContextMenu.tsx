@@ -177,7 +177,7 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
       </div>
 
       {/* Actions principales ou Résultat */}
-      {!result ? (
+      {result ? null : (
         <div className="p-2">
           {!showToneMenu && !showTranslateMenu ? (
             <>

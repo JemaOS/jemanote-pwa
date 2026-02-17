@@ -151,7 +151,7 @@ async function runESLint() {
     await runCommand('npx', ['eslint', ...args]);
     printSuccess('ESLint passed');
     results.passed.push('ESLint');
-  } catch (error) {
+  } catch {
     printError('ESLint failed');
     results.failed.push('ESLint');
     if (!shouldFix) {
@@ -169,7 +169,7 @@ async function runTypeCheck() {
     await runCommand('npx', ['tsc', '--noEmit']);
     printSuccess('TypeScript type check passed');
     results.passed.push('TypeScript');
-  } catch (error) {
+  } catch {
     printError('TypeScript type check failed');
     results.failed.push('TypeScript');
   }
@@ -187,7 +187,7 @@ async function runPrettier() {
     await runCommand('npx', ['prettier', ...args]);
     printSuccess(shouldFix ? 'Prettier formatting applied' : 'Prettier check passed');
     results.passed.push('Prettier');
-  } catch (error) {
+  } catch {
     if (shouldFix) {
       printError('Prettier failed');
       results.failed.push('Prettier');
@@ -208,7 +208,7 @@ async function runTests() {
     await runCommand('npx', ['vitest', 'run', '--passWithNoTests']);
     printSuccess('Unit tests passed');
     results.passed.push('Unit Tests');
-  } catch (error) {
+  } catch {
     printError('Unit tests failed');
     results.failed.push('Unit Tests');
   }
@@ -223,9 +223,9 @@ async function runDepcheck() {
     await runCommand('npx', ['depcheck', '--ignore-bin-package', '--skip-missing']);
     printSuccess('Dependency check passed');
     results.passed.push('Depcheck');
-  } catch (error) {
+  } catch (err) {
     // Depcheck exits with code 1 if it finds issues, but we want to treat warnings differently
-    const output = error.message || '';
+    const output = err.message || '';
     if (output.includes('Unused dependencies') || output.includes('Unused devDependencies')) {
       printWarning('Dependency check found unused dependencies');
       results.warnings.push('Depcheck');
@@ -245,7 +245,7 @@ async function runKnip() {
     await runCommand('npx', ['knip']);
     printSuccess('Dead code detection passed');
     results.passed.push('Knip');
-  } catch (error) {
+  } catch {
     printWarning('Knip found potential dead code or issues');
     results.warnings.push('Knip');
   }

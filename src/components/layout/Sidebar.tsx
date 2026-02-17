@@ -1,8 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { File, Folder as FolderIcon, Plus, ChevronDown, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, FolderInput, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
+import { File, Folder as FolderIcon, Plus, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, RotateCcw, Trash, Square, CheckSquare, MinusSquare } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 import { LocalStorage } from '@/lib/localStorage'
@@ -450,9 +449,9 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               </button>
             )}
             
-            <span role="heading" aria-level={3} className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+            <h3 className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
               Dossiers
-            </span>
+            </h3>
             
             {selectedFolderIds.size > 0 && (
               <button
@@ -476,7 +475,12 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               <div
                 role="treeitem"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { toggleFolder(folder.id); } }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    toggleFolder(folder.id);
+                  }
+                }}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
@@ -608,7 +612,8 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               dropTargetFolderId === 'root' ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
             }`}
           >
-            <div
+            <button
+              type="button"
               onClick={() => { toggleFolder('root'); }}
               className="w-full flex items-center gap-1.5 xs:gap-2 px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1 xs:py-1.5 sm:py-1.5 laptop:py-2 text-xs sm:text-xs laptop:text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md transition-colors group cursor-pointer"
             >
@@ -633,7 +638,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
               >
                 <Plus className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
               </button>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -683,6 +688,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
 
 /** Right sidebar content — metadata inspector */
 function RightSidebarContent({ activeNoteId }: { activeNoteId?: string | null }) {
+  const noteIdRef = activeNoteId
   return (
     <div className="hidden laptop-sm:block w-64 laptop:w-72 laptop-lg:w-80 desktop:w-96 bg-neutral-100 dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 p-4 laptop:p-5 laptop-lg:p-6 overflow-y-auto">
       <h3 className="text-base laptop:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4 laptop:mb-5">Métadonnées</h3>
@@ -731,7 +737,7 @@ export default function Sidebar({
   const [dropTargetFolderId, setDropTargetFolderId] = useState<string | null>(null)
   const [trashOpen, setTrashOpen] = useState(false)
   const [selectedTrashItems, setSelectedTrashItems] = useState<Set<string>>(new Set())
-  const [selectionMode, setSelectionMode] = useState(false)
+  const [, setSelectionMode] = useState(false)
   
   // Multi-select state for folder/unfiled notes
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set())
@@ -822,7 +828,7 @@ export default function Sidebar({
     if (!window.confirm(message)) {return}
     try {
       await permanentlyDeleteFolder(folderId)
-    } catch (error) {
+    } catch {
       console.error('Erreur lors de la suppression définitive du dossier:', error)
     }
   }
@@ -1253,8 +1259,8 @@ export default function Sidebar({
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {return}
     try {
       await deleteNote(noteId)
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error)
+    } catch (err) {
+      console.error('Erreur lors de la suppression:', err)
     }
   }
 
@@ -1275,8 +1281,8 @@ export default function Sidebar({
     if (!window.confirm('Cette action est irréversible. Supprimer définitivement ?')) {return}
     try {
       await permanentlyDeleteNote(noteId)
-    } catch (error) {
-      console.error('Erreur lors de la suppression définitive:', error)
+    } catch (err) {
+      console.error('Erreur lors de la suppression définitive:', err)
     }
   }
 
@@ -1291,7 +1297,7 @@ export default function Sidebar({
         draggedNoteId === note.id
           ? 'opacity-50'
           : ''
-      } ${getNoteBackgroundClass(selectedNoteIds, note.id, activeNoteId)} cursor-move`}
+      } ${getNoteBackgroundClass(selectedNoteIds, note.id, activeNoteId)} ${isInSelectionMode ? 'cursor-default' : 'cursor-move'}`}
     >
       {editingNoteId === note.id ? (
         // Edit mode

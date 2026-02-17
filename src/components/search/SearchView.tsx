@@ -63,43 +63,49 @@ export default function SearchView({ userId, notes, searchQuery = '', onSearchQu
         </div>
 
         <div className="space-y-4">
-          {filteredNotes.length > 0 ? (
-            <>
-              <div className="text-body-small text-neutral-700 dark:text-neutral-300 mb-4">
-                {getResultCountText(filteredNotes.length)}
-              </div>
-              {filteredNotes.map((note) => (
-                <div
-                  key={note.id}
-                  onClick={() => onSelectNote?.(note.id)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelectNote?.(note.id); } }}
-                  role="button"
-                  tabIndex={0}
-                  className="p-6 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:shadow-card hover:border-primary-500 dark:hover:border-primary-500 transition-all cursor-pointer"
-                >
-                  <h3 className="text-body-large font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
-                    {note.title}
-                  </h3>
-                  <p className="text-body text-neutral-700 dark:text-neutral-300 line-clamp-3">
-                    {note.content || 'Aucun contenu'}
-                  </p>
-                  <div className="mt-3 text-body-small text-neutral-500 dark:text-neutral-400">
-                    Modifié le {new Date(note.updated_at).toLocaleDateString('fr-FR')}
+          {(() => {
+            if (filteredNotes.length > 0) {
+              return (
+                <>
+                  <div className="text-body-small text-neutral-700 dark:text-neutral-300 mb-4">
+                    {getResultCountText(filteredNotes.length)}
                   </div>
+                  {filteredNotes.map((note) => (
+                    <button
+                      key={note.id}
+                      type="button"
+                      onClick={() => onSelectNote?.(note.id)}
+                      className="w-full text-left p-6 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:shadow-card hover:border-primary-500 dark:hover:border-primary-500 transition-all cursor-pointer"
+                    >
+                      <h3 className="text-body-large font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+                        {note.title}
+                      </h3>
+                      <p className="text-body text-neutral-700 dark:text-neutral-300 line-clamp-3">
+                        {note.content || 'Aucun contenu'}
+                      </p>
+                      <div className="mt-3 text-body-small text-neutral-500 dark:text-neutral-400">
+                        Modifié le {new Date(note.updated_at).toLocaleDateString('fr-FR')}
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )
+            }
+            if (query) {
+              return (
+                <div className="text-center py-12">
+                  <p className="text-body text-neutral-500 dark:text-neutral-400">Aucun résultat trouvé pour "{query}"</p>
                 </div>
-              ))}
-            </>
-          ) : query ? (
-            <div className="text-center py-12">
-              <p className="text-body text-neutral-500 dark:text-neutral-400">Aucun résultat trouvé pour "{query}"</p>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-body text-neutral-500 dark:text-neutral-400">
-                Commencez à taper pour rechercher dans vos notes
-              </p>
-            </div>
-          )}
+              )
+            }
+            return (
+              <div className="text-center py-12">
+                <p className="text-body text-neutral-500 dark:text-neutral-400">
+                  Commencez à taper pour rechercher dans vos notes
+                </p>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>

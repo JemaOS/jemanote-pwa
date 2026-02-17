@@ -60,7 +60,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   }, [])
 
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    const SpeechRecognition = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition || (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition
     if (!SpeechRecognition) {
       setIsSupported(false)
       return
@@ -407,7 +407,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   const getDisplayTranscript = (text: string) => {
     const MAX_TEXT_LENGTH = 100000 // 100KB max
     const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text
-    return safeText.replace(/!\[[^\]]{0,200}\]\(attachment:[a-zA-Z0-9-_]{1,100}\)/g, '').trim()
+    return safeText.replaceAll(/!\[[^\]]{0,200}\]\(attachment:[a-zA-Z0-9-_]{1,100}\)/g, '').trim()
   }
 
   if (!isSupported) {
@@ -511,6 +511,23 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
             aria-valuenow={Math.round(audioCurrentTime)}
             aria-valuetext={`${Math.round(audioCurrentTime)} secondes sur ${Math.round(audioDuration)}`}
             tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft') {
+                e.preventDefault()
+                const newTime = Math.max(0, audioCurrentTime - 5)
+                if (audioRef.current) {
+                  audioRef.current.currentTime = newTime
+                }
+                setAudioCurrentTime(newTime)
+              } else if (e.key === 'ArrowRight') {
+                e.preventDefault()
+                const newTime = Math.min(audioDuration, audioCurrentTime + 5)
+                if (audioRef.current) {
+                  audioRef.current.currentTime = newTime
+                }
+                setAudioCurrentTime(newTime)
+              }
+            }}
             onMouseDown={(e) => {
               e.preventDefault()
               const container = waveformContainerRef.current
@@ -602,7 +619,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           {/* Contrôles de lecture */}
           <div className="flex flex-col items-center gap-4 pt-2">
             <div className="flex justify-center">
-              {!isPlayingAudio ? (
+              {isPlayingAudio === false ? (
                 <button
                   onClick={playAudio}
                   className="flex items-center justify-center w-14 h-14 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Mail, Lock, User } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
@@ -33,7 +33,7 @@ export default function AuthView() {
       if (authError) {
         setError(authError.message)
       }
-    } catch (err) {
+    } catch {
       setError('Une erreur est survenue')
     } finally {
       setLoading(false)
@@ -71,7 +71,7 @@ export default function AuthView() {
                 const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors'
                 const activeClasses = 'bg-primary-500 text-white'
                 const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-                return `${baseClasses} ${!isLogin ? activeClasses : inactiveClasses}`
+                return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`
               })()}
             >
               Inscription

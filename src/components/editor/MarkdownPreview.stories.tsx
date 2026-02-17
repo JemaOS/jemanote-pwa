@@ -117,14 +117,14 @@ Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails sur les d
 export const MathEquations: Story = {
   args: {
     ...defaultProps,
-    content: `# Mathématiques
+    content: String.raw`# Mathématiques
 
 Voici une équation inline: $E = mc^2$
 
 Et voici un bloc d'équation:
 
 $$
-\\int_{a}^{b} f(x) \\, dx = F(b) - F(a)
+\int_{a}^{b} f(x) \, dx = F(b) - F(a)
 $$
 
 $$

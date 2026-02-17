@@ -96,7 +96,7 @@ const compareImages = async (baselinePath, actualPath) => {
       numDiffPixels,
       diffImage: diff,
     }
-  } catch (error) {
+  } catch {
     // Fallback: comparaison simple de taille de fichier
     const baselineStat = fs.statSync(baselinePath)
     const actualStat = fs.statSync(actualPath)
@@ -292,11 +292,11 @@ const generateReport = (results) => {
             <div class="comparison">
               <div class="image-box">
                 <h4>Baseline</h4>
-                <img src="${result.baselinePath}" alt="Baseline" loading="lazy">
+                <img src="${result.baselinePath}" alt="Baseline" loading="lazy" />
               </div>
               <div class="image-box">
                 <h4>Actual</h4>
-                <img src="${result.actualPath}" alt="Actual" loading="lazy">
+                <img src="${result.actualPath}" alt="Actual" loading="lazy" />
               </div>
               ${renderDiffImage(result.diffPath)}
             </div>
@@ -403,7 +403,7 @@ const main = async () => {
     try {
       const comparison = await compareImages(baselineFile, actualFile)
       
-      if (!comparison.match) {
+      if (comparison.match === false) {
         hasFailures = true
         results.push(processDiffResult(comparison, relativePath, baselineFile, actualFile))
       } else {

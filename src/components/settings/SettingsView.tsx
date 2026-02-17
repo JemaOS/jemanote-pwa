@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Palette, Type, Zap, Cloud, Moon, Sun, Monitor } from 'lucide-react'
+import { Palette, Type, Cloud, Moon, Sun } from 'lucide-react'
 import React from 'react'
 
 import AISettingsSection from '@/components/ai/AISettingsSection'
@@ -27,7 +27,7 @@ export default function SettingsView({ userId }: SettingsViewProps) {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+                <label htmlFor="theme-label" className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-3">
                   Thème
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -83,8 +83,9 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-body text-neutral-700 dark:text-neutral-300">Mode Vim</label>
+                <label htmlFor="vimMode" className="text-body text-neutral-700 dark:text-neutral-300">Mode Vim</label>
                 <input
+                  id="vimMode"
                   type="checkbox"
                   className="h-5 w-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"
                 />
@@ -103,18 +104,20 @@ export default function SettingsView({ userId }: SettingsViewProps) {
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <label className="text-body text-neutral-700 dark:text-neutral-300">Synchronisation activée</label>
+                  <label htmlFor="syncEnabled" className="text-body text-neutral-700 dark:text-neutral-300">Synchronisation activée</label>
                   <input
+                    id="syncEnabled"
                     type="checkbox"
                     defaultChecked
                     className="h-5 w-5 text-primary-500 rounded focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  <label htmlFor="syncInterval" className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     Intervalle de synchronisation (secondes)
                   </label>
                   <input
+                    id="syncInterval"
                     type="number"
                     defaultValue={60}
                     min={10}

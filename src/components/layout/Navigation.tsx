@@ -1,14 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { User } from '@supabase/supabase-js'
 import {
   Search,
   SidebarOpen,
   SidebarClose,
   Network,
   Settings,
-  Layout,
   LogOut,
   LogIn,
   PanelLeftOpen,

@@ -293,7 +293,7 @@ async function runAllTests(options) {
     try {
       await step.fn()
       console.log(color('green', `✅ ${step.name} passé`))
-    } catch (error) {
+    } catch {
       console.log(color('red', `❌ ${step.name} échoué`))
       hasErrors = true
     }
@@ -431,7 +431,7 @@ async function main() {
     try {
       await runType(options.type, options)
       process.exit(0)
-    } catch (error) {
+    } catch {
       process.exit(1)
     }
   } else {

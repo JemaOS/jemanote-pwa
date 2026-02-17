@@ -239,7 +239,7 @@ async function benchmarkPageLoad() {
 
         const duration = Date.now() - start;
         times.push(duration);
-      } catch (error) {
+      } catch {
         log(`    Request ${i + 1}: FAILED`);
       }
     }

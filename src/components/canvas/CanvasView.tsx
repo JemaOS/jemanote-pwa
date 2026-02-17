@@ -242,7 +242,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       const touch = e.touches[0]
       if (!touch) {return}
       
-      if (!draggedNode) {
+      if (draggedNode === null) {
         // Pan move
         // Direct state update without intermediate object creation for performance
         if (isDragging) {
@@ -461,7 +461,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     
     // If it's a note node, we might want to delete the actual note
     if (node?.type === 'note' && deleteNote) {
-      const confirmed = window.confirm('Voulez-vous également supprimer la note originale et la mettre à la corbeille ?')
+      const confirmed = window.confirm('Voulez-vous supprimer la note originale et la mettre à la corbeille ?')
       if (confirmed) {
         await deleteNote(node.id) // This uses the soft delete from useLocalNotes
       }
@@ -541,7 +541,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         <button
           onClick={() => {
             setIsMultiSelectMode(!isMultiSelectMode)
-            if (!isMultiSelectMode) {
+            if (isMultiSelectMode === false) {
               // Entering multi-select mode
               setSelectedNodes(new Set())
             } else {
@@ -577,11 +577,11 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       </div>
 
       {/* Canvas */}
-      <div
+      <button
         ref={canvasRef}
-        role="application"
+        type="button"
         aria-label="Canvas de visualisation du graphe"
-        className="canvas-background h-full w-full cursor-grab active:cursor-grabbing"
+        className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -635,12 +635,21 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             const isInMultiSelection = selectedNodes.has(node.id) && selectedNodes.size > 1
             
             return (
-            // Helper function to get border class based on selection state
             <div
               key={node.id}
               role="button"
               tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  if (isMultiSelectMode) {
+                    toggleNodeSelection(node.id)
+                  } else {
+                    setSelectedNode(node.id)
+                  }
+                }
+              }}
               className={`absolute bg-white dark:bg-neutral-800 border-2 rounded-lg shadow-lg overflow-hidden transition-shadow touch-none select-none ${getNodeBorderClass(isSelected, isInMultiSelection)} ${getCursorClass(draggedNode === node.id, isMultiSelectMode)}`}
               style={{
                 left: node.x,

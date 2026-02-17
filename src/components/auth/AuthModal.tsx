@@ -57,6 +57,12 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           onClose()
         }
       }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          onClose()
+        }
+      }}
+      tabIndex={-1}
     >
       <div className="relative w-full max-w-md">
         <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-modal p-4 sm:p-6 md:p-8">

@@ -159,7 +159,7 @@ function matchesKeyword(trimmed, keywords) {
     if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(keyword)) {
       continue; // Skip invalid keywords
     }
-    if (new RegExp(`\\b${keyword}\\b`).test(trimmed)) return true;
+    if (new RegExp(String.raw`\b${keyword}\b`).test(trimmed)) return true;
   }
   return false;
 }

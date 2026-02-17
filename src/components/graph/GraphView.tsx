@@ -1,13 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  Maximize, 
-  Filter, 
-  Settings, 
-  Circle,
+import {
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  Filter,
+  Settings,
   Play,
   Pause,
   SlidersHorizontal,
@@ -160,12 +159,15 @@ function resolveNodeColor(
   const hasTags = nodeData.tags && nodeData.tags.length > 0
   
   if (settings.colorScheme === 'tags' && hasTags) {
-    const tagHash = nodeData.tags![0].split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    const tagHash = nodeData.tags![0].split('').reduce((acc, char) => {
+      const code = char.codePointAt(0)
+      return acc + (code ?? 0)
+    }, 0)
     const hue = (tagHash * 137.508) % 360
-    color = parseInt(`0x${HSLToHex(hue, 70, 60)}`, 16)
+    color = Number.parseInt(`0x${HSLToHex(hue, 70, 60)}`, 16)
   } else if (settings.colorScheme === 'centrality' && nodeData.centrality !== undefined) {
     const lightness = 40 + Math.min(nodeData.centrality / 10, 1) * 30
-    color = parseInt(`0x${HSLToHex(240, 80, lightness)}`, 16)
+    color = Number.parseInt(`0x${HSLToHex(240, 80, lightness)}`, 16)
   }
 
   for (const group of groups) {
@@ -176,7 +178,7 @@ function resolveNodeColor(
       if (!/^#[0-9A-Fa-f]{6}$/.test(group.color)) {
         return color // Return default color if invalid format
       }
-      return parseInt(group.color.replace('#', '0x'), 16)
+      return Number.parseInt(group.color.replace('#', '0x'), 16)
     }
   }
   return color
@@ -319,7 +321,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
         const getDistance = (touches: TouchList) => {
           const dx = touches[0].clientX - touches[1].clientX
           const dy = touches[0].clientY - touches[1].clientY
-          return Math.sqrt(dx * dx + dy * dy)
+          return Math.hypot(dx, dy)
         }
 
         const handleTouchStart = (e: TouchEvent) => {

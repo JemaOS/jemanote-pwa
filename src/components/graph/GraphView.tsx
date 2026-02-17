@@ -9,7 +9,6 @@ import {
   Settings,
   Play,
   Pause,
-  SlidersHorizontal,
   Target,
   Circle
 } from 'lucide-react'
@@ -1009,7 +1008,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
                     max="2"
                     step="0.1"
                     value={graphSettings.nodeSize}
-                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, nodeSize: parseFloat(e.target.value) })); }}
+                    onChange={(e) => { setGraphSettings(prev => ({ ...prev, nodeSize: Number.parseFloat(e.target.value) })); }}
                     className="w-full accent-blue-500 h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>

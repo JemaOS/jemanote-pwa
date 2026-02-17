@@ -132,7 +132,7 @@ function ThreeStateCheckbox({ allSelected, someSelected }: { readonly allSelecte
 
 /** Trash section in the left sidebar */
 function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAllSelected, isSomeSelected,
-  deselectAllTrashItems, selectAllTrashItems, setSelectionMode, selectedTrashItems,
+  deselectAllTrashItems, selectAllTrashItems, selectedTrashItems,
   handleRestoreSelected, handleDeleteSelected, handleEmptyTrash, toggleTrashItemSelection,
   handleRestoreFolder, handlePermanentlyDeleteFolder, handleRestoreNote, handlePermanentlyDeleteNote,
 }: {
@@ -140,7 +140,7 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
   readonly trashNotes: readonly Note[]; readonly trashFolders: readonly Folder[];
   readonly isAllSelected: () => boolean; readonly isSomeSelected: () => boolean;
   readonly deselectAllTrashItems: () => void; readonly selectAllTrashItems: () => void;
-  readonly setSelectionMode: (v: boolean) => void; readonly selectedTrashItems: Set<string>;
+  readonly selectedTrashItems: Set<string>;
   readonly handleRestoreSelected: () => void; readonly handleDeleteSelected: () => void; readonly handleEmptyTrash: () => void;
   readonly toggleTrashItemSelection: (id: string) => void;
   readonly handleRestoreFolder: (id: string, e: React.MouseEvent) => void;
@@ -179,7 +179,6 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
                 <button
                   onClick={() => {
                     if (isAllSelected()) { deselectAllTrashItems() } else { selectAllTrashItems() }
-                    setSelectionMode(true)
                   }}
                   className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded text-neutral-600 dark:text-neutral-400"
                   title={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"} aria-label={isAllSelected() ? "Tout désélectionner" : "Tout sélectionner"}
@@ -225,7 +224,7 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
                 return (
                   <TrashFolderItem key={folder.id} folder={folder} notesInFolder={notesInFolder}
                     isSelected={selectedTrashItems.has(itemId)}
-                    onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                    onToggleSelection={() => { toggleTrashItemSelection(itemId) }}
                     onRestore={(e) => { handleRestoreFolder(folder.id, e); }}
                     onPermanentlyDelete={(e) => { handlePermanentlyDeleteFolder(folder.id, e); }}
                   />
@@ -240,7 +239,7 @@ function TrashSection({ trashOpen, setTrashOpen, trashNotes, trashFolders, isAll
                   return (
                     <TrashNoteItem key={note.id} note={note}
                       isSelected={selectedTrashItems.has(itemId)}
-                      onToggleSelection={() => { toggleTrashItemSelection(itemId); setSelectionMode(true) }}
+                      onToggleSelection={() => { toggleTrashItemSelection(itemId) }}
                       onRestore={(e) => { handleRestoreNote(note.id, e); }}
                       onPermanentlyDelete={(e) => { handlePermanentlyDeleteNote(note.id, e); }}
                     />
@@ -326,7 +325,6 @@ interface LeftSidebarContentProps {
   readonly isSomeSelected: () => boolean
   readonly deselectAllTrashItems: () => void
   readonly selectAllTrashItems: () => void
-  readonly setSelectionMode: (v: boolean) => void
   readonly selectedTrashItems: Set<string>
   readonly handleRestoreSelected: () => void
   readonly handleDeleteSelected: () => void
@@ -352,7 +350,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
     selectAllNotesInFolder, deselectAllNotesInFolder, selectedNoteIds, handleDeleteSelectedNotes,
     renderNote, trashOpen, setTrashOpen, trashNotes, trashFolders,
     isAllSelected, isSomeSelected, deselectAllTrashItems, selectAllTrashItems,
-    setSelectionMode, selectedTrashItems, handleRestoreSelected, handleDeleteSelected,
+    selectedTrashItems, handleRestoreSelected, handleDeleteSelected,
     handleEmptyTrash, toggleTrashItemSelection, handleRestoreFolder, handlePermanentlyDeleteFolder,
     handleRestoreNote, handlePermanentlyDeleteNote,
   } = props
@@ -474,14 +472,6 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           return (
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
-                role="treeitem"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    toggleFolder(folder.id);
-                  }
-                }}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
@@ -678,7 +668,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           trashNotes={trashNotes} trashFolders={trashFolders}
           isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
           deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
-          setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
+          selectedTrashItems={selectedTrashItems}
           handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
           handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
           handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}
@@ -739,7 +729,6 @@ export default function Sidebar({
   const [dropTargetFolderId, setDropTargetFolderId] = useState<string | null>(null)
   const [trashOpen, setTrashOpen] = useState(false)
   const [selectedTrashItems, setSelectedTrashItems] = useState<Set<string>>(new Set())
-  const [_selectionMode, setSelectionMode] = useState(false)
   
   // Multi-select state for folder/unfiled notes
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set())
@@ -1042,7 +1031,6 @@ export default function Sidebar({
           if (permanentlyDeleteNote) {await permanentlyDeleteNote(note.id)}
         }
         setSelectedTrashItems(new Set())
-        setSelectionMode(false)
       } catch (error) {
         console.error('Erreur lors du vidage de la corbeille:', error)
       }
@@ -1069,7 +1057,6 @@ export default function Sidebar({
           await permanentlyDeleteTrashItem(itemId)
         }
         setSelectedTrashItems(new Set())
-        setSelectionMode(false)
       } catch (error) {
         console.error('Erreur lors de la suppression des éléments sélectionnés:', error)
       }
@@ -1095,7 +1082,6 @@ export default function Sidebar({
         await restoreTrashItem(itemId)
       }
       setSelectedTrashItems(new Set())
-      setSelectionMode(false)
     } catch (error) {
       console.error('Erreur lors de la restauration des éléments sélectionnés:', error)
     }
@@ -1460,7 +1446,7 @@ export default function Sidebar({
         trashNotes={trashNotes} trashFolders={trashFolders}
         isAllSelected={isAllSelected} isSomeSelected={isSomeSelected}
         deselectAllTrashItems={deselectAllTrashItems} selectAllTrashItems={selectAllTrashItems}
-        setSelectionMode={setSelectionMode} selectedTrashItems={selectedTrashItems}
+        selectedTrashItems={selectedTrashItems}
         handleRestoreSelected={handleRestoreSelected} handleDeleteSelected={handleDeleteSelected}
         handleEmptyTrash={handleEmptyTrash} toggleTrashItemSelection={toggleTrashItemSelection}
         handleRestoreFolder={handleRestoreFolder} handlePermanentlyDeleteFolder={handlePermanentlyDeleteFolder}

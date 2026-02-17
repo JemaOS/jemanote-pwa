@@ -82,7 +82,7 @@ class LinkDetectionService {
   /**
    * Détecter les liens potentiels pour une note donnée
    */
-  detectLinks(currentNote: Note, allNotes: Note[]): LinkSuggestion[] {
+  detectLinks(currentNote: Note, allNotes: readonly Note[]): LinkSuggestion[] {
     if (!currentNote.content || currentNote.content.length < 50) {
       return []
     }
@@ -117,7 +117,7 @@ class LinkDetectionService {
 
     // Trier par confiance décroissante et retourner les 5 meilleures suggestions
     return suggestions
-      .sort((a, b) => b.confidence - a.confidence)
+      .toSorted((a, b) => b.confidence - a.confidence)
       .slice(0, 5)
   }
 

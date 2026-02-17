@@ -57,7 +57,7 @@ const summaryHistory = localforage.createInstance({
 })
 
 class MistralAIService {
-  private config: AIConfig
+  private readonly config: AIConfig
   private readonly CACHE_DURATION = 86_400_000 // 24 hours in milliseconds
   private readonly MAX_CACHE_SIZE = 100
   private readonly MAX_HISTORY_SIZE = 50
@@ -414,7 +414,7 @@ class MistralAIService {
     // Parser les idées
     const ideas = response.content
       .split('\n')
-      .map(idea => idea.trim().replaceAll(/^[\d\-*\.]+\s*/g, ''))
+      .map(idea => idea.trim().replace(/^[\d\-*\.]+\s*/g, ''))
       .filter(idea => idea.length > 0)
 
     return ideas

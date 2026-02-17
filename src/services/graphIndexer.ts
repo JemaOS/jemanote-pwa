@@ -120,17 +120,18 @@ class GraphIndexer {
 
     // Wikilinks [[Note]] ou [[Note|alias]]
     let match
-    while ((match = this.wikilinkRegex.exec(content)) !== null) {
-      const target = match[1].trim()
+    const wikilinkMatches = content.matchAll(this.wikilinkRegex)
+    for (const m of wikilinkMatches) {
+      const target = m[1].trim()
       if (target) {
         links.push({ target, type: 'wikilink' })
       }
     }
 
     // Markdown links [text](path) - ignorer URLs externes
-    this.mdLinkRegex.lastIndex = 0
-    while ((match = this.mdLinkRegex.exec(content)) !== null) {
-      const target = match[1].trim()
+    const mdMatches = content.matchAll(this.mdLinkRegex)
+    for (const m of mdMatches) {
+      const target = m[1].trim()
       // Ignorer URLs http/https
       if (target && !target.startsWith('http://') && !target.startsWith('https://')) {
         links.push({ target, type: 'mdlink' })

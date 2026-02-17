@@ -118,4 +118,11 @@ export interface GraphData {
   }>
 }
 
+export interface User {
+  id: string
+  email?: string
+  created_at?: string
+  updated_at?: string
+}
+
 export type ViewMode = 'workspace' | 'graph' | 'search' | 'settings' | 'canvas' | 'timeline'

@@ -14,11 +14,14 @@ import {
   LayoutTemplate,
   Menu,
   X,
+  Layout,
+  History,
+  User as UserIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
-import { ViewMode } from '@/types'
+import { ViewMode, User } from '@/types'
 
 
 interface NavigationProps {

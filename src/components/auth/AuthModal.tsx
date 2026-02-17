@@ -105,7 +105,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 const baseClasses = 'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch'
                 const activeClasses = 'bg-primary-500 text-white'
                 const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                return `${baseClasses} ${!isLogin ? activeClasses : inactiveClasses}`
+                return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`
               })()}
             >
               Inscription

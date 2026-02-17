@@ -60,7 +60,20 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
   }, [])
 
   useEffect(() => {
-    const SpeechRecognition = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition || (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition
+    interface SpeechRecognitionInterface {
+      continuous: boolean
+      interimResults: boolean
+      lang: string
+      onresult: ((event: unknown) => void) | null
+      onerror: ((event: unknown) => void) | null
+      onend: (() => void) | null
+      start: () => void
+      stop: () => void
+    }
+    interface SpeechRecognitionConstructor {
+      new (): SpeechRecognitionInterface
+    }
+    const SpeechRecognition = (globalThis as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition || (globalThis as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition
     if (!SpeechRecognition) {
       setIsSupported(false)
       return
@@ -504,7 +517,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           <div
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
-            role="slider"
+            role="progressbar"
             aria-label="Waveform de lecture audio"
             aria-valuemin={0}
             aria-valuemax={Math.round(audioDuration)}

@@ -12,7 +12,7 @@ interface CanvasViewProps {
   readonly notes?: readonly Note[]
   readonly onOpenNote?: (noteId: string) => void
   readonly deleteNote?: (noteId: string) => Promise<unknown>
-  readonly createNote?: (title: string, content: string) => Promise<unknown>
+  readonly createNote?: (title: string, content: string) => Promise<{ id: string; content: string; title: string } | null>
 }
 
 interface CanvasNode {
@@ -67,7 +67,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     node.type !== 'note' || notes.some(n => n.id === node.id), [notes])
 
   // Helper: create initial canvas nodes from notes
-  const createInitialNodes = useCallback((notesList: Note[]): CanvasNode[] =>
+  const createInitialNodes = useCallback((notesList: readonly Note[]): CanvasNode[] =>
     notesList
       .filter(note => !note.deleted_at)
       .slice(0, 5)
@@ -88,7 +88,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     if (savedNodes && savedNodes.length > 0) {
       setCanvasNodes(savedNodes.filter(node => isValidNode(node)))
     } else if (notes.length > 0) {
-      const initialNodes = createInitialNodes(notes)
+      const initialNodes = createInitialNodes(notes as readonly Note[])
       setCanvasNodes(initialNodes)
       await LocalStorage.setItem('canvas-nodes', initialNodes)
     }
@@ -285,7 +285,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   }
 
   // Toggle node selection for multi-select
-  const toggleNodeSelection = useCallback((nodeId: string, addToSelection: boolean) => {
+  const toggleNodeSelection = useCallback((nodeId: string, addToSelection?: boolean) => {
     if (isMultiSelectMode || addToSelection) {
       setSelectedNodes(prev => {
         const newSet = new Set(prev)
@@ -577,9 +577,10 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       </div>
 
       {/* Canvas */}
-      <button
+      <div
         ref={canvasRef}
-        type="button"
+        role="button"
+        tabIndex={0}
         aria-label="Canvas de visualisation du graphe"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
         onMouseDown={handleMouseDown}
@@ -589,6 +590,11 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+          }
+        }}
         style={{
           backgroundImage: 'radial-gradient(circle, #d1d5db 1px, transparent 1px)',
           backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
@@ -666,14 +672,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                   setEditingNodeId(node.id)
                 } else if (node.type === 'note' && onOpenNote) {
                   onOpenNote(node.id)
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  if (node.type === 'note' && onOpenNote) {
-                    onOpenNote(node.id)
-                  }
                 }
               }}
             >

@@ -13,6 +13,8 @@ import {
   Plus,
   LogIn,
   LogOut,
+  Paintbrush,
+  History,
 } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 

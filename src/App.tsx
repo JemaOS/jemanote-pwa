@@ -225,7 +225,6 @@ function App() {
             }}
           />
         )
-      case 'graph':
       default:
         // Graph view uses workspace as base with graph overlay
         // Default view is also workspace

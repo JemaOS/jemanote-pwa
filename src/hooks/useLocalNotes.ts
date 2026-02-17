@@ -542,11 +542,12 @@ function mergeNotes(localNotes: Note[], cloudNotes: Note[], userId: string): Not
     const localTime = new Date(localNote.updated_at).getTime()
     const cloudTime = cloudNote ? new Date(cloudNote.updated_at).getTime() : 0
 
-    if (!cloudNote || localTime > cloudTime) {
-      // Local note doesn't exist in cloud or is newer - add it (includes deletions)
-      merged.set(localNote.id, { ...localNote, user_id: userId })
+    if (cloudNote && localTime <= cloudTime) {
+      // Cloud is newer or same, keep cloud version (already in map)
+      continue
     }
-    // If cloud is newer or same, keep cloud version (already in map)
+    // Local note doesn't exist in cloud or is newer - add it (includes deletions)
+    merged.set(localNote.id, { ...localNote, user_id: userId })
   }
 
   // Convert map to array and sort by updated_at
@@ -571,11 +572,12 @@ function mergeFolders(localFolders: Folder[], cloudFolders: Folder[], userId: st
     const localTime = new Date(localFolder.updated_at).getTime()
     const cloudTime = cloudFolder ? new Date(cloudFolder.updated_at).getTime() : 0
 
-    if (!cloudFolder || localTime > cloudTime) {
-      // Local folder doesn't exist in cloud or is newer - add it (includes deletions)
-      merged.set(localFolder.id, { ...localFolder, user_id: userId })
+    if (cloudFolder && localTime <= cloudTime) {
+      // Cloud is newer or same, keep cloud version (already in map)
+      continue
     }
-    // If cloud is newer or same, keep cloud version (already in map)
+    // Local folder doesn't exist in cloud or is newer - add it (includes deletions)
+    merged.set(localFolder.id, { ...localFolder, user_id: userId })
   }
 
   // Convert map to array and sort by updated_at

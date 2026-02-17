@@ -103,7 +103,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
 
               <div className="space-y-3">
                 {group.notes.map(note => (
-                  <div
+                  <button
                     key={note.id}
                     onClick={() => { onOpenNote(note.id); }}
                     onKeyDown={(e) => {
@@ -112,9 +112,8 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
                         onOpenNote(note.id)
                       }
                     }}
-                    role="button"
-                    tabIndex={0}
-                    className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                    type="button"
+                    className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-all cursor-pointer group text-left w-full"
                   >
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg text-primary-600 dark:text-primary-400 group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40 transition-colors">
@@ -139,7 +138,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

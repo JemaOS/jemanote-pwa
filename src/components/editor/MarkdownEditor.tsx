@@ -33,7 +33,7 @@ import {
   lineNumbers,
   highlightActiveLineGutter,
 } from '@codemirror/view';
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 
 import AIContextMenu from '@/components/ai/AIContextMenu';
 import { useTheme } from '@/contexts/ThemeContext';

@@ -71,10 +71,11 @@ function parseImports(filePath, content) {
   const imports = [];
   const dirName = path.dirname(filePath);
   
-  // ES6 imports - simplified regex to avoid SonarQube warning
-  const es6Regex = /import\s+(?:\{[^}]*}|\*\s+as\s+\w+|\w+)?\s*from\s+['"]([^'"]+)['"];?/g;
+  // ES6 imports - simplified regex to avoid complexity issues
+  // Match: import x from 'path' or import { x } from 'path' or import * as x from 'path'
+  const importFromRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g;
   let match;
-  while ((match = es6Regex.exec(content)) !== null) {
+  while ((match = importFromRegex.exec(content)) !== null) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));
   }

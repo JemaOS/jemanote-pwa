@@ -113,6 +113,25 @@ const compareImages = async (baselinePath, actualPath) => {
   }
 }
 
+// Helper function to render diff image HTML
+const renderDiffImage = (diffPath) => {
+  if (!diffPath) {
+    return ''
+  }
+  return `<div class="image-box">
+            <h4>Différence</h4>
+            <img src="${diffPath}" alt="Diff" loading="lazy">
+          </div>`
+}
+
+// Helper function to render error message HTML
+const renderErrorMessage = (error) => {
+  if (!error) {
+    return ''
+  }
+  return `<p><strong>Erreur:</strong> ${error}</p>`
+}
+
 // Générer le rapport HTML
 const generateReport = (results) => {
   const timestamp = new Date().toISOString()
@@ -279,17 +298,12 @@ const generateReport = (results) => {
                 <h4>Actual</h4>
                 <img src="${result.actualPath}" alt="Actual" loading="lazy">
               </div>
-              ${result.diffPath ? `
-                <div class="image-box">
-                  <h4>Différence</h4>
-                  <img src="${result.diffPath}" alt="Diff" loading="lazy">
-                </div>
-              ` : ''}
+              ${renderDiffImage(result.diffPath)}
             </div>
             <div class="diff-info">
               <p><strong>Différence:</strong> ${result.diffPercentage?.toFixed(2) || 'N/A'}%</p>
               <p><strong>Pixels différents:</strong> ${result.numDiffPixels || 'N/A'}</p>
-              ${result.error ? `<p><strong>Erreur:</strong> ${result.error}</p>` : ''}
+              ${renderErrorMessage(result.error)}
             </div>
           </div>
         ` : ''}

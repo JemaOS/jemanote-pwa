@@ -3,8 +3,8 @@
  * Tests to ensure module coupling stays within acceptable thresholds
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { glob } from 'glob';
 import { describe, it, expect, beforeAll } from 'vitest';

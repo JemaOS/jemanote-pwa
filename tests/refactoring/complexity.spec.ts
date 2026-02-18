@@ -3,10 +3,10 @@
  * Tests to ensure code complexity stays within acceptable thresholds
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-import glob from 'glob';
+import { glob } from 'glob';
 import escomplex from 'typhonjs-escomplex';
 import { describe, it, expect, beforeAll } from 'vitest';
 

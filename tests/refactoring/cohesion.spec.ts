@@ -3,8 +3,8 @@
  * Tests to ensure module cohesion is high and responsibilities are well-defined
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { glob } from 'glob';
 import { describe, it, expect, beforeAll } from 'vitest';

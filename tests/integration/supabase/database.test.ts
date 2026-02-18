@@ -11,7 +11,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from
 
 
 import { supabase } from '@/lib/supabase'
-import type { Note, Folder, Tag, Link } from '@/types'
+import type { Note } from '@/types'
 
 import { server } from '../mocks/server'
 

@@ -6,7 +6,7 @@
  * Tests offline note creation, sync after reconnection, PWA installation, and Service Worker
  */
 
-import { test, expect, Page, BrowserContext } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
 // Generate unique test data
 // SECURITY NOTE: Math.random() is acceptable here for test ID generation

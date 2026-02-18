@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 // Helper function to get button text based on state
 function getButtonText(loading: boolean, isLogin: boolean): string {
-  if (loading) return 'Chargement...';
+  if (loading) {return 'Chargement...';}
   return isLogin ? 'Se connecter' : "S'inscrire";
 }
 

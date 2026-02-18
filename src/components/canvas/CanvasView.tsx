@@ -35,14 +35,14 @@ interface CanvasConnection {
 
 // Helper functions to avoid nested ternary operations
 function getNodeBorderClass(isSelected: boolean, isInMultiSelection: boolean): string {
-  if (!isSelected) return 'border-neutral-200 dark:border-neutral-700';
-  if (isInMultiSelection) return 'border-primary-400 shadow-xl ring-2 ring-primary-300 ring-opacity-50';
+  if (!isSelected) {return 'border-neutral-200 dark:border-neutral-700';}
+  if (isInMultiSelection) {return 'border-primary-400 shadow-xl ring-2 ring-primary-300 ring-opacity-50';}
   return 'border-primary-500 shadow-xl';
 }
 
 function getCursorClass(isDragging: boolean, isMultiSelectMode: boolean): string {
-  if (isDragging) return 'cursor-grabbing';
-  if (isMultiSelectMode) return 'cursor-pointer';
+  if (isDragging) {return 'cursor-grabbing';}
+  if (isMultiSelectMode) {return 'cursor-pointer';}
   return 'cursor-grab';
 }
 
@@ -176,7 +176,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
   useEffect(() => {
     if (canvasNodes.length > 0) {
       LocalStorage.setItem('canvas-nodes', canvasNodes).catch(err => 
-        console.error('Error saving canvas nodes:', err)
+        { console.error('Error saving canvas nodes:', err); }
       )
     }
   }, [canvasNodes])
@@ -322,7 +322,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     const noteNodes = canvasNodes.filter(n => selectedNodes.has(n.id) && n.type === 'note')
     
     if (noteNodes.length > 0 && deleteNote) {
-      const confirmed = globalThis.confirm(
+      const confirmed = window.confirm(
         `Voulez-vous supprimer ${selectedNodes.size} élément(s) du canvas et mettre les ${noteNodes.length} note(s) à la corbeille ?`
       )
       if (confirmed) {
@@ -541,7 +541,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         <button
           onClick={() => {
             setIsMultiSelectMode(!isMultiSelectMode)
-            if (isMultiSelectMode === false) {
+            if (!isMultiSelectMode) {
               // Entering multi-select mode
               setSelectedNodes(new Set())
             } else {

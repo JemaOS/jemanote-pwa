@@ -15,12 +15,12 @@ interface StatusBarProps {
 
 // Helper functions to get sync status text
 function getSyncStatusText(syncing: boolean, syncEnabled: boolean): string {
-  if (syncing) return 'Synchronisation...';
+  if (syncing) {return 'Synchronisation...';}
   return syncEnabled ? 'Synchronisé' : 'Déconnecté';
 }
 
 function getSyncStatusShortText(syncing: boolean, syncEnabled: boolean): string {
-  if (syncing) return 'Sync';
+  if (syncing) {return 'Sync';}
   return syncEnabled ? 'OK' : 'Off';
 }
 

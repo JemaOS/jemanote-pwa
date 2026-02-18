@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { File, Folder as FolderIcon, Plus, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, RotateCcw, Trash, Square, CheckSquare, MinusSquare, FolderInput } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { File, Folder as FolderIcon, Plus, ChevronRight, Edit2, Trash2, Check, X, FolderPlus, RotateCcw, Trash, Square, CheckSquare, MinusSquare, FolderInput } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 import { LocalStorage } from '@/lib/localStorage'
@@ -21,7 +21,7 @@ function getSelectionIcon(isAllSelected: boolean, isSomeSelected: boolean) {
 
 // Helper function to get note background class
 function getNoteBackgroundClass(selectedNoteIds: Set<string>, noteId: string | undefined, activeNoteId: string | null | undefined): string {
-  if (!noteId) return 'hover:bg-neutral-200 dark:hover:bg-neutral-800'
+  if (!noteId) {return 'hover:bg-neutral-200 dark:hover:bg-neutral-800'}
   if (selectedNoteIds.has(noteId)) {
     return 'bg-primary-50 dark:bg-primary-900/20'
   }
@@ -472,6 +472,8 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           return (
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
+                role="region"
+                aria-label={`Dossier ${folder.name}`}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
@@ -599,6 +601,8 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
         {/* Notes sans dossier */}
         <div className="mb-1.5 xs:mb-2">
           <div
+            role="region"
+            aria-label="Notes sans dossier"
             onDragOver={handleDragOver}
             onDrop={(e) => { handleDrop(undefined, e); }}
             onDragEnter={(e) => { handleDragEnter(undefined, e); }}
@@ -1282,6 +1286,8 @@ export default function Sidebar({
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
     <div
+      role="article"
+      aria-label={`Note: ${note.title || 'Sans titre'}`}
       key={note.id}
       draggable
       onDragStart={(e) => { handleDragStart(note.id, e); }}

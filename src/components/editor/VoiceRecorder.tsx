@@ -631,7 +631,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           {/* Contrôles de lecture */}
           <div className="flex flex-col items-center gap-4 pt-2">
             <div className="flex justify-center">
-              {isPlayingAudio === false ? (
+              {!isPlayingAudio ? (
                 <button
                   onClick={playAudio}
                   className="flex items-center justify-center w-14 h-14 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"

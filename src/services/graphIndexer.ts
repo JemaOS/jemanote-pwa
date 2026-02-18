@@ -192,7 +192,7 @@ class GraphIndexer {
     while ((match = tagRegex.exec(content)) !== null) {
       matches.push(match[0])
     }
-    if (matches.length === 0) return []
+    if (matches.length === 0) {return []}
     return [...new Set(matches.map(t => t.substring(1)))] // dédupliquer
   }
 

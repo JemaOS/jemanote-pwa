@@ -18,14 +18,13 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
 
   useEffect(() => {
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem('jemanote-theme') as Theme
-    if (savedTheme) {
+    const savedTheme = localStorage.getItem('jemanote-theme')
+    if (savedTheme === 'dark' || savedTheme === 'light') {
       setTheme(savedTheme)
       document.documentElement.classList.toggle('dark', savedTheme === 'dark')
     } else {
       // Default to light mode instead of system preference
-      const initialTheme = 'light'
-      setTheme(initialTheme)
+      setTheme('light')
       document.documentElement.classList.remove('dark')
       localStorage.setItem('jemanote-theme', 'light')
     }

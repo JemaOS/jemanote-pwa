@@ -122,28 +122,28 @@ function findNeighborNodes(
 
 // Helper function to get text alpha based on visibility and node type
 function getTextAlpha(labelVisible: boolean, nodeType: string): number {
-  if (!labelVisible) return 0
+  if (!labelVisible) {return 0}
   return nodeType === 'main' ? 0.95 : 0.75
 }
 
 // Helper function to get edge base alpha
 function getEdgeBaseAlpha(isConnectedToSelected: boolean, isConnectedToHovered: boolean): number {
-  if (isConnectedToSelected) return 0.8
-  if (isConnectedToHovered) return 0.6
+  if (isConnectedToSelected) {return 0.8}
+  if (isConnectedToHovered) {return 0.6}
   return 0.5
 }
 
 // Helper function to get edge base width
 function getEdgeBaseWidth(isConnectedToSelected: boolean, isConnectedToHovered: boolean): number {
-  if (isConnectedToSelected) return 2.5
-  if (isConnectedToHovered) return 2
+  if (isConnectedToSelected) {return 2.5}
+  if (isConnectedToHovered) {return 2}
   return 1.5
 }
 
 // Helper function to get node type based on degree
 function getNodeType(degree: number): 'main' | 'secondary' | 'isolated' {
-  if (degree >= 3) return 'main'
-  if (degree >= 1) return 'secondary'
+  if (degree >= 3) {return 'main'}
+  if (degree >= 1) {return 'secondary'}
   return 'isolated'
 }
 

@@ -112,8 +112,8 @@ function App() {
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => { window.removeEventListener('keydown', handleKeyDown); }
+    globalThis.addEventListener('keydown', handleKeyDown)
+    return () => { globalThis.removeEventListener('keydown', handleKeyDown); }
   }, [])
 
   // Sauvegarder avant de fermer l'application (F5, fermeture onglet, etc.)

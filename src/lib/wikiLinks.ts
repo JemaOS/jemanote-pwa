@@ -78,7 +78,7 @@ export function renderWikiLinksToHTML(content: string, onLinkClick?: (title: str
     : content
 
   return safeContent.replace(/\[\[([^\]]{1,200})\]\]/g, (match, linkText) => {
-    const escapedText = linkText.replace(/"/g, '&quot;')
+    const escapedText = linkText.replaceAll('"', '&quot;')
     return `<a href="#" class="wiki-link" data-note-title="${escapedText}" style="color: #5a63e9; text-decoration: underline; font-weight: 500;">${linkText}</a>`
   })
 }

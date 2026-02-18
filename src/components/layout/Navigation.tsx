@@ -7,7 +7,6 @@ import {
   SidebarClose,
   Settings,
   LogOut,
-  PanelLeftOpen,
   PanelRightOpen,
   LayoutTemplate,
   Menu,

@@ -78,7 +78,7 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
   const payload = {
     metrics,
     timestamp: Date.now(),
-    url: window.location.href,
+    url: globalThis.location.href,
     userAgent: navigator.userAgent,
     connection: (navigator as unknown as { connection?: { effectiveType: string } }).connection?.effectiveType,
   };
@@ -175,7 +175,7 @@ function measureCLS(): void {
   observer.observe({ entryTypes: ['layout-shift'] as const });
   
   // Envoyer CLS à la fin de la session
-  window.addEventListener('beforeunload', () => {
+  globalThis.addEventListener('beforeunload', () => {
     sendMetrics({ CLS: clsValue });
   });
 }
@@ -403,7 +403,7 @@ function initializeTracking(): void {
   measureTTI();
   
   // Envoyer toutes les métriques au unload
-  window.addEventListener('beforeunload', () => {
+  globalThis.addEventListener('beforeunload', () => {
     sendMetrics(metricsCollected);
   });
   

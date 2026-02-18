@@ -71,7 +71,12 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         }
       }}
     >
-      <div className="relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="relative w-full max-w-md" 
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        role="document"
+      >
         <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-modal p-4 sm:p-6 md:p-8">
           <button
             onClick={handleClose}

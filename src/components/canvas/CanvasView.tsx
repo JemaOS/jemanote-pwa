@@ -322,7 +322,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     const noteNodes = canvasNodes.filter(n => selectedNodes.has(n.id) && n.type === 'note')
     
     if (noteNodes.length > 0 && deleteNote) {
-      const confirmed = window.confirm(
+      const confirmed = globalThis.confirm(
         `Voulez-vous supprimer ${selectedNodes.size} élément(s) du canvas et mettre les ${noteNodes.length} note(s) à la corbeille ?`
       )
       if (confirmed) {
@@ -461,7 +461,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     
     // If it's a note node, we might want to delete the actual note
     if (node?.type === 'note' && deleteNote) {
-      const shouldDelete = window.confirm('Voulez-vous supprimer la note originale et la mettre à la corbeille ?')
+      const shouldDelete = globalThis.confirm('Voulez-vous supprimer la note originale et la mettre à la corbeille ?')
       if (shouldDelete) {
         await deleteNote(node.id) // This uses the soft delete from useLocalNotes
       }
@@ -540,8 +540,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         {/* Multi-select mode toggle */}
         <button
           onClick={() => {
-            setIsMultiSelectMode(!isMultiSelectMode)
-            if (!isMultiSelectMode) {
+            const entering = !isMultiSelectMode
+            setIsMultiSelectMode(entering)
+            if (entering) {
               // Entering multi-select mode
               setSelectedNodes(new Set())
             } else {
@@ -582,6 +583,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         role="application"
         aria-label="Zone de dessin"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
+        onClick={() => {}}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -642,7 +644,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             return (
             <div
               key={node.id}
-              type="button"
+              role="button"
               tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
               onKeyDown={(e) => {

@@ -414,7 +414,7 @@ class MistralAIService {
     // Parser les idées
     const ideas = response.content
       .split('\n')
-      .map(idea => idea.trim().replace(/^[\d\-*\.]+\s*/g, ''))
+      .map(idea => idea.trim().replace(/^[*\d.-]+\s*/g, ''))
       .filter(idea => idea.length > 0)
 
     return ideas

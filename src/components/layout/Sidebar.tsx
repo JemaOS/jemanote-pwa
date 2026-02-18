@@ -789,7 +789,7 @@ export default function Sidebar({
       ? `Supprimer ce dossier ? Les ${notesInFolder.length} note(s) seront déplacées vers la corbeille.`
       : 'Supprimer ce dossier vide ?'
     
-    if (window.confirm(message)) {
+    if (globalThis.confirm(message)) {
       try {
         await deleteFolderById(folderId)
         if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
@@ -819,7 +819,7 @@ export default function Sidebar({
       ? `Cette action est irréversible. Le dossier "${folder?.name}" et ses ${notesInFolder.length} note(s) seront supprimés définitivement.`
       : `Cette action est irréversible. Supprimer définitivement le dossier "${folder?.name}" ?`
     
-    if (window.confirm(message)) {
+    if (globalThis.confirm(message)) {
       try {
         await permanentlyDeleteFolder(folderId)
       } catch (err) {
@@ -889,7 +889,7 @@ export default function Sidebar({
       ? `Supprimer ${selectedFolderIds.size} dossier(s) sélectionné(s) ? Les ${totalNotes} note(s) seront déplacées vers la corbeille.`
       : `Supprimer ${selectedFolderIds.size} dossier(s) vide(s) sélectionné(s) ?`
     
-    if (window.confirm(message)) {
+    if (globalThis.confirm(message)) {
       try {
         for (const folderId of selectedFolderIds) {
           await deleteFolderById(folderId)
@@ -956,7 +956,7 @@ export default function Sidebar({
   const handleDeleteSelectedNotes = async () => {
     if (selectedNoteIds.size === 0) {return}
     
-    const confirmed = window.confirm(
+    const confirmed = globalThis.confirm(
       `Supprimer ${selectedNoteIds.size} note(s) sélectionnée(s) ?`
     )
     if (confirmed) {
@@ -1024,7 +1024,7 @@ export default function Sidebar({
 
   const handleEmptyTrash = async () => {
     const totalItems = trashNotes.length + trashFolders.length
-    if (window.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {
+    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {
       try {
         for (const folder of trashFolders) {
           if (permanentlyDeleteFolder) {await permanentlyDeleteFolder(folder.id)}
@@ -1054,7 +1054,7 @@ export default function Sidebar({
 
   const handleDeleteSelected = async () => {
     if (selectedTrashItems.size === 0) {return}
-    if (window.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {
+    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {
       try {
         for (const itemId of selectedTrashItems) {
           await permanentlyDeleteTrashItem(itemId)
@@ -1248,7 +1248,7 @@ export default function Sidebar({
     e.stopPropagation()
     if (!deleteNote) {return}
 
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
+    if (globalThis.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
       try {
         await deleteNote(noteId)
       } catch (err) {
@@ -1271,7 +1271,7 @@ export default function Sidebar({
     e.stopPropagation()
     if (!permanentlyDeleteNote) {return}
     
-    if (window.confirm('Cette action est irréversible. Supprimer définitivement ?')) {
+    if (globalThis.confirm('Cette action est irréversible. Supprimer définitivement ?')) {
       try {
         await permanentlyDeleteNote(noteId)
       } catch (err) {

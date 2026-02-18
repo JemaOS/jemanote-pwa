@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Performance Tests
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import type { Note, Folder } from '@/types'
 
-import { render, screen } from '@/tests/utils/test-utils'
+import { render } from '@/tests/utils/test-utils'
 
 describe('Performance Tests', () => {
   describe('Note List Rendering', () => {

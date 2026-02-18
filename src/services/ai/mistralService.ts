@@ -414,7 +414,11 @@ class MistralAIService {
     // Parser les idées
     const ideas = response.content
       .split('\n')
-      .map(idea => idea.trim().replace(/^[*\d.-]+\s*/g, ''))
+      .map(idea => {
+        const trimmed = idea.trim()
+        // Remove leading bullets like *, 1., - etc.
+        return trimmed.replace(/^[*\d.-]+\s*/, '')
+      })
       .filter(idea => idea.length > 0)
 
     return ideas

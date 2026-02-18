@@ -5,7 +5,6 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize,
-  Filter,
   Settings,
   Play,
   Pause,
@@ -15,7 +14,7 @@ import {
 import * as PIXI from 'pixi.js'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-import { graphIndexer, type GraphNode, type GraphEdge } from '@/services/graphIndexer'
+import { type GraphNode, type GraphEdge } from '@/services/graphIndexer'
 import { Note } from '@/types'
 
 interface GraphViewProps {

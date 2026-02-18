@@ -78,7 +78,7 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
   const payload = {
     metrics,
     timestamp: Date.now(),
-    url: globalThis.location.href,
+    url: window.location.href,
     userAgent: navigator.userAgent,
     connection: (navigator as unknown as { connection?: { effectiveType: string } }).connection?.effectiveType,
   };
@@ -110,7 +110,7 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
  * Mesure le Largest Contentful Paint (LCP)
  */
 function measureLCP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries();
@@ -132,7 +132,7 @@ function measureLCP(): void {
  * Mesure le First Input Delay (FID)
  */
 function measureFID(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries() as (PerformanceEntry & {
@@ -156,7 +156,7 @@ function measureFID(): void {
  * Mesure le Cumulative Layout Shift (CLS)
  */
 function measureCLS(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   let clsValue = 0;
   
@@ -175,7 +175,7 @@ function measureCLS(): void {
   observer.observe({ entryTypes: ['layout-shift'] as const });
   
   // Envoyer CLS à la fin de la session
-  globalThis.addEventListener('beforeunload', () => {
+  window.addEventListener('beforeunload', () => {
     sendMetrics({ CLS: clsValue });
   });
 }
@@ -184,7 +184,7 @@ function measureCLS(): void {
  * Mesure l'Interaction to Next Paint (INP)
  */
 function measureINP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   const interactions: number[] = [];
   
@@ -224,7 +224,7 @@ function measureINP(): void {
  * Mesure le First Contentful Paint (FCP)
  */
 function measureFCP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   const observer = new PerformanceObserver((list) => {
     const entries = list.getEntries() as PerformancePaintTiming[];
@@ -259,7 +259,7 @@ function measureTTFB(): void {
  * Approximation basée sur le Long Tasks API
  */
 function measureTTI(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
+  if (!('PerformanceObserver' in window)) {return;}
   
   let lastLongTaskEnd = 0;
   const startTime = performance.now();
@@ -403,7 +403,7 @@ function initializeTracking(): void {
   measureTTI();
   
   // Envoyer toutes les métriques au unload
-  globalThis.addEventListener('beforeunload', () => {
+  window.addEventListener('beforeunload', () => {
     sendMetrics(metricsCollected);
   });
   

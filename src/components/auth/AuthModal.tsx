@@ -2,7 +2,7 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { Mail, Lock, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
 
@@ -23,6 +23,19 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    dialogRef.current?.showModal()
+    return () => {
+      dialogRef.current?.close()
+    }
+  }, [])
+
+  const handleClose = () => {
+    dialogRef.current?.close()
+    onClose()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,27 +62,19 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   }
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="auth-modal-title"
+    <dialog
+      ref={dialogRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          onClose()
-        }
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          onClose()
+          handleClose()
         }
       }}
     >
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-modal p-4 sm:p-6 md:p-8">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
             className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors min-w-touch min-h-touch flex items-center justify-center"
             aria-label="Fermer"
@@ -171,6 +176,6 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </form>
         </div>
       </div>
-    </div>
+    </dialog>
   )
 }

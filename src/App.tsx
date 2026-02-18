@@ -50,7 +50,7 @@ function App() {
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showCommandPalette, setShowCommandPalette] = useState(false)
-  const [isMobile, setIsMobile] = useState(globalThis.innerWidth < 1024)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
   const [hasUserToggledSidebar, setHasUserToggledSidebar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -77,7 +77,7 @@ function App() {
   // Responsive: Detect mobile/desktop
   useEffect(() => {
     const handleResize = () => {
-      const mobile = globalThis.innerWidth < 1024
+      const mobile = window.innerWidth < 1024
       setIsMobile(mobile)
       
       // Only auto-manage sidebar if user hasn't manually toggled it
@@ -91,10 +91,10 @@ function App() {
       }
     }
 
-    globalThis.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize)
     // Initial check
     handleResize()
-    return () => { globalThis.removeEventListener('resize', handleResize); }
+    return () => { window.removeEventListener('resize', handleResize); }
   }, [leftSidebarOpen, hasUserToggledSidebar])
 
   // Keyboard shortcuts
@@ -112,8 +112,8 @@ function App() {
       }
     }
 
-    globalThis.addEventListener('keydown', handleKeyDown)
-    return () => { globalThis.removeEventListener('keydown', handleKeyDown); }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => { window.removeEventListener('keydown', handleKeyDown); }
   }, [])
 
   // Sauvegarder avant de fermer l'application (F5, fermeture onglet, etc.)
@@ -136,8 +136,8 @@ function App() {
       }
     }
 
-    globalThis.addEventListener('beforeunload', handleBeforeUnload)
-    return () => { globalThis.removeEventListener('beforeunload', handleBeforeUnload); }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => { window.removeEventListener('beforeunload', handleBeforeUnload); }
   }, [])
 
   // Manual sync function - just toggle sync to trigger a refresh

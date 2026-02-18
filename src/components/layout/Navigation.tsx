@@ -5,10 +5,8 @@ import {
   Search,
   SidebarOpen,
   SidebarClose,
-  Network,
   Settings,
   LogOut,
-  LogIn,
   PanelLeftOpen,
   PanelRightOpen,
   LayoutTemplate,
@@ -16,7 +14,6 @@ import {
   X,
   Layout,
   History,
-  User as UserIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 

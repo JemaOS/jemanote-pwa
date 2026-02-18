@@ -16,7 +16,7 @@ export default function InstallPrompt() {
 
   useEffect(() => {
     // Vérifier si déjà installé
-    if (globalThis.matchMedia('(display-mode: standalone)').matches) {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true)
       return
     }
@@ -45,16 +45,16 @@ export default function InstallPrompt() {
       }, 30000)
     }
 
-    globalThis.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener('beforeinstallprompt', handler)
 
     // Détecter si l'app a été installée
-    globalThis.addEventListener('appinstalled', () => {
+    window.addEventListener('appinstalled', () => {
       setIsInstalled(true)
       setShowPrompt(false)
     })
 
     return () => {
-      globalThis.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('beforeinstallprompt', handler)
     }
   }, [])
 

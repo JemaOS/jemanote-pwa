@@ -472,7 +472,6 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           return (
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
-                role="region"
                 aria-label={`Dossier ${folder.name}`}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
@@ -504,11 +503,10 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                   </button>
                 )}
                 
-                <div
-                  role="button"
-                  tabIndex={0}
+                <button
+                  type="button"
                   onClick={() => { toggleFolder(folder.id); }}
-                  className="flex-1 flex items-center gap-1.5 xs:gap-2 min-w-0"
+                  className="flex-1 flex items-center gap-1.5 xs:gap-2 min-w-0 text-left"
                 >
                 <ChevronRight
                   className={`h-3.5 w-3.5 xs:h-4 xs:w-4 flex-shrink-0 transition-transform ${
@@ -538,7 +536,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                   <span className="flex-1 text-left truncate">{folder.name}</span>
                 )}
                 
-              </div>
+              </button>
               
                 <span className="text-neutral-500 dark:text-neutral-400 text-xs flex-shrink-0">
                   {folderNotes.length}
@@ -601,7 +599,6 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
         {/* Notes sans dossier */}
         <div className="mb-1.5 xs:mb-2">
           <div
-            role="region"
             aria-label="Notes sans dossier"
             onDragOver={handleDragOver}
             onDrop={(e) => { handleDrop(undefined, e); }}
@@ -792,7 +789,7 @@ export default function Sidebar({
       ? `Supprimer ce dossier ? Les ${notesInFolder.length} note(s) seront déplacées vers la corbeille.`
       : 'Supprimer ce dossier vide ?'
     
-    if (globalThis.confirm(message)) {
+    if (window.confirm(message)) {
       try {
         await deleteFolderById(folderId)
         if (reloadFolders) {await reloadFolders()} else {await loadFolders()}
@@ -822,7 +819,7 @@ export default function Sidebar({
       ? `Cette action est irréversible. Le dossier "${folder?.name}" et ses ${notesInFolder.length} note(s) seront supprimés définitivement.`
       : `Cette action est irréversible. Supprimer définitivement le dossier "${folder?.name}" ?`
     
-    if (globalThis.confirm(message)) {
+    if (window.confirm(message)) {
       try {
         await permanentlyDeleteFolder(folderId)
       } catch (err) {
@@ -892,7 +889,7 @@ export default function Sidebar({
       ? `Supprimer ${selectedFolderIds.size} dossier(s) sélectionné(s) ? Les ${totalNotes} note(s) seront déplacées vers la corbeille.`
       : `Supprimer ${selectedFolderIds.size} dossier(s) vide(s) sélectionné(s) ?`
     
-    if (globalThis.confirm(message)) {
+    if (window.confirm(message)) {
       try {
         for (const folderId of selectedFolderIds) {
           await deleteFolderById(folderId)
@@ -959,7 +956,7 @@ export default function Sidebar({
   const handleDeleteSelectedNotes = async () => {
     if (selectedNoteIds.size === 0) {return}
     
-    const confirmed = globalThis.confirm(
+    const confirmed = window.confirm(
       `Supprimer ${selectedNoteIds.size} note(s) sélectionnée(s) ?`
     )
     if (confirmed) {
@@ -1027,7 +1024,7 @@ export default function Sidebar({
 
   const handleEmptyTrash = async () => {
     const totalItems = trashNotes.length + trashFolders.length
-    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {
+    if (window.confirm(`Cette action est irréversible. Supprimer définitivement ${totalItems} élément(s) de la corbeille ?`)) {
       try {
         for (const folder of trashFolders) {
           if (permanentlyDeleteFolder) {await permanentlyDeleteFolder(folder.id)}
@@ -1057,7 +1054,7 @@ export default function Sidebar({
 
   const handleDeleteSelected = async () => {
     if (selectedTrashItems.size === 0) {return}
-    if (globalThis.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {
+    if (window.confirm(`Cette action est irréversible. Supprimer définitivement ${selectedTrashItems.size} élément(s) sélectionné(s) ?`)) {
       try {
         for (const itemId of selectedTrashItems) {
           await permanentlyDeleteTrashItem(itemId)
@@ -1251,7 +1248,7 @@ export default function Sidebar({
     e.stopPropagation()
     if (!deleteNote) {return}
 
-    if (globalThis.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
       try {
         await deleteNote(noteId)
       } catch (err) {
@@ -1274,7 +1271,7 @@ export default function Sidebar({
     e.stopPropagation()
     if (!permanentlyDeleteNote) {return}
     
-    if (globalThis.confirm('Cette action est irréversible. Supprimer définitivement ?')) {
+    if (window.confirm('Cette action est irréversible. Supprimer définitivement ?')) {
       try {
         await permanentlyDeleteNote(noteId)
       } catch (err) {
@@ -1286,7 +1283,6 @@ export default function Sidebar({
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
     <div
-      role="article"
       aria-label={`Note: ${note.title || 'Sans titre'}`}
       key={note.id}
       draggable

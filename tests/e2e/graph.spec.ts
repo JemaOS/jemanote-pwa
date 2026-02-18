@@ -185,8 +185,6 @@ test.describe('Graph View', () => {
           
           await page.waitForTimeout(500)
           
-          // Check for tooltip (if implemented)
-          const tooltip = page.locator('.graph-tooltip, [role="tooltip"]').first()
           // Tooltip may or may not appear depending on implementation
         }
       }

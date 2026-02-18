@@ -157,9 +157,7 @@ test.describe('Offline Mode', () => {
       // Wait for sync
       await page.waitForTimeout(3000)
       
-      // Check for sync indicator
-      const syncIndicator = page.getByText(/synchronisé|synced|sauvegardé/i)
-      // May or may not be visible depending on implementation
+      // Check for sync indicator - may or may not be visible depending on implementation
     })
 
     test('should show sync status indicator', async ({ page }) => {

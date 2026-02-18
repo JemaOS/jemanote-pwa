@@ -407,9 +407,7 @@ console.log(x);
       
       await createAndOpenNote(page, title, '[[Linked Note]]')
       
-      // Wiki links should have special styling
-      const wikiLink = page.locator('.cm-editor .wiki-link, .cm-editor [data-wiki-link]').first()
-      // Just verify the content is there
+      // Wiki links should have special styling - just verify the content is there
       const editor = page.locator('.cm-editor .cm-content').first()
       await expect(editor).toContainText('Linked Note')
     })

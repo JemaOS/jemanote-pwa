@@ -65,7 +65,7 @@ describe('Performance Tests', () => {
       
       // Simulate markdown processing
       const lines = largeContent.split('\n')
-      const processed = lines.map(line => {
+      lines.map(line => {
         if (line.startsWith('# ')) {
           return `<h1>${line.slice(2)}</h1>`
         }

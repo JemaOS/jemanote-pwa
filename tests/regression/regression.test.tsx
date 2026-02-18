@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Regression Tests - Tests for previously fixed bugs
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import type { Note, Folder } from '@/types'
 
-import { render, screen, waitFor } from '@/tests/utils/test-utils'
+import { render, waitFor } from '@/tests/utils/test-utils'
 
 describe('Regression Tests', () => {
   describe('Note Synchronization', () => {

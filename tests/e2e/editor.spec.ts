@@ -6,7 +6,6 @@
  * Tests text input, preview, formatting, wiki links, and image upload
  */
 
-import * as path from 'path'
 
 import { test, expect, Page } from '@playwright/test'
 

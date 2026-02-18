@@ -159,7 +159,7 @@ describe('Module Cohesion Analysis', () => {
           const hookName = hook.replace('export function ', '');
           
           // SECURITY FIX: Validate hook name to prevent ReDoS in dynamic regex
-          if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(hookName)) {
+          if (!/^\w+$/.test(hookName)) {
             continue; // Skip invalid hook names
           }
           

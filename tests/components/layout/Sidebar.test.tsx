@@ -285,7 +285,7 @@ describe('Sidebar', () => {
       const deleteButtons = screen.getAllByTitle('Supprimer')
       await user.click(deleteButtons[0])
 
-      expect(window.confirm).toHaveBeenCalled()
+      expect(globalThis.confirm).toHaveBeenCalled()
     })
 
     it('should delete note after confirmation', async () => {

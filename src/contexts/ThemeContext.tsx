@@ -14,34 +14,34 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light')
+  const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('jemanote-theme') as Theme
     if (savedTheme) {
-      setThemeState(savedTheme)
+      setTheme(savedTheme)
       document.documentElement.classList.toggle('dark', savedTheme === 'dark')
     } else {
       // Default to light mode instead of system preference
       const initialTheme = 'light'
-      setThemeState(initialTheme)
+      setTheme(initialTheme)
       document.documentElement.classList.remove('dark')
       localStorage.setItem('jemanote-theme', 'light')
     }
   }, [])
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme)
     localStorage.setItem('jemanote-theme', newTheme)
     document.documentElement.classList.toggle('dark', newTheme === 'dark')
   }
 
   const toggleTheme = useCallback(() => {
-    setTheme(theme === 'light' ? 'dark' : 'light')
-  }, [theme, setTheme])
+    handleSetTheme(theme === 'light' ? 'dark' : 'light')
+  }, [theme])
 
-  const value = useMemo(() => ({ theme, toggleTheme, setTheme }), [theme, toggleTheme, setTheme])
+  const value = useMemo(() => ({ theme, toggleTheme, setTheme: handleSetTheme }), [theme, toggleTheme])
 
   return (
     <ThemeContext.Provider value={value}>

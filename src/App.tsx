@@ -17,6 +17,7 @@ import { ViewMode } from '@/types'
 // WorkspaceView is the default view - imported directly to avoid lazy-load delay
 // Sidebar is lazy-loaded since it starts closed on mobile (most users)
 const CanvasView = React.lazy(() => import('@/components/canvas/CanvasView'))
+const GraphView = React.lazy(() => import('@/components/graph/GraphView'))
 const SearchView = React.lazy(() => import('@/components/search/SearchView'))
 const SettingsView = React.lazy(() => import('@/components/settings/SettingsView'))
 const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView'))
@@ -225,18 +226,15 @@ function App() {
             }}
           />
         )
-      default:
-        // Graph view uses workspace as base with graph overlay
-        // Default view is also workspace
+      case 'graph':
         return (
-          <WorkspaceView
+          <GraphView
             userId={user?.id ?? null}
-            activeNoteId={activeNoteId}
-            onNoteChange={setActiveNoteId}
-            rightSidebarOpen={rightSidebarOpen}
             notes={notes}
-            updateNote={updateNote}
-            createNote={handleCreateNoteFromAI}
+            onNoteSelect={(noteId) => {
+              setActiveNoteId(noteId)
+              setCurrentView('workspace')
+            }}
           />
         )
     }

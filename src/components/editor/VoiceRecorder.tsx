@@ -73,7 +73,8 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
     interface SpeechRecognitionConstructor {
       new (): SpeechRecognitionInterface
     }
-    const SpeechRecognition = (globalThis as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition || (globalThis as unknown as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognition) {
       setIsSupported(false)
       return
@@ -517,7 +518,6 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           <div
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
-            role="progressbar"
             aria-label="Waveform de lecture audio"
             aria-valuemin={0}
             aria-valuemax={Math.round(audioDuration)}

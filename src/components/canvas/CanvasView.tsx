@@ -88,7 +88,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     if (savedNodes && savedNodes.length > 0) {
       setCanvasNodes(savedNodes.filter(node => isValidNode(node)))
     } else if (notes.length > 0) {
-      const initialNodes = createInitialNodes(notes as readonly Note[])
+      const initialNodes = createInitialNodes(notes)
       setCanvasNodes(initialNodes)
       await LocalStorage.setItem('canvas-nodes', initialNodes)
     }
@@ -461,8 +461,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
     
     // If it's a note node, we might want to delete the actual note
     if (node?.type === 'note' && deleteNote) {
-      const confirmed = window.confirm('Voulez-vous supprimer la note originale et la mettre à la corbeille ?')
-      if (confirmed) {
+      const shouldDelete = window.confirm('Voulez-vous supprimer la note originale et la mettre à la corbeille ?')
+      if (shouldDelete) {
         await deleteNote(node.id) // This uses the soft delete from useLocalNotes
       }
     }
@@ -579,9 +579,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       {/* Canvas */}
       <div
         ref={canvasRef}
-        role="button"
-        tabIndex={0}
-        aria-label="Canvas de visualisation du graphe"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -643,8 +640,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             return (
             <div
               key={node.id}
-              role="button"
-              tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

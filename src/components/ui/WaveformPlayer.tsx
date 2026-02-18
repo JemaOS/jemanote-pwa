@@ -164,7 +164,6 @@ export default function WaveformPlayer({
           const index = Math.floor(percentage * waveformData.length)
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)))
         }}
-        role="progressbar"
         aria-label="Audio waveform"
         aria-valuemin={0}
         aria-valuemax={waveformData.length}
@@ -177,7 +176,7 @@ export default function WaveformPlayer({
           
           return (
             <div
-              key={idx}
+              key={`waveform-${idx}-${value}`}
               className="flex-1 rounded-full transition-all pointer-events-none"
               style={{ 
                 height: `${Math.max(20, value * 100)}%`,

@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import CommandPalette from '@/components/command/CommandPalette'
 import type { Note, ViewMode } from '@/types'
 
-import { render, screen, waitFor } from '@/tests/utils/test-utils'
+import { render, screen } from '@/tests/utils/test-utils'
 
 // Mock ThemeContext
 vi.mock('@/contexts/ThemeContext', () => ({

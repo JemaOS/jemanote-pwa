@@ -154,20 +154,18 @@ export default function WaveformPlayer({
         )}
       </button>
 
-      <div 
-        ref={containerRef}
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.floor((currentTime / duration) * 100)}
-        aria-valuetext={`${Math.round(currentTime)} secondes sur ${Math.round(duration)}`}
-        className="flex-1 h-8 flex items-center gap-px cursor-pointer relative group"
+      <progress
+        value={(currentTime / duration) * 100}
+        max={100}
+        className="flex-1 h-8 cursor-pointer"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect()
           const x = e.clientX - rect.left
           const percentage = x / rect.width
           const index = Math.floor(percentage * waveformData.length)
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)))
+        }}
+      />
         }}
         aria-label="Audio waveform"
         tabIndex={0}

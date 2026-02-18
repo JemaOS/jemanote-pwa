@@ -642,7 +642,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             return (
             <div
               key={node.id}
-              role="button"
+              type="button"
               tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
               onKeyDown={(e) => {

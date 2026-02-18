@@ -517,8 +517,7 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           {/* Waveform interactive style Apple avec drag */}
           <div
             ref={waveformContainerRef}
-            role="progressbar"
-            aria-valuemin={0}
+            className=
             aria-valuemax={Math.round(audioDuration)}
             aria-valuenow={Math.round(audioCurrentTime)}
             aria-valuetext={`${Math.round(audioCurrentTime)} secondes sur ${Math.round(audioDuration)}`}

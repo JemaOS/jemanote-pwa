@@ -47,10 +47,10 @@ const PERFORMANCE_BUDGETS = {
 
 // Seuils minimum pour les catégories Lighthouse
 const CATEGORY_THRESHOLDS = {
-  performance: .85,
-  accessibility: .90,
-  bestPractices: .90,
-  seo: .90,
+  performance: 0.85,
+  accessibility: 0.90,
+  bestPractices: 0.90,
+  seo: 0.90,
 } as const;
 
 /**

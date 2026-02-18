@@ -5,10 +5,10 @@
  * qu'ils respectent les budgets définis.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { promisify } from 'util';
-import { gzip } from 'zlib';
+import * as nodeFs from 'node:fs';
+import * as nodePath from 'node:path';
+import { promisify } from 'node:util';
+import { gzip } from 'node:zlib';
 
 import { test, expect } from '@playwright/test';
 
@@ -80,18 +80,18 @@ const TOTAL_BUDGET = {
  * Récupère tous les fichiers du dossier dist/assets
  */
 async function getBundleFiles(): Promise<BundleStats[]> {
-  const assetsDir = path.join(process.cwd(), 'dist', 'assets');
+  const assetsDir = nodePath.join(process.cwd(), 'dist', 'assets');
   
-  if (!fs.existsSync(assetsDir)) {
+  if (!nodeFs.existsSync(assetsDir)) {
     throw new Error('dist/assets directory not found. Run npm run build first.');
   }
 
-  const files = fs.readdirSync(assetsDir);
+  const files = nodeFs.readdirSync(assetsDir);
   const stats: BundleStats[] = [];
 
   for (const file of files) {
-    const filePath = path.join(assetsDir, file);
-    const content = fs.readFileSync(filePath);
+    const filePath = nodePath.join(assetsDir, file);
+    const content = nodeFs.readFileSync(filePath);
     const gzipped = await gzipAsync(content);
 
     stats.push({

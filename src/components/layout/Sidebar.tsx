@@ -472,11 +472,20 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
           return (
             <div key={folder.id} className="mb-1.5 xs:mb-2">
               <div
+                role="treeitem"
                 aria-label={`Dossier ${folder.name}`}
+                aria-expanded={isExpanded}
+                tabIndex={0}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
                 onDragEnter={(e) => { handleDragEnter(folder.id, e); }}
                 onDragLeave={handleDragLeave}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    toggleFolder(folder.id)
+                  }
+                }}
                 className={`rounded-md transition-colors ${
                   isDropTarget ? 'bg-primary-100 dark:bg-primary-900/30 ring-2 ring-primary-500' : ''
                 }`}
@@ -1283,11 +1292,21 @@ export default function Sidebar({
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
     <div
+      role="listitem"
       aria-label={`Note: ${note.title || 'Sans titre'}`}
+      tabIndex={0}
       key={note.id}
       draggable
       onDragStart={(e) => { handleDragStart(note.id, e); }}
       onDragEnd={handleDragEnd}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          // Trigger click on the note - the click handler will handle it
+          const noteElement = e.currentTarget
+          noteElement.click()
+        }
+      }}
       className={`group relative flex items-center rounded-lg transition-all ${
         draggedNoteId === note.id
           ? 'opacity-50'

@@ -583,6 +583,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         role="application"
         aria-label="Zone de dessin"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
+        tabIndex={0}
         onClick={() => {}}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

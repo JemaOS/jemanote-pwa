@@ -14,7 +14,7 @@ import {
 import * as PIXI from 'pixi.js'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-import { type GraphEdge } from '@/services/graphIndexer'
+import { type GraphEdge, graphIndexer } from '@/services/graphIndexer'
 import { Note } from '@/types'
 
 interface GraphViewProps {
@@ -279,7 +279,7 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
           height: containerRef.current?.clientHeight || 600,
           backgroundColor: 0x0a0a0a,
           antialias: true,
-          resolution: window.devicePixelRatio || 1,
+          resolution: globalThis.devicePixelRatio || 1,
           autoDensity: true,
         })
 
@@ -413,11 +413,11 @@ export default function GraphView({ userId, notes, onNoteSelect }: GraphViewProp
       }
     }
 
-    window.addEventListener('resize', handleResize)
+    globalThis.addEventListener('resize', handleResize)
 
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize)
+      globalThis.removeEventListener('resize', handleResize)
       mounted = false
       if (appRef.current) {
         appRef.current.destroy(true, { children: true })

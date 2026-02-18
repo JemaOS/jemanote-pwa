@@ -579,6 +579,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       {/* Canvas */}
       <div
         ref={canvasRef}
+        role="application"
+        aria-label="Zone de dessin"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -640,6 +642,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             return (
             <div
               key={node.id}
+              role="button"
+              tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

@@ -517,12 +517,12 @@ export default function VoiceRecorder({ onTranscriptChange, initialTranscript = 
           {/* Waveform interactive style Apple avec drag */}
           <div
             ref={waveformContainerRef}
-            className="relative py-2 cursor-pointer select-none"
-            aria-label="Waveform de lecture audio"
+            role="progressbar"
             aria-valuemin={0}
             aria-valuemax={Math.round(audioDuration)}
             aria-valuenow={Math.round(audioCurrentTime)}
             aria-valuetext={`${Math.round(audioCurrentTime)} secondes sur ${Math.round(audioDuration)}`}
+            className="relative py-2 cursor-pointer select-none"
             onKeyDown={(e) => {
               if (e.key === 'ArrowLeft') {
                 e.preventDefault()

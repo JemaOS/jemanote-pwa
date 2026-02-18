@@ -186,8 +186,13 @@ class GraphIndexer {
    * Extraire les tags #tag d'un contenu
    */
   private extractTags(content: string): string[] {
-    const matches = content.match(this.tagRegex)
-    if (!matches) return []
+    const tagRegex = this.tagRegex
+    const matches: string[] = []
+    let match: RegExpExecArray | null
+    while ((match = tagRegex.exec(content)) !== null) {
+      matches.push(match[0])
+    }
+    if (matches.length === 0) return []
     return [...new Set(matches.map(t => t.substring(1)))] // dédupliquer
   }
 

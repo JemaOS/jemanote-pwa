@@ -156,6 +156,11 @@ export default function WaveformPlayer({
 
       <div 
         ref={containerRef}
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.floor((currentTime / duration) * 100)}
+        aria-valuetext={`${Math.round(currentTime)} secondes sur ${Math.round(duration)}`}
         className="flex-1 h-8 flex items-center gap-px cursor-pointer relative group"
         onClick={(e) => {
           const rect = e.currentTarget.getBoundingClientRect()
@@ -165,9 +170,6 @@ export default function WaveformPlayer({
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)))
         }}
         aria-label="Audio waveform"
-        aria-valuemin={0}
-        aria-valuemax={waveformData.length}
-        aria-valuenow={Math.floor((currentTime / duration) * waveformData.length)}
         tabIndex={0}
       >
         {waveformData.map((value, idx) => {
@@ -176,7 +178,7 @@ export default function WaveformPlayer({
           
           return (
             <div
-              key={`waveform-${idx}-${value}`}
+              key={`waveform-${value}`}
               className="flex-1 rounded-full transition-all pointer-events-none"
               style={{ 
                 height: `${Math.max(20, value * 100)}%`,

@@ -9,7 +9,6 @@ import {
   Network,
   Moon,
   Sun,
-  Trash2,
   Plus,
   LogIn,
   LogOut,

@@ -94,8 +94,6 @@ test.describe('AI Features', () => {
         
         // Look for summary type selector
         const shortOption = page.getByRole('radio', { name: /court|short|brief/i })
-        const detailedOption = page.getByRole('radio', { name: /détaillé|detailed|long/i })
-        const bulletsOption = page.getByRole('radio', { name: /puces|bullets|points/i })
         
         if (await shortOption.isVisible().catch(() => false)) {
           await shortOption.click()

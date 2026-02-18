@@ -205,7 +205,7 @@ describe('CommandPalette', () => {
 
     it('should highlight current view', () => {
       render(<CommandPalette {...defaultProps} currentView="workspace" />)
-      const workspaceOption = screen.getByText('Espace de travail')
+      expect(screen.getByText('Espace de travail')).toBeInTheDocument()
       expect(screen.getByText('Actif')).toBeInTheDocument()
     })
 

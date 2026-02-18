@@ -641,7 +641,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
         {expandedFolders.has('root') && (
           <div className="ml-3 xs:ml-4 space-y-0.5 xs:space-y-1">
             {/* Multi-select header for unfiled notes */}
-            {notes.filter(n => !n.folder_id).length > 0 && (
+            {notes.some(n => !n.folder_id) && (
               <NoteMultiSelectHeader folderId="root" noteMultiSelectMode={noteMultiSelectMode}
                 toggleNoteMultiSelectMode={toggleNoteMultiSelectMode}
                 isAllSelected={isAllNotesSelectedInFolder('root')} isSomeSelected={isSomeNotesSelectedInFolder('root')}

@@ -32,7 +32,7 @@ describe('InstallPrompt', () => {
     localStorage.clear()
 
     // Reset matchMedia
-    ;(window.matchMedia as any).mockReturnValue({
+    ;(globalThis.matchMedia as any).mockReturnValue({
       matches: false,
       media: '(display-mode: standalone)',
       onchange: null,
@@ -45,12 +45,12 @@ describe('InstallPrompt', () => {
 
     // Mock window.addEventListener for beforeinstallprompt
     beforeInstallPromptHandler = null
-    vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
+    vi.spyOn(globalThis, 'addEventListener').mockImplementation((event, handler) => {
       if (event === 'beforeinstallprompt') {
         beforeInstallPromptHandler = handler as (e: Event) => void
       }
     })
-    vi.spyOn(window, 'removeEventListener').mockImplementation(() => {})
+    vi.spyOn(globalThis, 'removeEventListener').mockImplementation(() => {})
 
     // Mock console.log
     vi.spyOn(console, 'log').mockImplementation(() => {})
@@ -62,7 +62,7 @@ describe('InstallPrompt', () => {
 
   describe('Initial State', () => {
     it('should not render when app is already installed', () => {
-      ;(window.matchMedia as any).mockReturnValue({
+      ;(globalThis.matchMedia as any).mockReturnValue({
         matches: true,
         media: '(display-mode: standalone)',
       })

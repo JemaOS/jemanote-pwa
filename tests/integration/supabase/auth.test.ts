@@ -213,7 +213,7 @@ describe('Supabase Auth Integration', () => {
 
     it('should not reveal if email exists (security)', async () => {
       // Even for non-existent email, should return success to prevent enumeration
-      const { data, error } = await supabase.auth.resetPasswordForEmail('nonexistent@example.com')
+      const { error } = await supabase.auth.resetPasswordForEmail('nonexistent@example.com')
 
       // Note: In real implementation, this might still return success
       // for security reasons (prevent email enumeration)

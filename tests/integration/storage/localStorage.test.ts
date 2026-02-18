@@ -7,7 +7,7 @@
  */
 
 import localforage from 'localforage'
-import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach, vi } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 
 import { LocalStorage } from '@/lib/localStorage'
 import type { Note, Folder, Tag, Link, Attachment } from '@/types'

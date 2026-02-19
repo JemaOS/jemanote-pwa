@@ -30,7 +30,6 @@ afterAll(() => {
 
 describe('Offline/Online Sync Integration', () => {
   const testUserId = 'test-user-id';
-  let isOnline: boolean = true;
 
   beforeEach(async () => {
     // Clear storage
@@ -43,8 +42,6 @@ describe('Offline/Online Sync Integration', () => {
     });
 
     // Reset online status
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isOnline = true;
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
       value: true,

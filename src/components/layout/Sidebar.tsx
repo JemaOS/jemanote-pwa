@@ -1035,8 +1035,6 @@ export default function Sidebar({
 
   // Multi-select state for folder/unfiled notes
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [folderSelectionMode, setFolderSelectionMode] = useState(false);
   const [noteMultiSelectMode, setNoteMultiSelectMode] = useState(false);
 
   // Multi-select state for folders themselves
@@ -1144,7 +1142,7 @@ export default function Sidebar({
   // Clear folder note selection when folder changes
   useEffect(() => {
     setSelectedNoteIds(new Set());
-    setFolderSelectionMode(false);
+    setFolderMultiSelectMode(false);
   }, [expandedFolders]);
 
   // Folder multi-select handlers
@@ -1246,7 +1244,7 @@ export default function Sidebar({
       }
       return next;
     });
-    setFolderSelectionMode(true);
+    setFolderMultiSelectMode(true);
   };
 
   const getNotesInView = (folderId: string | undefined): Note[] => {
@@ -1259,7 +1257,7 @@ export default function Sidebar({
   const selectAllNotesInFolder = (folderId: string | undefined) => {
     const notesInView = getNotesInView(folderId);
     setSelectedNoteIds(new Set(notesInView.map(n => n.id)));
-    setFolderSelectionMode(true);
+    setFolderMultiSelectMode(true);
   };
 
   const deselectAllNotesInFolder = () => {
@@ -1293,7 +1291,7 @@ export default function Sidebar({
           }
         }
         setSelectedNoteIds(new Set());
-        setFolderSelectionMode(false);
+        setFolderMultiSelectMode(false);
         setNoteMultiSelectMode(false);
       } catch (error) {
         console.error('Erreur lors de la suppression des notes sélectionnées:', error);
@@ -1305,7 +1303,7 @@ export default function Sidebar({
     if (noteMultiSelectMode) {
       // Exiting selection mode - clear selection
       setSelectedNoteIds(new Set());
-      setFolderSelectionMode(false);
+      setFolderMultiSelectMode(false);
     }
     setNoteMultiSelectMode(!noteMultiSelectMode);
   };

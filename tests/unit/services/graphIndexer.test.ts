@@ -97,12 +97,10 @@ describe('graphIndexer', () => {
 
       // The graph indexer creates edges with type 'wikilink' and 'backlink'
       // Check that there's a backlink edge from note-2 to note-1
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const backlink = result.edges.find(
         (e: GraphEdge) => e.from === 'note-2' && e.to === 'note-1' && e.type === 'backlink'
       );
-      // Note: The actual implementation may not create backlinks if the link resolution fails
-      // Let's check for any edge from note-2 to note-1
+      expect(backlink).toBeDefined();
       const anyEdge = result.edges.find((e: GraphEdge) => e.from === 'note-2' && e.to === 'note-1');
       expect(anyEdge || result.edges.length >= 1).toBeTruthy();
     });

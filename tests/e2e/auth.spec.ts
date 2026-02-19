@@ -6,7 +6,7 @@
  * Tests user registration, login, logout, password recovery, and session persistence
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { generateTestEmail, generateTestPassword, clearLocalStorage } from './utils';
 
 test.describe('Authentication', () => {

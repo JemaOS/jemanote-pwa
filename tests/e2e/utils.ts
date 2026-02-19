@@ -7,8 +7,8 @@ export const generateTestPassword = () => `TestPass${Date.now()}!`;
 export async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
-    if (window.indexedDB) {
-      window.indexedDB.deleteDatabase('ObsidianPWA');
+    if (globalThis.indexedDB) {
+      globalThis.indexedDB.deleteDatabase('ObsidianPWA');
     }
   });
 }

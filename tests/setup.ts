@@ -14,7 +14,7 @@ vi.mock('localforage', () => ({
 
 // Mock matchMedia
 // eslint-disable-next-line prefer-global
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(globalThis, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -47,7 +47,7 @@ const localStorageMock = {
   key: vi.fn((index: number) => Object.keys(localStorageStore)[index] || null),
 };
 // eslint-disable-next-line prefer-global
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(globalThis, 'localStorage', {
   value: localStorageMock,
   writable: true,
 });
@@ -70,7 +70,7 @@ const sessionStorageMock = {
   },
   key: vi.fn((index: number) => Object.keys(sessionStorageStore)[index] || null),
 };
-Object.defineProperty(window, 'sessionStorage', {
+Object.defineProperty(globalThis, 'sessionStorage', {
   value: sessionStorageMock,
   writable: true,
 });
@@ -88,7 +88,7 @@ class IntersectionObserverMock {
   takeRecords = vi.fn(() => []);
 }
 
-Object.defineProperty(window, 'IntersectionObserver', {
+Object.defineProperty(globalThis, 'IntersectionObserver', {
   writable: true,
   value: IntersectionObserverMock,
 });
@@ -102,14 +102,14 @@ class ResizeObserverMock {
   disconnect = vi.fn();
 }
 
-Object.defineProperty(window, 'ResizeObserver', {
+Object.defineProperty(globalThis, 'ResizeObserver', {
   writable: true,
   value: ResizeObserverMock,
 });
 
-// Mock window.scrollTo
+// Mock globalThis.scrollTo
 // eslint-disable-next-line prefer-global
-Object.defineProperty(window, 'scrollTo', {
+Object.defineProperty(globalThis, 'scrollTo', {
   writable: true,
   value: vi.fn(),
 });
@@ -146,7 +146,7 @@ class BroadcastChannelMock {
 }
 
 // eslint-disable-next-line prefer-global
-Object.defineProperty(global, 'BroadcastChannel', {
+Object.defineProperty(globalThis, 'BroadcastChannel', {
   writable: true,
   value: BroadcastChannelMock,
 });
@@ -175,7 +175,7 @@ class WritableStreamMock {
 }
 
 // eslint-disable-next-line prefer-global
-Object.defineProperty(global, 'WritableStream', {
+Object.defineProperty(globalThis, 'WritableStream', {
   writable: true,
   value: WritableStreamMock,
 });
@@ -198,7 +198,7 @@ class ReadableStreamMock {
 }
 
 // eslint-disable-next-line prefer-global
-Object.defineProperty(global, 'ReadableStream', {
+Object.defineProperty(globalThis, 'ReadableStream', {
   writable: true,
   value: ReadableStreamMock,
 });
@@ -210,7 +210,7 @@ class TransformStreamMock {
 }
 
 // eslint-disable-next-line prefer-global
-Object.defineProperty(global, 'TransformStream', {
+Object.defineProperty(globalThis, 'TransformStream', {
   writable: true,
   value: TransformStreamMock,
 });

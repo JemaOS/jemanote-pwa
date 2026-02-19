@@ -502,7 +502,7 @@ async function main() {
 
 // Run if executed directly
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main();
+  await main();
 }
 
 export { main, runJscpd, parseReport, generateSummary };

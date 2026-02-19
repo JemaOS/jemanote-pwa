@@ -6,7 +6,7 @@
  * Tests note creation, editing, deletion, search, folders, and wiki links
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { generateUniqueId, clearLocalStorage, createNote } from './utils';
 
 const generateNoteTitle = () => `Test Note ${generateUniqueId()}`;

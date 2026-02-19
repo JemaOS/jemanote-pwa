@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Local Storage Security Tests
 
+/* eslint-disable prefer-global */
+
 import { test, expect } from '@playwright/test'
 
 test.describe('Local Storage Security', () => {

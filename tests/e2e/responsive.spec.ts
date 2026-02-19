@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+/* eslint-disable prefer-global */
+
 /**
  * End-to-End Responsive/Mobile Tests
  * Tests mobile display, tablet display, hamburger menu, and interface adaptation

@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Tests for Sidebar component
 
+/* eslint-disable prefer-global */
+
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 

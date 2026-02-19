@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Cross-Site Scripting (XSS) Protection Tests
 
+/* eslint-disable prefer-global */
+
 import { test, expect } from '@playwright/test'
 
 /**

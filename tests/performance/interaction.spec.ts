@@ -5,6 +5,8 @@
  * et s'assurer que l'application reste réactive.
  */
 
+/* eslint-disable prefer-global */
+
 import { test, expect, type Page } from '@playwright/test';
 
 interface InteractionMetrics {

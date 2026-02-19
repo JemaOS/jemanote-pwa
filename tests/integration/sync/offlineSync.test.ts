@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+/* eslint-disable prefer-global */
+
 /**
  * Integration Tests for Offline/Online Synchronization
  * Tests offline queue, conflict resolution, and sync after reconnection

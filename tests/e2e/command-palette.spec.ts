@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+/* eslint-disable prefer-global */
+
 /**
  * End-to-End Command Palette Tests
  * Tests opening with Cmd+K, searching commands, keyboard navigation, and execution

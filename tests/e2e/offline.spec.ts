@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
+/* eslint-disable prefer-global */
+
 /**
  * End-to-End Offline/PWA Tests
  * Tests offline note creation, sync after reconnection, PWA installation, and Service Worker

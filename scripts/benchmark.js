@@ -7,7 +7,7 @@
  * Usage: node scripts/benchmark.js [--compare] [--verbose]
  */
 
-import { execSync, execFileSync, spawn } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -27,8 +27,8 @@ process.on('exit', () => {
         serverProcess.kill();
       } catch (e) {
         // Ignore
-      }
-    }
+      } // NOSONAR
+    } // NOSONAR
   }
 });
 

@@ -375,11 +375,11 @@ test.describe('Offline Mode', () => {
     test('should listen to online/offline events', async ({ page }) => {
       // Add event listener
       await page.evaluate(() => {
-        window.addEventListener('online', () => {
-          (window as any).onlineEventFired = true;
+        globalThis.addEventListener('online', () => {
+          (globalThis as any).onlineEventFired = true;
         });
-        window.addEventListener('offline', () => {
-          (window as any).offlineEventFired = true;
+        globalThis.addEventListener('offline', () => {
+          (globalThis as any).offlineEventFired = true;
         });
       });
 

@@ -198,7 +198,7 @@ test.describe('Rendering Performance Tests', () => {
       // Simuler le scroll
       await page.evaluate(async () => {
         for (let i = 0; i < 10; i++) {
-          window.scrollBy(0, 100);
+          globalThis.scrollBy(0, 100);
           await new Promise(r => setTimeout(r, 100));
         }
       });

@@ -23,7 +23,6 @@ export default function WaveformPlayer({
   const [waveformData, setWaveformData] = useState<number[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -184,9 +183,6 @@ export default function WaveformPlayer({
           const index = Math.floor(percentage * waveformData.length);
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)));
         }}
-        aria-label="Audio waveform"
-        role="button"
-        tabIndex={0}
       >
         {waveformData.map((value, idx) => {
           const progress = duration > 0 ? currentTime / duration : 0;

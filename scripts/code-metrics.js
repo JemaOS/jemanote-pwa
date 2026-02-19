@@ -67,7 +67,7 @@ function getSourceFiles() {
   const extensions = ['*.ts', '*.tsx'];
 
   for (const ext of extensions) {
-    const pattern = path.join(CONFIG.sourceDir, '**', ext).replace(/\\/g, '/');
+    const pattern = path.join(CONFIG.sourceDir, '**', ext).replaceAll('\\', '/');
     const matches = globSync(pattern, {
       ignore: CONFIG.excludePatterns,
     });
@@ -222,7 +222,6 @@ function calculateMaintainabilityIndex(metrics) {
  */
 function calculateTechnicalDebtRatio(metrics) {
   const cyclomatic = metrics.cyclomatic || 1;
-  const loc = metrics.lines?.code || 1;
 
   // Simple heuristic: higher complexity and lower comment ratio = more debt
   const complexityDebt = Math.max(0, cyclomatic - CONFIG.thresholds.cyclomaticComplexity);
@@ -256,7 +255,7 @@ function analyzeFile(filePath) {
       cyclomatic = report.aggregate.cyclomatic || 1;
       cognitive = report.aggregate.cognitive || 1;
       halstead = report.aggregate.halstead || {};
-    } catch (e) {
+    } catch (e) { // NOSONAR
       // Fallback to simple calculation if escomplex fails
       cyclomatic = calculateCyclomaticComplexity(content);
       cognitive = calculateCognitiveComplexity(content);
@@ -333,6 +332,20 @@ function generateSummary(metrics) {
 }
 
 /**
+ * Get color for metric based on threshold
+ */
+function getMetricColor(value, threshold, inverse = false) {
+  if (inverse) {
+    if (value < threshold) return colors.red;
+    if (value < threshold * 1.2) return colors.yellow;
+    return colors.green;
+  }
+  if (value > threshold) return colors.red;
+  if (value > threshold * 0.7) return colors.yellow;
+  return colors.green;
+}
+
+/**
  * Print detailed report
  */
 function printReport(metrics) {
@@ -342,26 +355,9 @@ function printReport(metrics) {
   const sorted = [...metrics].sort((a, b) => b.cyclomatic - a.cyclomatic);
 
   for (const m of sorted) {
-    const complexityColor =
-      m.cyclomatic > CONFIG.thresholds.cyclomaticComplexity
-        ? colors.red
-        : m.cyclomatic > CONFIG.thresholds.cyclomaticComplexity * 0.7
-          ? colors.yellow
-          : colors.green;
-
-    const cognitiveColor =
-      m.cognitive > CONFIG.thresholds.cognitiveComplexity
-        ? colors.red
-        : m.cognitive > CONFIG.thresholds.cognitiveComplexity * 0.7
-          ? colors.yellow
-          : colors.green;
-
-    const miColor =
-      m.maintainability < CONFIG.thresholds.maintainabilityIndex
-        ? colors.red
-        : m.maintainability < CONFIG.thresholds.maintainabilityIndex * 1.2
-          ? colors.yellow
-          : colors.green;
+    const complexityColor = getMetricColor(m.cyclomatic, CONFIG.thresholds.cyclomaticComplexity);
+    const cognitiveColor = getMetricColor(m.cognitive, CONFIG.thresholds.cognitiveComplexity);
+    const miColor = getMetricColor(m.maintainability, CONFIG.thresholds.maintainabilityIndex, true);
 
     console.log(`${colors.blue}${m.path}${colors.reset}`);
     console.log(`  LOC: ${m.lines.code} code, ${m.lines.comments} comments, ${m.lines.blank} blank`);

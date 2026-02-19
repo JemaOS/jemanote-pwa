@@ -384,7 +384,7 @@ function extractComponentExports(content: string): string[] {
     if (name && /^[A-Z]/.test(name) && !components.includes(name)) {
       // Check if function returns JSX
       const funcRegex = new RegExp(
-        `(?:function|const)\\s+${name}.*?=>\\s*\\(??[\\s\\S]*?<\\w+`,
+        String.raw`(?:function|const)\s+${name}.*?=>\s*\(??[\s\S]*?<\w+`,
         's'
       );
       if (funcRegex.test(content)) {

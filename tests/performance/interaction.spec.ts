@@ -40,7 +40,7 @@ async function measureInteraction(
 ): Promise<InteractionMetrics> {
   // Injecter un script de mesure
   await page.evaluate(() => {
-    (window as unknown as { __interactionMetrics?: InteractionMetrics }).__interactionMetrics = {
+    (globalThis as unknown as { __interactionMetrics?: InteractionMetrics }).__interactionMetrics = {
       inputDelay: 0,
       processingTime: 0,
       presentationDelay: 0,
@@ -384,11 +384,11 @@ test.describe('Interaction Performance Tests', () => {
 
       // Injecter un compteur d'events
       await page.evaluate(() => {
-        (window as unknown as { __scrollCount: number }).__scrollCount = 0;
-        window.addEventListener(
+        (globalThis as unknown as { __scrollCount: number }).__scrollCount = 0;
+        globalThis.addEventListener(
           'scroll',
           () => {
-            (window as unknown as { __scrollCount: number }).__scrollCount++;
+            (globalThis as unknown as { __scrollCount: number }).__scrollCount++;
           },
           { passive: true }
         );
@@ -397,7 +397,7 @@ test.describe('Interaction Performance Tests', () => {
       // Simuler beaucoup de scroll events
       await page.evaluate(async () => {
         for (let i = 0; i < 100; i++) {
-          window.scrollBy(0, 10);
+          globalThis.scrollBy(0, 10);
           // Pas de délai - events rapides
         }
       });
@@ -406,7 +406,7 @@ test.describe('Interaction Performance Tests', () => {
 
       // Vérifier que les events ont été traités
       const scrollCount = await page.evaluate(
-        () => (window as unknown as { __scrollCount: number }).__scrollCount
+        () => (globalThis as unknown as { __scrollCount: number }).__scrollCount
       );
 
       // Si throttled correctement, on ne devrait pas avoir 100 callbacks

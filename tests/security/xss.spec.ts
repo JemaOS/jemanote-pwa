@@ -97,11 +97,11 @@ test.describe('XSS Prevention', () => {
     // Check that script tag is not executed
     const hasAlert = await page.evaluate(() => {
       return new Promise<boolean>(resolve => {
-        const originalAlert = window.alert;
+        const originalAlert = globalThis.alert;
         let alertCalled = false;
-        window.alert = () => {
+        globalThis.alert = () => {
           alertCalled = true;
-          window.alert = originalAlert;
+          globalThis.alert = originalAlert;
         };
         setTimeout(() => {
           resolve(alertCalled);
@@ -220,10 +220,10 @@ test.describe('XSS Prevention', () => {
     const hasAlert = await page.evaluate(() => {
       return new Promise<boolean>(resolve => {
         let alertCalled = false;
-        const originalAlert = window.alert;
-        window.alert = () => {
+        const originalAlert = globalThis.alert;
+        globalThis.alert = () => {
           alertCalled = true;
-          window.alert = originalAlert;
+          globalThis.alert = originalAlert;
         };
         setTimeout(() => {
           resolve(alertCalled);
@@ -391,10 +391,10 @@ test.describe('XSS Prevention', () => {
       const hasAlert = await page.evaluate(() => {
         return new Promise<boolean>(resolve => {
           let alertCalled = false;
-          const originalAlert = window.alert;
-          window.alert = () => {
+          const originalAlert = globalThis.alert;
+          globalThis.alert = () => {
             alertCalled = true;
-            window.alert = originalAlert;
+            globalThis.alert = originalAlert;
           };
           setTimeout(() => {
             resolve(alertCalled);

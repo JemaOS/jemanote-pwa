@@ -139,9 +139,6 @@ describe('Offline/Online Sync Integration', () => {
         value: false,
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const operations = [];
-
       // Create operations in specific order
       for (let i = 0; i < 3; i++) {
         const note: Note = {
@@ -155,7 +152,6 @@ describe('Offline/Online Sync Integration', () => {
           updated_at: new Date().toISOString(),
         };
         await LocalStorage.saveNote(note);
-        operations.push(note.id);
       }
 
       // Verify all notes exist locally
@@ -329,7 +325,7 @@ describe('Offline/Online Sync Integration', () => {
       });
 
       // Simulate online event
-      window.dispatchEvent(new Event('online'));
+      globalThis.dispatchEvent(new Event('online'));
 
       // Note should still be in local storage
       localNotes = await LocalStorage.getNotes();
@@ -560,35 +556,35 @@ describe('Offline/Online Sync Integration', () => {
     it('should listen for online event', async () => {
       const onlineHandler = vi.fn();
 
-      window.addEventListener('online', onlineHandler);
+      globalThis.addEventListener('online', onlineHandler);
 
       // Simulate going online
       Object.defineProperty(navigator, 'onLine', {
         writable: true,
         value: true,
       });
-      window.dispatchEvent(new Event('online'));
+      globalThis.dispatchEvent(new Event('online'));
 
       expect(onlineHandler).toHaveBeenCalled();
 
-      window.removeEventListener('online', onlineHandler);
+      globalThis.removeEventListener('online', onlineHandler);
     });
 
     it('should listen for offline event', async () => {
       const offlineHandler = vi.fn();
 
-      window.addEventListener('offline', offlineHandler);
+      globalThis.addEventListener('offline', offlineHandler);
 
       // Simulate going offline
       Object.defineProperty(navigator, 'onLine', {
         writable: true,
         value: false,
       });
-      window.dispatchEvent(new Event('offline'));
+      globalThis.dispatchEvent(new Event('offline'));
 
       expect(offlineHandler).toHaveBeenCalled();
 
-      window.removeEventListener('offline', offlineHandler);
+      globalThis.removeEventListener('offline', offlineHandler);
     });
 
     it('should check initial online status', () => {

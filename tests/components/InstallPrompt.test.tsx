@@ -10,7 +10,7 @@ import InstallPrompt from '@/components/InstallPrompt';
 
 import { render, screen, waitFor } from '@/tests/utils/test-utils';
 
-// Mock window.matchMedia
+// Mock globalThis.matchMedia
 Object.defineProperty(globalThis, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -45,7 +45,7 @@ describe('InstallPrompt', () => {
       dispatchEvent: vi.fn(),
     });
 
-    // Mock window.addEventListener for beforeinstallprompt
+    // Mock globalThis.addEventListener for beforeinstallprompt
     beforeInstallPromptHandler = null;
     vi.spyOn(globalThis, 'addEventListener').mockImplementation((event, handler) => {
       if (event === 'beforeinstallprompt') {

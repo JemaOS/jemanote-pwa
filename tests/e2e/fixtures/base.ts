@@ -1,4 +1,4 @@
-import { test as base, Page, expect } from '@playwright/test';
+import { test as base, Page } from '@playwright/test';
 
 // Define custom fixtures type
 type TestFixtures = {

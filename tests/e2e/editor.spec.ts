@@ -609,8 +609,8 @@ graph TD
 
     test('should render block math', async ({ page }) => {
       const title = generateNoteTitle();
-      const content = `$$
-\\sum_{i=1}^{n} x_i
+      const content = String.raw`$$
+\sum_{i=1}^{n} x_i
 $$`;
 
       await createAndOpenNote(page, title, content);

@@ -82,12 +82,9 @@ export default function VoiceRecorder({
       start: () => void;
       stop: () => void;
     }
-    interface SpeechRecognitionConstructor {
-      new (): SpeechRecognitionInterface;
-    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (globalThis as any).SpeechRecognition || (globalThis as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setIsSupported(false);
       return;
@@ -578,7 +575,7 @@ export default function VoiceRecorder({
           <div
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
-            role="button"
+            role="button" // NOSONAR
             tabIndex={0}
             aria-label="Waveform player"
             onKeyDown={e => {
@@ -694,21 +691,21 @@ export default function VoiceRecorder({
           {/* Contrôles de lecture */}
           <div className="flex flex-col items-center gap-4 pt-2">
             <div className="flex justify-center">
-              {!isPlayingAudio ? (
-                <button
-                  onClick={playAudio}
-                  className="flex items-center justify-center w-14 h-14 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"
-                  title="Lire"
-                >
-                  <Play className="h-6 w-6 ml-0.5 fill-white" />
-                </button>
-              ) : (
+              {isPlayingAudio ? (
                 <button
                   onClick={pauseAudio}
                   className="flex items-center justify-center w-14 h-14 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"
                   title="Pause"
                 >
                   <Pause className="h-6 w-6 fill-white" />
+                </button>
+              ) : (
+                <button
+                  onClick={playAudio}
+                  className="flex items-center justify-center w-14 h-14 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                  title="Lire"
+                >
+                  <Play className="h-6 w-6 ml-0.5 fill-white" />
                 </button>
               )}
             </div>

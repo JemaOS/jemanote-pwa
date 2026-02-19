@@ -396,7 +396,7 @@ test.describe('Injection Attack Prevention', () => {
       // Check that supabase client exists and is properly configured
       // @ts-ignore
       const hasSupabase =
-        window.supabase !== undefined || document.querySelector('[data-supabase]') !== null;
+        globalThis.supabase !== undefined || document.querySelector('[data-supabase]') !== null;
       return hasSupabase;
     });
 

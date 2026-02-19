@@ -187,7 +187,7 @@ test.describe('Local Storage Security', () => {
 
     // Try to access via XSS
     const xssPayload =
-      '<script>window.stolenData = localStorage.getItem("obsidian_pwa_notes_sync")</script>';
+      '<script>globalThis.stolenData = localStorage.getItem("obsidian_pwa_notes_sync")</script>';
 
     await page.evaluate(payload => {
       const notes = [
@@ -208,7 +208,7 @@ test.describe('Local Storage Security', () => {
     // Check that XSS didn't execute
     const stolenData = await page.evaluate(() => {
       // @ts-ignore
-      return window.stolenData;
+      return globalThis.stolenData;
     });
 
     expect(stolenData).toBeUndefined();
@@ -262,11 +262,11 @@ test.describe('Local Storage Security', () => {
     const events: string[] = [];
 
     await page.evaluate(() => {
-      window.addEventListener('storage', e => {
+      globalThis.addEventListener('storage', e => {
         // @ts-ignore
-        window.storageEvents = window.storageEvents || [];
+        globalThis.storageEvents = globalThis.storageEvents || [];
         // @ts-ignore
-        window.storageEvents.push({
+        globalThis.storageEvents.push({
           key: e.key,
           newValue: e.newValue?.substring(0, 100), // Limit logged data
         });
@@ -281,7 +281,7 @@ test.describe('Local Storage Security', () => {
     // Check that events are handled
     const eventCount = await page.evaluate(() => {
       // @ts-ignore
-      return window.storageEvents?.length || 0;
+      return globalThis.storageEvents?.length || 0;
     });
 
     // Events may or may not be captured depending on implementation
@@ -320,7 +320,7 @@ test.describe('Local Storage Security', () => {
     // Check that storage is origin-bound
     const storageInfo = await page.evaluate(() => {
       return {
-        origin: window.location.origin,
+        origin: globalThis.location.origin,
         localStorageAvailable: typeof localStorage !== 'undefined',
         sessionStorageAvailable: typeof sessionStorage !== 'undefined',
       };

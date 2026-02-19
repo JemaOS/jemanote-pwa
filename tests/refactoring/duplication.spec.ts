@@ -236,17 +236,17 @@ function readFileContents(files: string[]): {
   return { fileContents, totalLines };
 }
 
-function findDuplicateWindow(
-  // eslint-disable-next-line max-params
-  window1: string,
-  file1: string,
-  i: number,
-  file2: string,
-  lines2: string[],
-  windowSize: number,
-  processed: Set<string>,
-  duplicates: DuplicateBlock[]
-) {
+function findDuplicateWindow(params: {
+  window1: string;
+  file1: string;
+  i: number;
+  file2: string;
+  lines2: string[];
+  windowSize: number;
+  processed: Set<string>;
+  duplicates: DuplicateBlock[];
+}) {
+  const { window1, file1, i, file2, lines2, windowSize, processed, duplicates } = params;
   for (let j = 0; j <= lines2.length - windowSize; j++) {
     const window2 = lines2
       .slice(j, j + windowSize)
@@ -288,7 +288,16 @@ function analyzeDuplication(files: string[]): DuplicationReport {
 
       for (const [file2, lines2] of Object.entries(fileContents)) {
         if (file1 === file2) continue;
-        findDuplicateWindow(window1, file1, i, file2, lines2, windowSize, processed, duplicates);
+        findDuplicateWindow({
+          window1,
+          file1,
+          i,
+          file2,
+          lines2,
+          windowSize,
+          processed,
+          duplicates,
+        });
       }
     }
   }
@@ -419,7 +428,7 @@ function findSimilarFunctions(files: string[]): string[] {
 
   // Find similar functions
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  for (const [body, locations] of Object.entries(functionBodies)) {
+  for (const locations of Object.values(functionBodies)) {
     if (locations.length > CONFIG.thresholds.maxSimilarFunctions) {
       violations.push(`Similar functions found in: ${locations.join(', ')}`);
     }

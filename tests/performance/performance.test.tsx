@@ -109,7 +109,7 @@ const code = "example";
 
       // Simple processing simulation with safer regex patterns
       // @typescript-eslint/no-unused-vars
-      const processed = safeContent
+      safeContent
         .replaceAll(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
         .replaceAll(/\*\*([^*]{1,500}?)\*\*/g, '<strong>$1</strong>')
         .replaceAll(/\*([^*]{1,500}?)\*/g, '<em>$1</em>');
@@ -160,7 +160,7 @@ const code = "example";
       const start = performance.now();
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const results = notes.filter(note => {
+      notes.filter(note => {
         const title = note.title.toLowerCase();
         let queryIndex = 0;
         for (let i = 0; i < title.length && queryIndex < searchQuery.length; i++) {
@@ -231,10 +231,10 @@ const code = "example";
 
       // Process the note
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const processed = {
+      ({
         ...largeNote,
         preview: largeNote.content.slice(0, 200),
-      };
+      });
 
       const endMemory = (performance as any).memory?.usedJSHeapSize || 0;
       const memoryIncrease = endMemory - startMemory;
@@ -253,7 +253,7 @@ const code = "example";
       }));
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const links = Array.from({ length: 150 }, () => ({
+      Array.from({ length: 150 }, () => ({
         source: `node-${Math.floor(Math.random() * 100)}`, // NOSONAR
         target: `node-${Math.floor(Math.random() * 100)}`, // NOSONAR
       }));

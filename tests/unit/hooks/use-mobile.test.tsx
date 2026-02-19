@@ -163,7 +163,7 @@ describe('useIsMobile', () => {
   describe('edge cases', () => {
     it('should handle matchMedia not being available', () => {
       // Store original matchMedia
-      const originalMatchMedia = window.matchMedia;
+      const originalMatchMedia = globalThis.matchMedia;
 
       // Mock matchMedia as undefined to test error handling
       Object.defineProperty(window, 'matchMedia', {

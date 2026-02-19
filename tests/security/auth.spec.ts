@@ -152,7 +152,7 @@ test.describe('Authentication Security', () => {
       const hasUpper = /[A-Z]/.test(password);
       const hasLower = /[a-z]/.test(password);
       const hasNumber = /\d/.test(password);
-      const hasSpecial = /[!@#$%^&*()_+-=\[\]{};':"\\|,.<>?]/.test(password);
+      const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]/.test(password);
       const minLength = password.length >= 8;
 
       return (
@@ -173,7 +173,7 @@ test.describe('Authentication Security', () => {
   test('should prevent authentication bypass attempts', async ({ page }) => {
     // Try various bypass payloads
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const payload of AUTH_BYPASS_PAYLOADS) {
+    for (const _ of AUTH_BYPASS_PAYLOADS) {
       // These should not result in successful authentication
       // The actual behavior depends on the auth implementation
 

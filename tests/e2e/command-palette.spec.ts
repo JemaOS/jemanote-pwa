@@ -414,7 +414,7 @@ test.describe('Command Palette', () => {
 
       // Check for backdrop blur
       const hasBackdrop = await commandPalette.evaluate(el => {
-        const style = window.getComputedStyle(el);
+        const style = globalThis.getComputedStyle(el);
         return style.backdropFilter !== 'none' || style.backgroundColor !== 'transparent';
       });
 

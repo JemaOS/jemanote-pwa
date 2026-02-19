@@ -105,7 +105,7 @@ test.describe('Responsive Design', () => {
       // Either not visible or has transform to hide it
       if (isVisible) {
         const transform = await sidebar.evaluate(el => {
-          return window.getComputedStyle(el).transform;
+          return globalThis.getComputedStyle(el).transform;
         });
         // If visible, it might be transformed off-screen
         expect(transform).toBeTruthy();
@@ -387,7 +387,7 @@ test.describe('Responsive Design', () => {
     test('should have safe area insets on mobile', async ({ page }) => {
       const body = page.locator('body');
       const padding = await body.evaluate(el => {
-        const style = window.getComputedStyle(el);
+        const style = globalThis.getComputedStyle(el);
         return {
           top: style.paddingTop,
           bottom: style.paddingBottom,
@@ -421,7 +421,7 @@ test.describe('Responsive Design', () => {
     test('should have readable font sizes on mobile', async ({ page }) => {
       const body = page.locator('body');
       const fontSize = await body.evaluate(el => {
-        return window.getComputedStyle(el).fontSize;
+        return globalThis.getComputedStyle(el).fontSize;
       });
 
       // Should be at least 16px for readability

@@ -21,6 +21,29 @@ async function clearLocalStorage(page: Page) {
   });
 }
 
+// Helper to login user
+async function loginUser(page: Page) {
+  const email = `test-${Date.now()}@example.com`;
+  const password = 'TestPassword123!';
+
+  // Open auth modal
+  await page.getByRole('button', { name: /connexion|login/i }).click();
+  await page.waitForTimeout(500);
+
+  // Switch to register tab
+  await page.getByRole('button', { name: /inscription|sign up|register/i }).click();
+  await page.waitForTimeout(500);
+
+  // Fill form
+  await page.locator('input[type="email"], input[name="email"]').fill(email);
+  await page.locator('input[type="password"], input[name="password"]').fill(password);
+  await page.locator('input[type="password"], input[name="confirmPassword"]').fill(password);
+
+  // Submit
+  await page.getByRole('button', { name: /inscription|sign up|register|créer/i }).click();
+  await page.waitForTimeout(2000);
+}
+
 // Helper to create a note with content
 async function createNoteWithContent(page: Page, title: string, content: string) {
   await page.getByRole('button', { name: /nouvelle note|new note/i }).click();
@@ -46,6 +69,9 @@ test.describe('AI Features', () => {
     await clearLocalStorage(page);
     await page.reload();
     await page.waitForLoadState('networkidle');
+    // Login user for AI features
+    await loginUser(page);
+    await page.waitForTimeout(1000);
   });
 
   test.describe('AI Summary Generation', () => {

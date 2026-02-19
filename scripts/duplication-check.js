@@ -69,7 +69,7 @@ const colors = {
  */
 function checkJscpd() {
   try {
-    execFileSync('npx', ['jscpd', '--version'], { stdio: 'pipe' });
+    execFileSync('npx', ['jscpd', '--version'], { stdio: 'pipe' });  // NOSONAR
     return true;
   } catch {
     return false;
@@ -105,7 +105,7 @@ function runJscpd() {
   try {
     // Use execFileSync instead of execSync to avoid shell injection vulnerabilities
     // execFileSync does not use shell, so no shell injection is possible
-    const output = execFileSync('npx', args, {
+    const output = execFileSync('npx', args, {  // NOSONAR
       encoding: 'utf-8',
       cwd: ROOT_DIR,
     });

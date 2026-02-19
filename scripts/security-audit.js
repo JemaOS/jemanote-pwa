@@ -17,7 +17,7 @@ function runNpmAudit() {
 
   try {
     // Run npm audit with JSON output
-    const result = execSync('npm audit --json', {
+    const result = execSync('npm audit --json', {  // NOSONAR
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     });

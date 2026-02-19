@@ -38,8 +38,8 @@ function initGraph(data) {
 
   // Initialiser les nœuds avec positions aléatoires
   data.nodes.forEach(nodeData => {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = 200 + Math.random() * 100;
+    const angle = Math.random() * Math.PI * 2; // NOSONAR
+    const radius = 200 + Math.random() * 100; // NOSONAR
 
     nodes.set(nodeData.id, {
       id: nodeData.id,

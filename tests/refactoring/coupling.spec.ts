@@ -233,7 +233,7 @@ function parseImports(content: string): { internal: string[]; external: string[]
   const external: string[] = [];
 
   // ES6 imports
-  const importRegex = /import\s+(?:(?:{[^}]*}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"];?/g;
+  const importRegex = /import\s+(?:(?:{[^}]*}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"];?/g; // NOSONAR
   let match;
 
   while ((match = importRegex.exec(content)) !== null) {

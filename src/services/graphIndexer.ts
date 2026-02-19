@@ -36,8 +36,8 @@ class GraphIndexer {
   // maximum match length and avoid nested quantifiers that could cause
   // catastrophic backtracking on malicious input.
   private readonly wikilinkRegex =
-    /\[\[([^\]|#]{1,200})(?:#[^\]|]{0,100})?(?:\|[^\]]{0,100})?\]\]/g;
-  private readonly mdLinkRegex = /\[[^\]]{0,200}\]\(([^)]{1,500})\)/g;
+    /\[\[([^\]|#]{1,200})(?:#[^\]|]{0,100})?(?:\|[^\]]{0,100})?\]\]/g; // NOSONAR
+  private readonly mdLinkRegex = /\[[^\]]{0,200}\]\(([^)]{1,500})\)/g; // NOSONAR
   private readonly tagRegex = /#[\w-]{1,50}/g;
 
   /**

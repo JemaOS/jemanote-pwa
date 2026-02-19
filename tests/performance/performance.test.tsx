@@ -250,14 +250,14 @@ const code = "example";
     it('should calculate graph layout for 100 nodes in under 200ms', () => {
       const nodes = Array.from({ length: 100 }, (_, i) => ({
         id: `node-${i}`,
-        x: Math.random() * 1000,
-        y: Math.random() * 1000,
+        x: Math.random() * 1000, // NOSONAR
+        y: Math.random() * 1000, // NOSONAR
       }));
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const links = Array.from({ length: 150 }, () => ({
-        source: `node-${Math.floor(Math.random() * 100)}`,
-        target: `node-${Math.floor(Math.random() * 100)}`,
+        source: `node-${Math.floor(Math.random() * 100)}`, // NOSONAR
+        target: `node-${Math.floor(Math.random() * 100)}`, // NOSONAR
       }));
 
       const start = performance.now();

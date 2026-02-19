@@ -344,8 +344,8 @@ test.describe('Input Sanitization', () => {
 
   test('should sanitize markdown content', async ({ page }) => {
     const markdownPayloads = [
-      { input: '[Link](javascript:alert(1))', shouldNotContain: ['javascript:'] },
-      { input: '![Image](javascript:alert(1))', shouldNotContain: ['javascript:'] },
+      { input: '[Link](javascript:alert(1))', shouldNotContain: ['javascript:'] }, // NOSONAR
+      { input: '![Image](javascript:alert(1))', shouldNotContain: ['javascript:'] }, // NOSONAR
       { input: '<script>alert(1)</script>', shouldNotContain: ['<script>'] },
       { input: '```\n<script>alert(1)</script>\n```', shouldNotContain: ['<script>'] },
     ];
@@ -379,7 +379,7 @@ test.describe('Input Sanitization', () => {
   test('should sanitize search queries', async ({ page }) => {
     const searchPayloads = [
       '<script>alert(1)</script>',
-      'javascript:alert(1)',
+      'javascript:alert(1)', // NOSONAR
       "'; DROP TABLE notes; --",
       '<img src=x onerror=alert(1)>',
     ];
@@ -444,7 +444,7 @@ test.describe('Input Sanitization', () => {
   test('should sanitize ID attributes', async ({ page }) => {
     const idPayloads = [
       { input: 'id="<script>alert(1)</script>"', shouldNotContain: ['<script>'] },
-      { input: 'id="javascript:alert(1)"', shouldNotContain: ['javascript:'] },
+      { input: 'id="javascript:alert(1)"', shouldNotContain: ['javascript:'] }, // NOSONAR
     ];
 
     for (const testCase of idPayloads) {

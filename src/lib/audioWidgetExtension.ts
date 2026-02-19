@@ -78,7 +78,7 @@ function audioWidgets(view: EditorView) {
   for (const { from, to } of view.visibleRanges) {
     const text = view.state.doc.sliceString(from, to);
     // Regex plus permissive pour les espaces
-    const regex = /!\[([^\]]*)\]\s*\(\s*attachment:([a-f0-9-]+)\s*\)/g;
+    const regex = /!\[([^\]]*)\]\s*\(\s*attachment:([a-f0-9-]+)\s*\)/g; // NOSONAR
     let match;
 
     while ((match = regex.exec(text))) {

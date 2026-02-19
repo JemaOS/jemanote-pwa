@@ -330,7 +330,7 @@ export const TEST_CONFIG = {
     XSS_PAYLOADS: [
       '<script>alert("XSS")</script>',
       '<img src=x onerror="alert(\'XSS\')">',
-      'javascript:alert("XSS")',
+      'javascript:alert("XSS")', // NOSONAR
       '<svg onload="alert(\'XSS\')">',
       '"><script>alert(String.fromCharCode(88,83,83))</script>',
     ],

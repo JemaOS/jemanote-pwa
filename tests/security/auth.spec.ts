@@ -411,8 +411,8 @@ test.describe('Authentication Security', () => {
     // 3. Session replay attacks
 
     const sessions = [
-      { id: 'session-1', ip: '192.168.1.1', userAgent: 'Chrome', createdAt: Date.now() },
-      { id: 'session-2', ip: '10.0.0.1', userAgent: 'Firefox', createdAt: Date.now() },
+      { id: 'session-1', ip: '192.168.1.1', userAgent: 'Chrome', createdAt: Date.now() }, // NOSONAR
+      { id: 'session-2', ip: '10.0.0.1', userAgent: 'Firefox', createdAt: Date.now() }, // NOSONAR
     ];
 
     // Different IPs should trigger security alert

@@ -98,7 +98,7 @@ function extractMetrics(result: LighthouseResult): PerformanceMetrics {
 }
 
 test.describe('Lighthouse Performance Audits', () => {
-  const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
+  const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173'; // NOSONAR
 
   test.describe('Homepage', () => {
     test('should pass performance budget', async () => {

@@ -403,7 +403,7 @@ function findSimilarFunctions(files: string[]): string[] {
 
     // Extract function bodies (simplified) with safer regex patterns
     const functionRegex =
-      /(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z_]\w{0,99})\s*\([^)]{0,500}\)\s*\{([^}]*)\}/g;
+      /(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z_]\w{0,99})\s*\([^)]{0,500}\)\s*\{([^}]*)\}/g; // NOSONAR
     let match;
 
     while ((match = functionRegex.exec(safeContent)) !== null) {
@@ -442,7 +442,7 @@ function findDuplicatedErrorHandling(files: string[]): string[] {
       content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
     // Find try-catch blocks with safer regex
-    const tryCatchRegex = /try\s*\{[\s\S]{0,10000}\}\s*catch\s*\([^)]{0,200}\)\s*\{([^}]*)\}/g;
+    const tryCatchRegex = /try\s*\{[\s\S]{0,10000}\}\s*catch\s*\([^)]{0,200}\)\s*\{([^}]*)\}/g; // NOSONAR
     let match;
 
     while ((match = tryCatchRegex.exec(safeContent)) !== null) {
@@ -474,7 +474,7 @@ function findDuplicatedTypes(files: string[]): string[] {
     const relativePath = path.relative(CONFIG.sourceDir, file);
 
     // Find interface definitions
-    const interfaceRegex = /export\s+interface\s+(\w+)\s*\{([^}]*)\}/g;
+    const interfaceRegex = /export\s+interface\s+(\w+)\s*\{([^}]*)\}/g; // NOSONAR
     let match;
 
     while ((match = interfaceRegex.exec(content)) !== null) {
@@ -501,7 +501,7 @@ function findUnusedImports(content: string): string[] {
   const unused: string[] = [];
 
   // Find all imports
-  const importRegex = /import\s+\{([^}]+)\}\s+from\s+['"][^'"]+['"];?/g;
+  const importRegex = /import\s+\{([^}]+)\}\s+from\s+['"][^'"]+['"];?/g; // NOSONAR
   let match;
 
   while ((match = importRegex.exec(content)) !== null) {

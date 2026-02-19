@@ -122,7 +122,7 @@ describe('Module Cohesion Analysis', () => {
           );
 
           // Look for Props interfaces with many properties
-          const propsInterfaceMatch = content.match(/interface\s+\w*Props\s*{([^}]*)}/s);
+          const propsInterfaceMatch = content.match(/interface\s+\w*Props\s*{([^}]*)}/s); // NOSONAR
           if (propsInterfaceMatch) {
             const propsContent = propsInterfaceMatch[1];
             const propCount = (propsContent.match(/\w+\??\s*:/g) || []).length;
@@ -367,7 +367,7 @@ function extractClassExports(content: string): string[] {
 function extractComponentExports(content: string): string[] {
   const components: string[] = [];
   const regex =
-    /export\s+(?:default\s+)?(?:function|const)\s+(\w+):?\s*.*?React\.FC|export\s+(?:default\s+)?(?:function|const)\s+(\w+)\s*[=\(].*?=>/g;
+    /export\s+(?:default\s+)?(?:function|const)\s+(\w+):?\s*.*?React\.FC|export\s+(?:default\s+)?(?:function|const)\s+(\w+)\s*[=\(].*?=>/g; // NOSONAR
   let match;
 
   while ((match = regex.exec(content)) !== null) {

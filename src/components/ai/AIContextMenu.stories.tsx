@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import AIContextMenu from './AIContextMenu'
+import AIContextMenu from './AIContextMenu';
 
 const meta: Meta<typeof AIContextMenu> = {
   title: 'AI/AIContextMenu',
@@ -17,7 +17,7 @@ const meta: Meta<typeof AIContextMenu> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-screen w-screen flex items-center justify-center">
           <Story />
@@ -26,28 +26,28 @@ const meta: Meta<typeof AIContextMenu> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof AIContextMenu>
+export default meta;
+type Story = StoryObj<typeof AIContextMenu>;
 
 const defaultProps = {
   position: { x: 100, y: 100 },
-  selectedText: 'Ceci est le texte sélectionné pour l\'analyse IA.',
+  selectedText: "Ceci est le texte sélectionné pour l'analyse IA.",
   onClose: () => {},
   onInsert: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const WithShortText: Story = {
   args: {
     ...defaultProps,
     selectedText: 'Texte court.',
   },
-}
+};
 
 export const WithLongText: Story = {
   args: {
@@ -57,18 +57,18 @@ Il contient plusieurs phrases et pourrait représenter un paragraphe entier d'un
 L'assistant IA pourrait analyser ce texte pour proposer des améliorations, une continuation,
 ou même une traduction dans une autre langue selon les besoins de l'utilisateur.`,
   },
-}
+};
 
 export const PositionTopLeft: Story = {
   args: {
     ...defaultProps,
     position: { x: 50, y: 50 },
   },
-}
+};
 
 export const PositionBottomRight: Story = {
   args: {
     ...defaultProps,
     position: { x: 500, y: 400 },
   },
-}
+};

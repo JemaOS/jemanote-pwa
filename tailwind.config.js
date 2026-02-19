@@ -23,16 +23,16 @@ module.exports = {
       },
     },
     screens: {
-      'xs': '375px',            // Smartphone 4-5 pouces
-      'sm': '640px',            // Smartphone 6-7 pouces  
-      'md': '768px',            // Tablet portrait
-      'lg': '1024px',           // Tablet landscape
-      'laptop-sm': '1024px',    // Laptop 13 pouces
-      'laptop': '1280px',       // Laptop 14-15 pouces
-      'laptop-lg': '1440px',    // Laptop 16 pouces
-      'desktop': '1680px',      // Desktop 19-20 pouces
-      'xl': '1920px',           // Desktop large
-      '2xl': '2560px',          // 4K
+      xs: '375px', // Smartphone 4-5 pouces
+      sm: '640px', // Smartphone 6-7 pouces
+      md: '768px', // Tablet portrait
+      lg: '1024px', // Tablet landscape
+      'laptop-sm': '1024px', // Laptop 13 pouces
+      laptop: '1280px', // Laptop 14-15 pouces
+      'laptop-lg': '1440px', // Laptop 16 pouces
+      desktop: '1680px', // Desktop 19-20 pouces
+      xl: '1920px', // Desktop large
+      '2xl': '2560px', // 4K
     },
     extend: {
       colors: {
@@ -79,7 +79,10 @@ module.exports = {
         'body-large': ['clamp(1rem, 1.5vw, 1.125rem)', { lineHeight: '1.6' }],
         body: ['clamp(0.9375rem, 1vw, 1rem)', { lineHeight: '1.5' }],
         'body-small': ['clamp(0.8125rem, 0.9vw, 0.875rem)', { lineHeight: '1.5' }],
-        caption: ['clamp(0.6875rem, 0.85vw, 0.75rem)', { lineHeight: '1.4', letterSpacing: '0.01em' }],
+        caption: [
+          'clamp(0.6875rem, 0.85vw, 0.75rem)',
+          { lineHeight: '1.4', letterSpacing: '0.01em' },
+        ],
       },
       boxShadow: {
         card: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
@@ -120,4 +123,4 @@ module.exports = {
     },
   },
   plugins: [require('tailwindcss-animate')],
-}
+};

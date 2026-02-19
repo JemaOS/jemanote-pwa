@@ -1,65 +1,67 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Mail, Lock, X } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { Mail, Lock, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth';
 
 // Helper function to get button text based on state
 function getButtonText(loading: boolean, isLogin: boolean): string {
-  if (loading) {return 'Chargement...';}
+  if (loading) {
+    return 'Chargement...';
+  }
   return isLogin ? 'Se connecter' : "S'inscrire";
 }
 
 interface AuthModalProps {
-  readonly onClose: () => void
+  readonly onClose: () => void;
 }
 
 export default function AuthModal({ onClose }: AuthModalProps) {
-  const { signIn, signUp } = useAuth()
-  const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const { signIn, signUp } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    dialogRef.current?.showModal()
+    dialogRef.current?.showModal();
     return () => {
-      dialogRef.current?.close()
-    }
-  }, [])
+      dialogRef.current?.close();
+    };
+  }, []);
 
   const handleClose = () => {
-    dialogRef.current?.close()
-    onClose()
-  }
+    dialogRef.current?.close();
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
       const { error: authError } = isLogin
         ? await signIn(email, password)
-        : await signUp(email, password)
+        : await signUp(email, password);
 
       if (authError) {
-        setError(authError.message)
+        setError(authError.message);
       } else {
-        onClose()
+        onClose();
       }
     } catch (err) {
       // Handle error - log for debugging but show user-friendly message
-      console.error('Auth error:', err)
-      setError('Une erreur est survenue')
+      console.error('Auth error:', err);
+      setError('Une erreur est survenue');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <dialog
@@ -77,7 +79,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         </button>
 
         <div className="mb-4 sm:mb-6">
-          <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+          <h2
+            id="auth-modal-title"
+            className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2"
+          >
             Synchronisation Cloud
           </h2>
           <p className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
@@ -87,26 +92,34 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
         <div className="mb-4 sm:mb-6 flex gap-2">
           <button
-            onClick={() => { setIsLogin(true); }}
+            onClick={() => {
+              setIsLogin(true);
+            }}
             type="button"
             className={(() => {
-                const baseClasses = 'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch'
-                const activeClasses = 'bg-primary-500 text-white'
-                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`
-              })()}
+              const baseClasses =
+                'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch';
+              const activeClasses = 'bg-primary-500 text-white';
+              const inactiveClasses =
+                'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700';
+              return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`;
+            })()}
           >
             Connexion
           </button>
           <button
-            onClick={() => { setIsLogin(false); }}
+            onClick={() => {
+              setIsLogin(false);
+            }}
             type="button"
             className={(() => {
-                const baseClasses = 'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch'
-                const activeClasses = 'bg-primary-500 text-white'
-                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`
-              })()}
+              const baseClasses =
+                'flex-1 py-2.5 sm:py-3 px-4 rounded-lg font-semibold transition-colors text-sm sm:text-base min-h-touch';
+              const activeClasses = 'bg-primary-500 text-white';
+              const inactiveClasses =
+                'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700';
+              return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`;
+            })()}
           >
             Inscription
           </button>
@@ -114,7 +127,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5"
+            >
               Email
             </label>
             <div className="relative">
@@ -123,7 +139,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); }}
+                onChange={e => {
+                  setEmail(e.target.value);
+                }}
                 required
                 className="w-full h-11 sm:h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 rounded-lg text-sm sm:text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="votre@email.com"
@@ -132,7 +150,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5"
+            >
               Mot de passe
             </label>
             <div className="relative">
@@ -141,7 +162,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => { setPassword(e.target.value); }}
+                onChange={e => {
+                  setPassword(e.target.value);
+                }}
                 required
                 minLength={6}
                 className="w-full h-11 sm:h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 rounded-lg text-sm sm:text-base text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -170,5 +193,5 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         </form>
       </div>
     </dialog>
-  )
+  );
 }

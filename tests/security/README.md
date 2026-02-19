@@ -7,11 +7,13 @@ This directory contains comprehensive security tests for the Jemanote applicatio
 ## Test Categories
 
 ### 1. Content Security Policy (CSP) Tests
+
 **File:** [`csp.spec.ts`](csp.spec.ts)
 
 Tests that verify the application has proper CSP headers configured to prevent XSS and other code injection attacks.
 
 **Key Tests:**
+
 - CSP header/meta tag presence
 - Secure `default-src` directive
 - `object-src: 'none'` to prevent plugin attacks
@@ -23,11 +25,13 @@ Tests that verify the application has proper CSP headers configured to prevent X
 - PWA manifest and worker restrictions
 
 ### 2. HTTP Security Headers Tests
+
 **File:** [`headers.spec.ts`](headers.spec.ts)
 
 Tests for essential HTTP security headers that protect against various attacks.
 
 **Key Tests:**
+
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options` or CSP frame-ancestors
 - `Strict-Transport-Security` (HSTS)
@@ -40,11 +44,13 @@ Tests for essential HTTP security headers that protect against various attacks.
 - Error page security headers
 
 ### 3. XSS Prevention Tests
+
 **File:** [`xss.spec.ts`](xss.spec.ts)
 
 Comprehensive tests for Cross-Site Scripting vulnerabilities.
 
 **Key Tests:**
+
 - Script tag sanitization
 - Event handler sanitization (onerror, onload, etc.)
 - JavaScript protocol URL blocking
@@ -57,6 +63,7 @@ Comprehensive tests for Cross-Site Scripting vulnerabilities.
 - Unicode and special character handling
 
 **Test Payloads:**
+
 - `<script>alert("XSS")</script>`
 - `<img src=x onerror="alert('XSS')">`
 - `javascript:alert('XSS')`
@@ -65,11 +72,13 @@ Comprehensive tests for Cross-Site Scripting vulnerabilities.
 - Encoded payloads
 
 ### 4. Injection Attack Tests
+
 **File:** [`injection.spec.ts`](injection.spec.ts)
 
 Tests for SQL, NoSQL, Command, LDAP, and XPath injection vulnerabilities.
 
 **Key Tests:**
+
 - SQL injection in search queries
 - SQL injection in note titles
 - NoSQL injection (MongoDB operators)
@@ -83,6 +92,7 @@ Tests for SQL, NoSQL, Command, LDAP, and XPath injection vulnerabilities.
 - JSON injection
 
 **Test Payloads:**
+
 - `' OR '1'='1`
 - `'; DROP TABLE users; --`
 - `{"$gt": ""}`
@@ -90,11 +100,13 @@ Tests for SQL, NoSQL, Command, LDAP, and XPath injection vulnerabilities.
 - `{{constructor.constructor("alert('XSS')")()}}`
 
 ### 5. Input Sanitization Tests
+
 **File:** [`sanitization.spec.ts`](sanitization.spec.ts)
 
 Tests for proper input sanitization across the application.
 
 **Key Tests:**
+
 - HTML tag sanitization
 - URL sanitization (blocking dangerous protocols)
 - File name sanitization (path traversal prevention)
@@ -108,11 +120,13 @@ Tests for proper input sanitization across the application.
 - ID attribute sanitization
 
 ### 6. Authentication Security Tests
+
 **File:** [`auth.spec.ts`](auth.spec.ts)
 
 Tests for authentication and session management security.
 
 **Key Tests:**
+
 - No password storage in localStorage
 - No plain text token storage
 - Secure logout (data clearing)
@@ -134,11 +148,13 @@ Tests for authentication and session management security.
 - Secure error messages
 
 ### 7. Storage Security Tests
+
 **File:** [`storage.spec.ts`](storage.spec.ts)
 
 Tests for localStorage, sessionStorage, and IndexedDB security.
 
 **Key Tests:**
+
 - No plain text sensitive data storage
 - Data validation before loading
 - Quota exceeded handling
@@ -159,21 +175,25 @@ Tests for localStorage, sessionStorage, and IndexedDB security.
 ## Running the Tests
 
 ### Run All Security Tests
+
 ```bash
 npx playwright test tests/security/ --project=chromium
 ```
 
 ### Run Specific Test File
+
 ```bash
 npx playwright test tests/security/xss.spec.ts --project=chromium
 ```
 
 ### Run with UI Mode
+
 ```bash
 npx playwright test tests/security/ --ui
 ```
 
 ### Run with Debug Mode
+
 ```bash
 npx playwright test tests/security/ --debug
 ```
@@ -181,6 +201,7 @@ npx playwright test tests/security/ --debug
 ## Security Scripts
 
 ### Security Audit
+
 ```bash
 # Run dependency security audit
 node scripts/security-audit.js
@@ -193,6 +214,7 @@ node scripts/security-audit.js --save
 ```
 
 ### CSP Check
+
 ```bash
 # Check CSP configuration
 node scripts/csp-check.js
@@ -204,6 +226,7 @@ node scripts/csp-check.js --generate
 ## Vulnerability Coverage
 
 ### OWASP Top 10 (2021)
+
 1. **Broken Access Control** - Covered in auth.spec.ts
 2. **Cryptographic Failures** - Covered in storage.spec.ts
 3. **Injection** - Covered in injection.spec.ts, xss.spec.ts
@@ -216,6 +239,7 @@ node scripts/csp-check.js --generate
 10. **Server-Side Request Forgery** - Covered in sanitization.spec.ts
 
 ### Additional Vulnerabilities Tested
+
 - Cross-Site Scripting (XSS)
 - Cross-Site Request Forgery (CSRF)
 - SQL/NoSQL Injection
@@ -234,6 +258,7 @@ node scripts/csp-check.js --generate
 ## Security Checklist (Pre-Deployment)
 
 ### Code Security
+
 - [ ] All security tests pass
 - [ ] No high/critical npm audit vulnerabilities
 - [ ] No secrets in code (use secret-scan)
@@ -243,6 +268,7 @@ node scripts/csp-check.js --generate
 - [ ] Authorization checks in place
 
 ### Configuration Security
+
 - [ ] CSP headers configured
 - [ ] Security headers configured
 - [ ] HTTPS enforced
@@ -251,6 +277,7 @@ node scripts/csp-check.js --generate
 - [ ] Build optimizations enabled
 
 ### Infrastructure Security
+
 - [ ] Server security headers configured
 - [ ] SSL/TLS properly configured
 - [ ] Rate limiting enabled
@@ -258,6 +285,7 @@ node scripts/csp-check.js --generate
 - [ ] Web Application Firewall (WAF) configured
 
 ### Monitoring & Response
+
 - [ ] Security logging enabled
 - [ ] Error tracking configured
 - [ ] Uptime monitoring enabled
@@ -283,10 +311,11 @@ node scripts/csp-check.js --generate
 ### Responding to Incidents
 
 1. **Immediate Actions**
+
    ```bash
    # Run security audit
    node scripts/security-audit.js --fail-on-critical
-   
+
    # Run all security tests
    npx playwright test tests/security/
    ```
@@ -339,19 +368,23 @@ If you discover a security vulnerability:
 ### Regular Security Tasks
 
 **Daily:**
+
 - Review security alerts
 - Monitor error logs
 
 **Weekly:**
+
 - Run security tests
 - Check for new vulnerabilities
 
 **Monthly:**
+
 - Full security audit
 - Dependency updates
 - Security test review
 
 **Quarterly:**
+
 - Penetration testing
 - Security architecture review
 - Incident response drill

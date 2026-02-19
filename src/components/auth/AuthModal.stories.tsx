@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import AuthModal from './AuthModal'
+import AuthModal from './AuthModal';
 
 const meta: Meta<typeof AuthModal> = {
   title: 'Auth/AuthModal',
@@ -17,7 +17,7 @@ const meta: Meta<typeof AuthModal> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-screen w-screen flex items-center justify-center bg-black/50">
           <Story />
@@ -26,33 +26,33 @@ const meta: Meta<typeof AuthModal> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof AuthModal>
+export default meta;
+type Story = StoryObj<typeof AuthModal>;
 
 const defaultProps = {
   onClose: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const LoginTab: Story = {
   args: defaultProps,
-}
+};
 
 export const SignupTab: Story = {
   args: defaultProps,
   play: ({ canvasElement }) => {
     // Simuler le clic sur l'onglet Inscription
-    const signupButton = canvasElement.querySelector('button:nth-child(2)')
+    const signupButton = canvasElement.querySelector('button:nth-child(2)');
     if (signupButton) {
-      ;(signupButton as HTMLButtonElement).click()
+      (signupButton as HTMLButtonElement).click();
     }
   },
-}
+};
 
 export const MobileViewport: Story = {
   args: defaultProps,
@@ -61,7 +61,7 @@ export const MobileViewport: Story = {
       defaultViewport: 'mobile',
     },
   },
-}
+};
 
 export const TabletViewport: Story = {
   args: defaultProps,
@@ -70,4 +70,4 @@ export const TabletViewport: Story = {
       defaultViewport: 'tablet',
     },
   },
-}
+};

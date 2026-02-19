@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import { ViewMode } from '@/types'
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ViewMode } from '@/types';
 
-import Navigation from './Navigation'
+import Navigation from './Navigation';
 
 const meta: Meta<typeof Navigation> = {
   title: 'Layout/Navigation',
@@ -18,17 +18,17 @@ const meta: Meta<typeof Navigation> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <Story />
       </ThemeProvider>
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof Navigation>
+export default meta;
+type Story = StoryObj<typeof Navigation>;
 
 const defaultProps = {
   currentView: 'workspace' as ViewMode,
@@ -41,11 +41,11 @@ const defaultProps = {
   onShowAuth: () => {},
   searchQuery: '',
   onSearchQueryChange: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const WithUser: Story = {
   args: {
@@ -56,28 +56,28 @@ export const WithUser: Story = {
       user_metadata: { name: 'John Doe' },
     } as any,
   },
-}
+};
 
 export const WithSearch: Story = {
   args: {
     ...defaultProps,
     searchQuery: 'recherche de notes',
   },
-}
+};
 
 export const GraphView: Story = {
   args: {
     ...defaultProps,
     currentView: 'graph',
   },
-}
+};
 
 export const SettingsView: Story = {
   args: {
     ...defaultProps,
     currentView: 'settings',
   },
-}
+};
 
 export const BothSidebarsOpen: Story = {
   args: {
@@ -85,7 +85,7 @@ export const BothSidebarsOpen: Story = {
     leftSidebarOpen: true,
     rightSidebarOpen: true,
   },
-}
+};
 
 export const BothSidebarsClosed: Story = {
   args: {
@@ -93,7 +93,7 @@ export const BothSidebarsClosed: Story = {
     leftSidebarOpen: false,
     rightSidebarOpen: false,
   },
-}
+};
 
 export const MobileViewport: Story = {
   args: defaultProps,
@@ -102,7 +102,7 @@ export const MobileViewport: Story = {
       defaultViewport: 'mobile',
     },
   },
-}
+};
 
 export const TabletViewport: Story = {
   args: defaultProps,
@@ -111,4 +111,4 @@ export const TabletViewport: Story = {
       defaultViewport: 'tablet',
     },
   },
-}
+};

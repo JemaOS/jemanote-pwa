@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Command } from 'cmdk'
+import { Command } from 'cmdk';
 import {
   FileText,
   Search,
@@ -14,23 +14,23 @@ import {
   LogOut,
   Paintbrush,
   History,
-} from 'lucide-react'
-import React, { useState, useEffect } from 'react'
+} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-import { useTheme } from '@/contexts/ThemeContext'
-import { ViewMode, Note } from '@/types'
+import { useTheme } from '@/contexts/ThemeContext';
+import { ViewMode, Note } from '@/types';
 
 interface CommandPaletteProps {
-  readonly open: boolean
-  readonly onClose: () => void
-  readonly notes: readonly Note[]
-  readonly currentView: ViewMode
-  readonly onViewChange: (view: ViewMode) => void
-  readonly onNoteSelect: (noteId: string) => void
-  readonly onCreateNote: () => void
-  readonly onShowAuth: () => void
-  readonly user: unknown
-  readonly onSignOut: () => void
+  readonly open: boolean;
+  readonly onClose: () => void;
+  readonly notes: readonly Note[];
+  readonly currentView: ViewMode;
+  readonly onViewChange: (view: ViewMode) => void;
+  readonly onNoteSelect: (noteId: string) => void;
+  readonly onCreateNote: () => void;
+  readonly onShowAuth: () => void;
+  readonly user: unknown;
+  readonly onSignOut: () => void;
 }
 
 export default function CommandPalette({
@@ -45,33 +45,35 @@ export default function CommandPalette({
   user,
   onSignOut,
 }: CommandPaletteProps) {
-  const [search, setSearch] = useState('')
-  const { theme, toggleTheme } = useTheme()
+  const [search, setSearch] = useState('');
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        onClose()
+        e.preventDefault();
+        onClose();
       }
-    }
+    };
 
     if (open) {
-      document.addEventListener('keydown', handleKeyDown)
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [open, onClose])
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, onClose]);
 
-  if (!open) {return null}
+  if (!open) {
+    return null;
+  }
 
   const handleSelect = (callback: () => void) => {
-    callback()
-    onClose()
-    setSearch('')
-  }
+    callback();
+    onClose();
+    setSearch('');
+  };
 
   return (
     <button
@@ -81,9 +83,11 @@ export default function CommandPalette({
       aria-label="Fermer la palette de commandes"
     >
       <div className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-2xl">
-        <Command 
+        <Command
           className="bg-white dark:bg-neutral-900 rounded-lg shadow-modal border border-neutral-200 dark:border-neutral-700 overflow-hidden"
-          onClick={(e) => { e.stopPropagation(); }}
+          onClick={e => {
+            e.stopPropagation();
+          }}
         >
           <div className="flex items-center border-b border-neutral-200 dark:border-neutral-700 px-4">
             <Search className="h-5 w-5 text-neutral-500 mr-2" />
@@ -102,18 +106,25 @@ export default function CommandPalette({
             </Command.Empty>
 
             {/* Actions */}
-            <Command.Group heading="Actions" className="text-caption text-neutral-500 px-2 py-2 font-semibold">
+            <Command.Group
+              heading="Actions"
+              className="text-caption text-neutral-500 px-2 py-2 font-semibold"
+            >
               <Command.Item
-                onSelect={() => { handleSelect(onCreateNote); }}
+                onSelect={() => {
+                  handleSelect(onCreateNote);
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <Plus className="h-5 w-5" />
                 <span>Créer une nouvelle note</span>
                 <span className="ml-auto text-caption text-neutral-500">Ctrl+N</span>
               </Command.Item>
-              
+
               <Command.Item
-                onSelect={() => { handleSelect(toggleTheme); }}
+                onSelect={() => {
+                  handleSelect(toggleTheme);
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
@@ -123,7 +134,9 @@ export default function CommandPalette({
 
               {user ? (
                 <Command.Item
-                  onSelect={() => { handleSelect(onSignOut); }}
+                  onSelect={() => {
+                    handleSelect(onSignOut);
+                  }}
                   className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
                 >
                   <LogOut className="h-5 w-5" />
@@ -131,7 +144,9 @@ export default function CommandPalette({
                 </Command.Item>
               ) : (
                 <Command.Item
-                  onSelect={() => { handleSelect(onShowAuth); }}
+                  onSelect={() => {
+                    handleSelect(onShowAuth);
+                  }}
                   className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
                 >
                   <LogIn className="h-5 w-5" />
@@ -141,70 +156,116 @@ export default function CommandPalette({
             </Command.Group>
 
             {/* Vues */}
-            <Command.Group heading="Vues" className="text-caption text-neutral-500 px-2 py-2 font-semibold mt-2">
+            <Command.Group
+              heading="Vues"
+              className="text-caption text-neutral-500 px-2 py-2 font-semibold mt-2"
+            >
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('workspace'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('workspace');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <FileText className="h-5 w-5" />
                 <span>Espace de travail</span>
-                {currentView === 'workspace' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'workspace' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
 
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('graph'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('graph');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <Network className="h-5 w-5" />
                 <span>Graphe de connaissances</span>
-                {currentView === 'graph' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'graph' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
 
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('canvas'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('canvas');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <Paintbrush className="h-5 w-5" />
                 <span>Canvas</span>
-                {currentView === 'canvas' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'canvas' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
 
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('timeline'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('timeline');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <History className="h-5 w-5" />
                 <span>Chronologie</span>
-                {currentView === 'timeline' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'timeline' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
 
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('search'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('search');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <Search className="h-5 w-5" />
                 <span>Recherche</span>
-                {currentView === 'search' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'search' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
 
               <Command.Item
-                onSelect={() => { handleSelect(() => { onViewChange('settings'); }); }}
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('settings');
+                  });
+                }}
                 className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
               >
                 <Settings className="h-5 w-5" />
                 <span>Paramètres</span>
-                {currentView === 'settings' && <span className="ml-auto text-caption text-primary-500">Actif</span>}
+                {currentView === 'settings' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
               </Command.Item>
             </Command.Group>
 
             {/* Notes */}
             {notes.length > 0 && (
-              <Command.Group heading="Notes" className="text-caption text-neutral-500 px-2 py-2 font-semibold mt-2">
-                {notes.slice(0, 10).map((note) => (
+              <Command.Group
+                heading="Notes"
+                className="text-caption text-neutral-500 px-2 py-2 font-semibold mt-2"
+              >
+                {notes.slice(0, 10).map(note => (
                   <Command.Item
                     key={note.id}
                     value={note.title}
-                    onSelect={() => { handleSelect(() => { onNoteSelect(note.id); }); }}
+                    onSelect={() => {
+                      handleSelect(() => {
+                        onNoteSelect(note.id);
+                      });
+                    }}
                     className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
                   >
                     <FileText className="h-5 w-5" />
@@ -224,5 +285,5 @@ export default function CommandPalette({
         </Command>
       </div>
     </button>
-  )
+  );
 }

@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import { Note, ViewMode } from '@/types'
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { Note, ViewMode } from '@/types';
 
-import CommandPalette from './CommandPalette'
+import CommandPalette from './CommandPalette';
 
 const meta: Meta<typeof CommandPalette> = {
   title: 'Command/CommandPalette',
@@ -18,17 +18,17 @@ const meta: Meta<typeof CommandPalette> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <Story />
       </ThemeProvider>
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof CommandPalette>
+export default meta;
+type Story = StoryObj<typeof CommandPalette>;
 
 const mockNotes: Note[] = [
   {
@@ -61,7 +61,7 @@ const mockNotes: Note[] = [
     created_at: '2025-01-10T10:00:00Z',
     updated_at: '2025-01-10T10:00:00Z',
   },
-]
+];
 
 const defaultProps = {
   open: true,
@@ -74,11 +74,11 @@ const defaultProps = {
   onShowAuth: () => {},
   user: null,
   onSignOut: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const WithUser: Story = {
   args: {
@@ -88,7 +88,7 @@ export const WithUser: Story = {
       email: 'user@example.com',
     },
   },
-}
+};
 
 export const WithSearch: Story = {
   args: {
@@ -96,20 +96,20 @@ export const WithSearch: Story = {
   },
   play: async ({ canvasElement }) => {
     // Simuler la saisie dans la recherche
-    const input = canvasElement.querySelector('input')
+    const input = canvasElement.querySelector('input');
     if (input) {
-      input.value = 'note'
-      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.value = 'note';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
     }
   },
-}
+};
 
 export const EmptyNotes: Story = {
   args: {
     ...defaultProps,
     notes: [],
   },
-}
+};
 
 export const ManyNotes: Story = {
   args: {
@@ -125,25 +125,25 @@ export const ManyNotes: Story = {
       updated_at: '2025-01-15T10:00:00Z',
     })),
   },
-}
+};
 
 export const GraphView: Story = {
   args: {
     ...defaultProps,
     currentView: 'graph',
   },
-}
+};
 
 export const SettingsView: Story = {
   args: {
     ...defaultProps,
     currentView: 'settings',
   },
-}
+};
 
 export const Closed: Story = {
   args: {
     ...defaultProps,
     open: false,
   },
-}
+};

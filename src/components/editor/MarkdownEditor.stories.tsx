@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import MarkdownEditor from './MarkdownEditor'
+import MarkdownEditor from './MarkdownEditor';
 
 const meta: Meta<typeof MarkdownEditor> = {
   title: 'Editor/MarkdownEditor',
@@ -18,7 +18,7 @@ const meta: Meta<typeof MarkdownEditor> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-[600px] w-full">
           <Story />
@@ -27,20 +27,20 @@ const meta: Meta<typeof MarkdownEditor> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof MarkdownEditor>
+export default meta;
+type Story = StoryObj<typeof MarkdownEditor>;
 
 const defaultProps = {
   value: '',
   onChange: () => {},
   onWikiLinkClick: () => {},
-}
+};
 
 export const Empty: Story = {
   args: defaultProps,
-}
+};
 
 export const WithContent: Story = {
   args: {
@@ -65,7 +65,7 @@ console.log(x);
 > Citation importante
 `,
   },
-}
+};
 
 export const WithWikiLinks: Story = {
   args: {
@@ -77,7 +77,7 @@ Cette note fait référence à [[Note importante]] et [[Projet Alpha]].
 Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails.
 `,
   },
-}
+};
 
 export const WithMathEquations: Story = {
   args: {
@@ -91,14 +91,16 @@ $$
 $$
 `,
   },
-}
+};
 
 export const LongContent: Story = {
   args: {
     ...defaultProps,
     value: `# Document long
 
-${Array.from({ length: 20 }, (_, i) => `
+${Array.from(
+  { length: 20 },
+  (_, i) => `
 ## Section ${i + 1}
 
 Ceci est le contenu de la section ${i + 1}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -107,7 +109,8 @@ Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 - Point A
 - Point B
 - Point C
-`).join('\n')}
+`
+).join('\n')}
 `,
   },
-}
+};

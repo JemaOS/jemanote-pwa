@@ -1,6 +1,6 @@
 /**
  * Bundle Size Tests
- * 
+ *
  * Tests pour surveiller la taille des bundles et s'assurer
  * qu'ils respectent les budgets définis.
  */
@@ -23,8 +23,8 @@ interface BundleStats {
 
 interface BundleBudget {
   pattern: RegExp;
-  maxSize: number;      // Taille max en bytes (non compressée)
-  maxGzipSize: number;  // Taille max en bytes (gzip)
+  maxSize: number; // Taille max en bytes (non compressée)
+  maxGzipSize: number; // Taille max en bytes (gzip)
   name: string;
 }
 
@@ -32,37 +32,37 @@ interface BundleBudget {
 const BUNDLE_BUDGETS: BundleBudget[] = [
   {
     pattern: /index-.*\.js$/,
-    maxSize: 500 * 1024,     // 500KB non compressé
+    maxSize: 500 * 1024, // 500KB non compressé
     maxGzipSize: 150 * 1024, // 150KB gzippé
     name: 'Main Entry (index.js)',
   },
   {
     pattern: /vendor-.*\.js$/,
-    maxSize: 800 * 1024,     // 800KB non compressé
+    maxSize: 800 * 1024, // 800KB non compressé
     maxGzipSize: 250 * 1024, // 250KB gzippé
     name: 'Vendor Bundle',
   },
   {
     pattern: /react-.*\.js$/,
-    maxSize: 300 * 1024,     // 300KB non compressé
+    maxSize: 300 * 1024, // 300KB non compressé
     maxGzipSize: 100 * 1024, // 100KB gzippé
     name: 'React Bundle',
   },
   {
     pattern: /codemirror-.*\.js$/,
-    maxSize: 400 * 1024,     // 400KB non compressé
+    maxSize: 400 * 1024, // 400KB non compressé
     maxGzipSize: 120 * 1024, // 120KB gzippé
     name: 'CodeMirror Bundle',
   },
   {
     pattern: /cytoscape-.*\.js$/,
-    maxSize: 350 * 1024,     // 350KB non compressé
+    maxSize: 350 * 1024, // 350KB non compressé
     maxGzipSize: 100 * 1024, // 100KB gzippé
     name: 'Cytoscape Bundle',
   },
   {
     pattern: /.*\.css$/,
-    maxSize: 200 * 1024,    // 200KB non compressé
+    maxSize: 200 * 1024, // 200KB non compressé
     maxGzipSize: 50 * 1024, // 50KB gzippé
     name: 'CSS Bundle',
   },
@@ -70,10 +70,10 @@ const BUNDLE_BUDGETS: BundleBudget[] = [
 
 // Budget global
 const TOTAL_BUDGET = {
-  maxSize: 2 * 1024 * 1024,     // 2MB total non compressé
-  maxGzipSize: 500 * 1024,      // 500KB total gzippé
+  maxSize: 2 * 1024 * 1024, // 2MB total non compressé
+  maxGzipSize: 500 * 1024, // 500KB total gzippé
   maxJsSize: 1.5 * 1024 * 1024, // 1.5MB JS total
-  maxCssSize: 200 * 1024,       // 200KB CSS total
+  maxCssSize: 200 * 1024, // 200KB CSS total
 };
 
 /**
@@ -81,7 +81,7 @@ const TOTAL_BUDGET = {
  */
 async function getBundleFiles(): Promise<BundleStats[]> {
   const assetsDir = nodePath.join(process.cwd(), 'dist', 'assets');
-  
+
   if (!nodeFs.existsSync(assetsDir)) {
     throw new Error('dist/assets directory not found. Run npm run build first.');
   }
@@ -122,16 +122,16 @@ test.describe('Bundle Size Tests', () => {
   test.describe('Individual Bundle Budgets', () => {
     test('all JS bundles should respect their budgets', () => {
       const jsBundles = bundleStats.filter(stat => stat.name.endsWith('.js'));
-      
+
       for (const bundle of jsBundles) {
         const budget = findBudget(bundle.name);
-        
+
         if (budget) {
           expect(
             bundle.gzipSize,
             `${budget.name} (${bundle.name}) exceeds gzip budget: ${(bundle.gzipSize / 1024).toFixed(2)}KB > ${(budget.maxGzipSize / 1024).toFixed(2)}KB`
           ).toBeLessThanOrEqual(budget.maxGzipSize);
-          
+
           expect(
             bundle.size,
             `${budget.name} (${bundle.name}) exceeds raw budget: ${(bundle.size / 1024).toFixed(2)}KB > ${(budget.maxSize / 1024).toFixed(2)}KB`
@@ -142,10 +142,10 @@ test.describe('Bundle Size Tests', () => {
 
     test('all CSS bundles should respect their budgets', () => {
       const cssBundles = bundleStats.filter(stat => stat.name.endsWith('.css'));
-      
+
       for (const bundle of cssBundles) {
         const budget = findBudget(bundle.name);
-        
+
         if (budget) {
           expect(
             bundle.gzipSize,
@@ -208,7 +208,7 @@ test.describe('Bundle Size Tests', () => {
   test.describe('Chunk Analysis', () => {
     test('should have reasonable number of chunks', () => {
       const jsChunks = bundleStats.filter(stat => stat.name.endsWith('.js'));
-      
+
       // Devrait avoir entre 5 et 20 chunks pour un bon code splitting
       expect(jsChunks.length).toBeGreaterThanOrEqual(5);
       expect(jsChunks.length).toBeLessThanOrEqual(30);
@@ -217,7 +217,7 @@ test.describe('Bundle Size Tests', () => {
     test('no single chunk should exceed 50% of total JS', () => {
       const jsStats = bundleStats.filter(stat => stat.name.endsWith('.js'));
       const totalJsSize = jsStats.reduce((sum, stat) => sum + stat.size, 0);
-      
+
       for (const stat of jsStats) {
         const percentage = (stat.size / totalJsSize) * 100;
         expect(
@@ -229,8 +229,10 @@ test.describe('Bundle Size Tests', () => {
 
     test('should generate source maps in development', () => {
       const sourceMaps = bundleStats.filter(stat => stat.name.endsWith('.map'));
-      const jsFiles = bundleStats.filter(stat => stat.name.endsWith('.js') && !stat.name.endsWith('.map'));
-      
+      const jsFiles = bundleStats.filter(
+        stat => stat.name.endsWith('.js') && !stat.name.endsWith('.map')
+      );
+
       // En production, on peut ne pas avoir de source maps
       // Ce test vérifie juste la cohérence si elles existent
       if (sourceMaps.length > 0) {
@@ -241,22 +243,22 @@ test.describe('Bundle Size Tests', () => {
 
   test.describe('Bundle Composition', () => {
     test('should have separate vendor chunks', () => {
-      const vendorChunks = bundleStats.filter(stat => 
-        stat.name.includes('vendor') || stat.name.includes('node_modules')
+      const vendorChunks = bundleStats.filter(
+        stat => stat.name.includes('vendor') || stat.name.includes('node_modules')
       );
-      
+
       expect(vendorChunks.length).toBeGreaterThanOrEqual(1);
     });
 
     test('should lazy load heavy dependencies', () => {
       // Vérifie que les grosses dépendances sont dans des chunks séparés
       const heavyLibs = ['cytoscape', 'codemirror', 'mermaid', 'recharts'];
-      
+
       for (const lib of heavyLibs) {
-        const libChunk = bundleStats.find(stat => 
+        const libChunk = bundleStats.find(stat =>
           stat.name.toLowerCase().includes(lib.toLowerCase())
         );
-        
+
         // Si la librairie est présente, elle devrait être dans un chunk séparé
         if (libChunk) {
           expect(libChunk.size).toBeGreaterThan(10 * 1024); // Au moins 10KB

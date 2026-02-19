@@ -1,6 +1,6 @@
 /**
  * Lighthouse Performance Tests
- * 
+ *
  * Tests automatisés utilisant Lighthouse via Playwright
  * pour auditer les performances des pages critiques.
  */
@@ -18,39 +18,42 @@ interface LighthouseResult {
       'best-practices': { score: number };
       seo: { score: number };
     };
-    audits: Record<string, {
-      numericValue?: number;
-      score: number | null;
-      displayValue?: string;
-    }>;
+    audits: Record<
+      string,
+      {
+        numericValue?: number;
+        score: number | null;
+        displayValue?: string;
+      }
+    >;
   };
 }
 
 interface PerformanceMetrics {
-  lcp: number;  // Largest Contentful Paint (ms)
-  fcp: number;  // First Contentful Paint (ms)
-  tbt: number;  // Total Blocking Time (ms)
-  cls: number;  // Cumulative Layout Shift
-  tti: number;  // Time to Interactive (ms)
-  si: number;   // Speed Index (ms)
+  lcp: number; // Largest Contentful Paint (ms)
+  fcp: number; // First Contentful Paint (ms)
+  tbt: number; // Total Blocking Time (ms)
+  cls: number; // Cumulative Layout Shift
+  tti: number; // Time to Interactive (ms)
+  si: number; // Speed Index (ms)
 }
 
 // Budgets de performance (en ms sauf CLS)
 const PERFORMANCE_BUDGETS = {
-  lcp: 2500,    // Largest Contentful Paint < 2.5s
-  fcp: 1800,    // First Contentful Paint < 1.8s
-  tbt: 200,     // Total Blocking Time < 200ms
-  cls: 0.1,     // Cumulative Layout Shift < 0.1
-  tti: 3800,    // Time to Interactive < 3.8s
-  si: 3400,     // Speed Index < 3.4s
+  lcp: 2500, // Largest Contentful Paint < 2.5s
+  fcp: 1800, // First Contentful Paint < 1.8s
+  tbt: 200, // Total Blocking Time < 200ms
+  cls: 0.1, // Cumulative Layout Shift < 0.1
+  tti: 3800, // Time to Interactive < 3.8s
+  si: 3400, // Speed Index < 3.4s
 } as const;
 
 // Seuils minimum pour les catégories Lighthouse
 const CATEGORY_THRESHOLDS = {
   performance: 0.85,
-  accessibility: .90,
-  bestPractices: .90,
-  seo: .90,
+  accessibility: 0.9,
+  bestPractices: 0.9,
+  seo: 0.9,
 } as const;
 
 /**
@@ -83,7 +86,7 @@ async function runLighthouseAudit(url: string): Promise<LighthouseResult> {
  */
 function extractMetrics(result: LighthouseResult): PerformanceMetrics {
   const { audits } = result.lhr;
-  
+
   return {
     lcp: audits['largest-contentful-paint']?.numericValue ?? 0,
     fcp: audits['first-contentful-paint']?.numericValue ?? 0,
@@ -99,7 +102,7 @@ test.describe('Lighthouse Performance Audits', () => {
 
   test.describe('Homepage', () => {
     test('should pass performance budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/`);
+      const result = await runLighthouseAudit(`${baseUrl}/`);
       const metrics = extractMetrics(result);
 
       expect(metrics.lcp).toBeLessThan(PERFORMANCE_BUDGETS.lcp);
@@ -111,19 +114,23 @@ test.describe('Lighthouse Performance Audits', () => {
     });
 
     test('should meet category thresholds', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/`);
+      const result = await runLighthouseAudit(`${baseUrl}/`);
       const { categories } = result.lhr;
 
       expect(categories.performance.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.performance);
-      expect(categories.accessibility.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.accessibility);
-      expect(categories['best-practices'].score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.bestPractices);
+      expect(categories.accessibility.score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.accessibility
+      );
+      expect(categories['best-practices'].score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.bestPractices
+      );
       expect(categories.seo.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.seo);
     });
   });
 
   test.describe('Editor Page', () => {
     test('should pass performance budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/?note=new`);
+      const result = await runLighthouseAudit(`${baseUrl}/?note=new`);
       const metrics = extractMetrics(result);
 
       // Budgets plus permissifs pour l'éditeur (plus complexe)
@@ -135,17 +142,21 @@ test.describe('Lighthouse Performance Audits', () => {
     });
 
     test('should meet category thresholds', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/?note=new`);
+      const result = await runLighthouseAudit(`${baseUrl}/?note=new`);
       const { categories } = result.lhr;
 
-      expect(categories.performance.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.performance - 0.05);
-      expect(categories.accessibility.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.accessibility);
+      expect(categories.performance.score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.performance - 0.05
+      );
+      expect(categories.accessibility.score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.accessibility
+      );
     });
   });
 
   test.describe('Graph View', () => {
     test('should pass performance budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/?view=graph`);
+      const result = await runLighthouseAudit(`${baseUrl}/?view=graph`);
       const metrics = extractMetrics(result);
 
       // Budgets plus permissifs pour le graph (WebGL/Canvas)
@@ -156,40 +167,48 @@ test.describe('Lighthouse Performance Audits', () => {
     });
 
     test('should meet category thresholds', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/?view=graph`);
+      const result = await runLighthouseAudit(`${baseUrl}/?view=graph`);
       const { categories } = result.lhr;
 
-      expect(categories.performance.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.performance - 0.1);
-      expect(categories.accessibility.score).toBeGreaterThanOrEqual(CATEGORY_THRESHOLDS.accessibility);
+      expect(categories.performance.score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.performance - 0.1
+      );
+      expect(categories.accessibility.score).toBeGreaterThanOrEqual(
+        CATEGORY_THRESHOLDS.accessibility
+      );
     });
   });
 
   test.describe('Resource Budgets', () => {
     test('JavaScript bundle should be under budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/`);
-      const jsSize = result.lhr.audits['resource-summary']?.details?.items?.find(
-        (item: { resourceType: string }) => item.resourceType === 'script'
-      )?.transferSize ?? 0;
+      const result = await runLighthouseAudit(`${baseUrl}/`);
+      const jsSize =
+        result.lhr.audits['resource-summary']?.details?.items?.find(
+          (item: { resourceType: string }) => item.resourceType === 'script'
+        )?.transferSize ?? 0;
 
       // Budget: 300KB gzipped
       expect(jsSize).toBeLessThan(300 * 1024);
     });
 
     test('CSS bundle should be under budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/`);
-      const cssSize = result.lhr.audits['resource-summary']?.details?.items?.find(
-        (item: { resourceType: string }) => item.resourceType === 'stylesheet'
-      )?.transferSize ?? 0;
+      const result = await runLighthouseAudit(`${baseUrl}/`);
+      const cssSize =
+        result.lhr.audits['resource-summary']?.details?.items?.find(
+          (item: { resourceType: string }) => item.resourceType === 'stylesheet'
+        )?.transferSize ?? 0;
 
       // Budget: 50KB gzipped
       expect(cssSize).toBeLessThan(50 * 1024);
     });
 
     test('Total page weight should be under budget', async () => {
-      const result = await runLighthouseAudit(`${baseUrl  }/`);
-      const totalSize = result.lhr.audits['resource-summary']?.details?.items?.reduce(
-        (sum: number, item: { transferSize: number }) => sum + (item.transferSize || 0), 0
-      ) ?? 0;
+      const result = await runLighthouseAudit(`${baseUrl}/`);
+      const totalSize =
+        result.lhr.audits['resource-summary']?.details?.items?.reduce(
+          (sum: number, item: { transferSize: number }) => sum + (item.transferSize || 0),
+          0
+        ) ?? 0;
 
       // Budget: 500KB total
       expect(totalSize).toBeLessThan(500 * 1024);

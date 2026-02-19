@@ -6,82 +6,89 @@
  * Fonctions: Continuer, Améliorer, Changer ton, Traduire
  */
 
-import { X, Sparkles, ArrowRight, Wand2, Languages } from 'lucide-react'
-import React, { useState, useEffect } from 'react'
+import { X, Sparkles, ArrowRight, Wand2, Languages } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-import { aiService } from '@/services/ai/mistralService'
+import { aiService } from '@/services/ai/mistralService';
 
 interface AIContextMenuProps {
-  readonly position: { readonly x: number; readonly y: number }
-  readonly selectedText: string
-  readonly onClose: () => void
-  readonly onInsert: (text: string) => void
+  readonly position: { readonly x: number; readonly y: number };
+  readonly selectedText: string;
+  readonly onClose: () => void;
+  readonly onInsert: (text: string) => void;
 }
 
-export default function AIContextMenu({ position, selectedText, onClose, onInsert }: AIContextMenuProps) {
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [showToneMenu, setShowToneMenu] = useState(false)
-  const [showTranslateMenu, setShowTranslateMenu] = useState(false)
+export default function AIContextMenu({
+  position,
+  selectedText,
+  onClose,
+  onInsert,
+}: AIContextMenuProps) {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showToneMenu, setShowToneMenu] = useState(false);
+  const [showTranslateMenu, setShowTranslateMenu] = useState(false);
 
   // Réinitialiser l'état quand le texte sélectionné change
   // Cela évite d'afficher l'ancien résultat quand l'utilisateur sélectionne un nouveau texte
   useEffect(() => {
-    setResult(null)
-    setError(null)
-    setShowToneMenu(false)
-    setShowTranslateMenu(false)
-    setLoading(false)
-  }, [selectedText])
+    setResult(null);
+    setError(null);
+    setShowToneMenu(false);
+    setShowTranslateMenu(false);
+    setLoading(false);
+  }, [selectedText]);
 
   const handleAction = async (action: string, param?: string) => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      let response: string
+      let response: string;
 
       switch (action) {
         case 'continue':
-          response = await aiService.continueText(selectedText)
-          break
+          response = await aiService.continueText(selectedText);
+          break;
         case 'improve':
-          response = await aiService.improveText(selectedText)
-          break
+          response = await aiService.improveText(selectedText);
+          break;
         case 'tone':
-          response = await aiService.changeTone(selectedText, param as any)
-          break
+          response = await aiService.changeTone(selectedText, param as any);
+          break;
         case 'translate':
-          response = await aiService.translate(selectedText, param || 'anglais')
-          break
+          response = await aiService.translate(selectedText, param || 'anglais');
+          break;
         default:
-          throw new Error('Action non reconnue')
+          throw new Error('Action non reconnue');
       }
 
-      setResult(response)
+      setResult(response);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du traitement IA')
+      setError(err instanceof Error ? err.message : 'Erreur lors du traitement IA');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleInsertAction = () => {
     if (result) {
       // La logique de remplacement sera gérée par le parent
-      onInsert(result)
-      onClose()
+      onInsert(result);
+      onClose();
     }
-  }
+  };
 
   const getSecondaryMenu = () => {
     if (showToneMenu) {
       return (
         <>
           <button
-            onClick={() => { setShowToneMenu(false); }}
+            onClick={() => {
+              setShowToneMenu(false);
+            }}
             className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           >
             ← Retour
@@ -115,12 +122,14 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
             Persuasif
           </button>
         </>
-      )
+      );
     }
     return (
       <>
         <button
-          onClick={() => { setShowTranslateMenu(false); }}
+          onClick={() => {
+            setShowTranslateMenu(false);
+          }}
           className="w-full text-left px-3 py-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
         >
           ← Retour
@@ -154,8 +163,8 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
           Italien
         </button>
       </>
-    )
-  }
+    );
+  };
 
   return (
     <div
@@ -200,7 +209,9 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
               </button>
 
               <button
-                onClick={() => { setShowToneMenu(true); }}
+                onClick={() => {
+                  setShowToneMenu(true);
+                }}
                 disabled={loading}
                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-left rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
               >
@@ -209,7 +220,9 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
               </button>
 
               <button
-                onClick={() => { setShowTranslateMenu(true); }}
+                onClick={() => {
+                  setShowTranslateMenu(true);
+                }}
                 disabled={loading}
                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-left rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
               >
@@ -217,7 +230,9 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
                 <span>Traduire</span>
               </button>
             </>
-          ) : getSecondaryMenu()}
+          ) : (
+            getSecondaryMenu()
+          )}
 
           {loading && (
             <div className="px-3 py-2 text-sm text-gray-500 flex items-center gap-2">
@@ -226,11 +241,7 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
             </div>
           )}
 
-          {error && (
-            <div className="px-3 py-2 text-sm text-red-600 dark:text-red-400">
-              {error}
-            </div>
-          )}
+          {error && <div className="px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</div>}
         </div>
       ) : (
         <div className="p-3">
@@ -257,5 +268,5 @@ export default function AIContextMenu({ position, selectedText, onClose, onInser
         </div>
       )}
     </div>
-  )
+  );
 }

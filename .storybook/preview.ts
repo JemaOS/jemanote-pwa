@@ -1,8 +1,8 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Preview } from '@storybook/react'
-import '../src/index.css'
+import type { Preview } from '@storybook/react';
+import '../src/index.css';
 
 const preview: Preview = {
   parameters: {
@@ -78,7 +78,7 @@ const preview: Preview = {
   },
   decorators: [
     // Ajouter un décorateur pour simuler le contexte si nécessaire
-    (Story) => {
+    Story => {
       // Simuler localStorage pour les stories
       if (typeof window !== 'undefined') {
         Object.defineProperty(window, 'localStorage', {
@@ -88,11 +88,11 @@ const preview: Preview = {
             removeItem: () => {},
           },
           writable: true,
-        })
+        });
       }
-      return Story()
+      return Story();
     },
   ],
-}
+};
 
-export default preview
+export default preview;

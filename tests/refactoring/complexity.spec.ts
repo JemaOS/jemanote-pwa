@@ -18,7 +18,7 @@ const CONFIG = {
     cognitive: 15,
     linesPerFunction: 50,
     paramsPerFunction: 4,
-    nestedDepth: 3
+    nestedDepth: 3,
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -28,8 +28,8 @@ const CONFIG = {
     '**/__mocks__/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // Store analysis results
@@ -60,16 +60,16 @@ describe('Code Complexity Analysis', () => {
       for (const result of analysisResults) {
         for (const method of result.methods) {
           if (method.cyclomatic > CONFIG.thresholds.cyclomatic) {
-            violations.push(
-              `${result.file}:${method.name} - cyclomatic: ${method.cyclomatic}`
-            );
+            violations.push(`${result.file}:${method.name} - cyclomatic: ${method.cyclomatic}`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Cyclomatic complexity violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -99,16 +99,16 @@ describe('Code Complexity Analysis', () => {
         for (const method of result.methods) {
           const cognitive = calculateCognitiveComplexity(method);
           if (cognitive > CONFIG.thresholds.cognitive) {
-            violations.push(
-              `${result.file}:${method.name} - cognitive: ${cognitive}`
-            );
+            violations.push(`${result.file}:${method.name} - cognitive: ${cognitive}`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Cognitive complexity violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -122,16 +122,16 @@ describe('Code Complexity Analysis', () => {
       for (const result of analysisResults) {
         for (const method of result.methods) {
           if (method.sloc.logical > CONFIG.thresholds.linesPerFunction) {
-            violations.push(
-              `${result.file}:${method.name} - lines: ${method.sloc.logical}`
-            );
+            violations.push(`${result.file}:${method.name} - lines: ${method.sloc.logical}`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Function size violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -145,16 +145,16 @@ describe('Code Complexity Analysis', () => {
       for (const result of analysisResults) {
         for (const method of result.methods) {
           if (method.paramCount > CONFIG.thresholds.paramsPerFunction) {
-            violations.push(
-              `${result.file}:${method.name} - params: ${method.paramCount}`
-            );
+            violations.push(`${result.file}:${method.name} - params: ${method.paramCount}`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Parameter count violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -169,16 +169,16 @@ describe('Code Complexity Analysis', () => {
         for (const method of result.methods) {
           const depth = method.maxNestedMethodDepth || 0;
           if (depth > CONFIG.thresholds.nestedDepth) {
-            violations.push(
-              `${result.file}:${method.name} - nesting: ${depth}`
-            );
+            violations.push(`${result.file}:${method.name} - nesting: ${depth}`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Nesting depth violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -199,7 +199,9 @@ describe('Code Complexity Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Maintainability violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -212,9 +214,8 @@ describe('Code Complexity Analysis', () => {
         totalMaintainability += result.maintainability;
       }
 
-      const averageMaintainability = analysisResults.length > 0
-        ? totalMaintainability / analysisResults.length
-        : 0;
+      const averageMaintainability =
+        analysisResults.length > 0 ? totalMaintainability / analysisResults.length : 0;
 
       expect(averageMaintainability).toBeGreaterThan(85);
     });
@@ -229,7 +230,7 @@ function getSourceFiles(): string[] {
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
@@ -258,13 +259,13 @@ function analyzeFile(filePath: string): {
       logicalor: true,
       switchcase: true,
       trycatch: true,
-      newmi: true
+      newmi: true,
     });
 
     return {
       file: relativePath,
       methods: result.methods || [],
-      maintainability: result.maintainability || 100
+      maintainability: result.maintainability || 100,
     };
   } catch (error) {
     console.warn(`Could not analyze ${filePath}:`, error);

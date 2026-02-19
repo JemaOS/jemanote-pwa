@@ -1,15 +1,15 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import importPlugin from 'eslint-plugin-import'
-import jsxA11y from 'eslint-plugin-jsx-a11y'
-import tseslint from 'typescript-eslint'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import importPlugin from 'eslint-plugin-import';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import tseslint from 'typescript-eslint';
 
-const isProduction = process.env.NODE_ENV === 'production'
+const isProduction = process.env.NODE_ENV === 'production';
 
 export default tseslint.config(
   { ignores: ['dist', 'node_modules', 'coverage', 'playwright-report', 'test-results'] },
@@ -32,28 +32,25 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'import': importPlugin,
+      import: importPlugin,
       'jsx-a11y': jsxA11y,
     },
     rules: {
       // React Hooks rules
       ...reactHooks.configs.recommended.rules,
       'react-hooks/exhaustive-deps': 'error',
-      
+
       // React Refresh rules
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-      
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { 
+        {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
-        }
+        },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
@@ -66,7 +63,7 @@ export default tseslint.config(
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      
+
       // Import rules
       'import/no-unresolved': 'off', // TypeScript handles this
       'import/no-cycle': 'error',
@@ -75,28 +72,21 @@ export default tseslint.config(
       'import/order': [
         'error',
         {
-          'groups': [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-          ],
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           'newlines-between': 'always',
-          'alphabetize': {
-            'order': 'asc',
-            'caseInsensitive': true,
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
           },
         },
       ],
-      
+
       // Accessibility rules
       ...jsxA11y.configs.recommended.rules,
       'jsx-a11y/anchor-is-valid': 'error',
       'jsx-a11y/click-events-have-key-events': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn',
-      
+
       // Performance rules
       'no-console': isProduction ? 'error' : 'warn',
       'no-debugger': isProduction ? 'error' : 'warn',
@@ -104,10 +94,10 @@ export default tseslint.config(
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
-      
+
       // Best practices
-      'eqeqeq': ['error', 'always', { 'null': 'ignore' }],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      curly: ['error', 'all'],
       'no-throw-literal': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
@@ -140,5 +130,5 @@ export default tseslint.config(
       '@typescript-eslint/unbound-method': 'off',
       'no-console': 'off',
     },
-  },
-)
+  }
+);

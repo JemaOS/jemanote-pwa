@@ -6,12 +6,12 @@ Ce fichier sert de point d'entrée centralisé pour toute la documentation des t
 
 ## 📚 Documentation principale
 
-| Document | Description | Public cible |
-|----------|-------------|--------------|
-| **[README.md](README.md)** | Vue d'ensemble complète de l'infrastructure de tests | Tous les développeurs |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guide pour écrire des tests (conventions, exemples) | Contributeurs |
-| **[DEBUGGING.md](DEBUGGING.md)** | Guide de débogage des tests | Développeurs en difficulté |
-| **[CI_CD.md](CI_CD.md)** | Documentation CI/CD et workflows | DevOps, Lead Dev |
+| Document                               | Description                                          | Public cible               |
+| -------------------------------------- | ---------------------------------------------------- | -------------------------- |
+| **[README.md](README.md)**             | Vue d'ensemble complète de l'infrastructure de tests | Tous les développeurs      |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Guide pour écrire des tests (conventions, exemples)  | Contributeurs              |
+| **[DEBUGGING.md](DEBUGGING.md)**       | Guide de débogage des tests                          | Développeurs en difficulté |
+| **[CI_CD.md](CI_CD.md)**               | Documentation CI/CD et workflows                     | DevOps, Lead Dev           |
 
 ---
 
@@ -134,25 +134,25 @@ tests/
 
 ## 📊 Statistiques
 
-| Métrique | Valeur |
-|----------|--------|
-| **Tests unitaires** | 50+ |
-| **Tests d'intégration** | 30+ |
-| **Tests de composants** | 25+ |
-| **Tests E2E** | 40+ |
-| **Tests de sécurité** | 100+ |
-| **Tests de performance** | 20+ |
-| **Tests de refactoring** | 15+ |
-| **Total** | **280+ tests** |
+| Métrique                 | Valeur         |
+| ------------------------ | -------------- |
+| **Tests unitaires**      | 50+            |
+| **Tests d'intégration**  | 30+            |
+| **Tests de composants**  | 25+            |
+| **Tests E2E**            | 40+            |
+| **Tests de sécurité**    | 100+           |
+| **Tests de performance** | 20+            |
+| **Tests de refactoring** | 15+            |
+| **Total**                | **280+ tests** |
 
 ### Couverture de code
 
-| Type | Seuil | Statut |
-|------|-------|--------|
-| Statements | 70% | 🟢 |
-| Branches | 60% | 🟢 |
-| Functions | 70% | 🟢 |
-| Lines | 70% | 🟢 |
+| Type       | Seuil | Statut |
+| ---------- | ----- | ------ |
+| Statements | 70%   | 🟢     |
+| Branches   | 60%   | 🟢     |
+| Functions  | 70%   | 🟢     |
+| Lines      | 70%   | 🟢     |
 
 ---
 
@@ -160,21 +160,21 @@ tests/
 
 ### Fichiers de configuration
 
-| Fichier | Description |
-|---------|-------------|
-| [`vitest.config.ts`](../vitest.config.ts) | Configuration Vitest |
-| [`playwright.config.ts`](../playwright.config.ts) | Configuration Playwright |
-| [`tests/config.ts`](config.ts) | Configuration globale des tests |
-| [`tests/setup.ts`](setup.ts) | Setup global Vitest |
+| Fichier                                           | Description                     |
+| ------------------------------------------------- | ------------------------------- |
+| [`vitest.config.ts`](../vitest.config.ts)         | Configuration Vitest            |
+| [`playwright.config.ts`](../playwright.config.ts) | Configuration Playwright        |
+| [`tests/config.ts`](config.ts)                    | Configuration globale des tests |
+| [`tests/setup.ts`](setup.ts)                      | Setup global Vitest             |
 
 ### Variables d'environnement
 
-| Variable | Description | Défaut |
-|----------|-------------|--------|
-| `CI` | Mode CI (timeouts plus longs) | `false` |
-| `DEBUG` | Mode debug | `false` |
-| `VERBOSE` | Mode verbose | `false` |
-| `PLAYWRIGHT_BASE_URL` | URL de base pour E2E | `http://localhost:5173` |
+| Variable              | Description                   | Défaut                  |
+| --------------------- | ----------------------------- | ----------------------- |
+| `CI`                  | Mode CI (timeouts plus longs) | `false`                 |
+| `DEBUG`               | Mode debug                    | `false`                 |
+| `VERBOSE`             | Mode verbose                  | `false`                 |
+| `PLAYWRIGHT_BASE_URL` | URL de base pour E2E          | `http://localhost:5173` |
 
 ---
 

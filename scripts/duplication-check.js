@@ -41,8 +41,8 @@ const CONFIG = {
     '**/scripts/**',
     '**/public/**',
     '**/types/**',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 /**
@@ -61,7 +61,7 @@ const colors = {
   yellow: '\x1b[33m',
   green: '\x1b[32m',
   blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 /**
@@ -81,29 +81,33 @@ function checkJscpd() {
  */
 function runJscpd() {
   console.log(`${colors.blue}🔍 Running jscpd analysis...${colors.reset}\n`);
-  
+
   // Build command arguments array to avoid shell injection
   // All values are from trusted CONFIG object, not user input
   const args = [
     'jscpd',
     path.join(ROOT_DIR, 'src'),
-    '--min-lines', String(CONFIG.minLines),
-    '--min-tokens', String(CONFIG.minTokens),
-    '--threshold', String(CONFIG.threshold),
-    '--output', CONFIG.outputDir,
+    '--min-lines',
+    String(CONFIG.minLines),
+    '--min-tokens',
+    String(CONFIG.minTokens),
+    '--threshold',
+    String(CONFIG.threshold),
+    '--output',
+    CONFIG.outputDir,
     ...CONFIG.reporters.flatMap(r => ['--reporters', r]),
     ...CONFIG.formats.flatMap(f => ['--format', f]),
     ...CONFIG.ignore.flatMap(i => ['--ignore', i]),
     '--gitignore',
-    '--blame'
+    '--blame',
   ];
-  
+
   try {
     // Use execFileSync instead of execSync to avoid shell injection vulnerabilities
     // execFileSync does not use shell, so no shell injection is possible
-    const output = execFileSync('npx', args, { 
+    const output = execFileSync('npx', args, {
       encoding: 'utf-8',
-      cwd: ROOT_DIR
+      cwd: ROOT_DIR,
     });
     return { success: true, output };
   } catch (error) {
@@ -120,16 +124,18 @@ function runJscpd() {
  */
 function parseReport() {
   const reportPath = path.join(CONFIG.outputDir, 'jscpd-report.json');
-  
+
   if (!fs.existsSync(reportPath)) {
     return null;
   }
-  
+
   try {
     const content = fs.readFileSync(reportPath, 'utf-8');
     return JSON.parse(content);
   } catch (error) {
-    console.warn(`${colors.yellow}Warning: Could not parse jscpd report: ${error.message}${colors.reset}`);
+    console.warn(
+      `${colors.yellow}Warning: Could not parse jscpd report: ${error.message}${colors.reset}`
+    );
     return null;
   }
 }
@@ -146,15 +152,15 @@ function generateSummary(report) {
       duplicatedTokens: 0,
       duplicationPercentage: 0,
       clones: [],
-      formats: {}
+      formats: {},
     };
   }
-  
+
   const stats = report.statistics;
   const totalLines = stats.total?.lines || 0;
   const duplicatedLines = stats.total?.duplicatedLines || 0;
   const duplicationPercentage = totalLines > 0 ? (duplicatedLines / totalLines) * 100 : 0;
-  
+
   return {
     totalFiles: stats.total?.sources || 0,
     totalLines,
@@ -162,7 +168,7 @@ function generateSummary(report) {
     duplicatedTokens: stats.total?.duplicatedTokens || 0,
     duplicationPercentage: Math.round(duplicationPercentage * 100) / 100,
     clones: report.duplicates || [],
-    formats: stats.formats || {}
+    formats: stats.formats || {},
   };
 }
 
@@ -171,7 +177,7 @@ function generateSummary(report) {
  */
 function generateHTMLReport(summary, report) {
   const clones = summary.clones || [];
-  
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -347,10 +353,14 @@ function generateHTMLReport(summary, report) {
         </tr>
       </thead>
       <tbody>
-        ${Object.entries(summary.formats).map(([format, stats]) => {
-          const pct = stats.total?.lines ? ((stats.total?.duplicatedLines || 0) / stats.total.lines * 100).toFixed(2) : 0;
-          const cellClass = getDuplicationClass(Number.parseFloat(pct), CONFIG.threshold);
-          return `
+        ${
+          Object.entries(summary.formats)
+            .map(([format, stats]) => {
+              const pct = stats.total?.lines
+                ? (((stats.total?.duplicatedLines || 0) / stats.total.lines) * 100).toFixed(2)
+                : 0;
+              const cellClass = getDuplicationClass(Number.parseFloat(pct), CONFIG.threshold);
+              return `
             <tr>
               <td>${format}</td>
               <td>${stats.total?.sources || 0}</td>
@@ -359,38 +369,65 @@ function generateHTMLReport(summary, report) {
               <td class="${cellClass}">${pct}%</td>
             </tr>
           `;
-        }).join('') || '<tr><td colspan="5" style="text-align: center;">No data available</td></tr>'}
+            })
+            .join('') ||
+          '<tr><td colspan="5" style="text-align: center;">No data available</td></tr>'
+        }
       </tbody>
     </table>
 
     <h2>🔍 Clone Details (${clones.length} found)</h2>
-    ${clones.length > 0 ? clones.map((clone, index) => `
+    ${
+      clones.length > 0
+        ? clones
+            .map(
+              (clone, index) => `
       <div class="clone-block">
         <div class="clone-header">
           <span class="clone-title">Clone #${index + 1}</span>
           <span class="clone-lines">${clone.duplicatedLines} lines</span>
         </div>
         <div class="clone-files">
-          ${clone.fragment ? `
+          ${
+            clone.fragment
+              ? `
             <div class="clone-file">
               <path>${clone.fragment.sourceId}</path> 
               <lines>(lines ${clone.fragment.startLine}-${clone.fragment.endLine})</lines>
             </div>
-          ` : ''}
-          ${clone.duplicates ? clone.duplicates.map(dup => `
+          `
+              : ''
+          }
+          ${
+            clone.duplicates
+              ? clone.duplicates
+                  .map(
+                    dup => `
             <div class="clone-file">
               <path>${dup.sourceId}</path> 
               <lines>(lines ${dup.startLine}-${dup.endLine})</lines>
             </div>
-          `).join('') : ''}
+          `
+                  )
+                  .join('')
+              : ''
+          }
         </div>
-        ${clone.fragment?.fragment ? `
+        ${
+          clone.fragment?.fragment
+            ? `
           <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-x: auto;">
             <pre>${clone.fragment.fragment}</pre>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-    `).join('') : '<div class="card"><p style="text-align: center; color: #27ae60; font-weight: 600;">🎉 No clones detected!</p></div>'}
+    `
+            )
+            .join('')
+        : '<div class="card"><p style="text-align: center; color: #27ae60; font-weight: 600;">🎉 No clones detected!</p></div>'
+    }
   </div>
 </body>
 </html>`;
@@ -403,34 +440,33 @@ function generateHTMLReport(summary, report) {
  */
 async function main() {
   console.log(`${colors.cyan}📋 Starting duplication check...${colors.reset}\n`);
-  
+
   // Check jscpd
   if (!checkJscpd()) {
-    console.error(`${colors.red}Error: jscpd is not installed. Run: npm install -g jscpd${colors.reset}`);
+    console.error(
+      `${colors.red}Error: jscpd is not installed. Run: npm install -g jscpd${colors.reset}`
+    );
     process.exit(1);
   }
-  
+
   // Ensure output directory exists
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
+
   // Run jscpd
   runJscpd();
-  
+
   // Parse report
   const report = parseReport();
   const summary = generateSummary(report);
-  
+
   // Generate custom HTML report
   if (report) {
     const htmlReport = generateHTMLReport(summary, report);
-    fs.writeFileSync(
-      path.join(CONFIG.outputDir, 'duplication-report.html'),
-      htmlReport
-    );
+    fs.writeFileSync(path.join(CONFIG.outputDir, 'duplication-report.html'), htmlReport);
   }
-  
+
   // Print summary
   console.log(`\n${colors.cyan}📊 Duplication Summary:${colors.reset}`);
   console.log(`  Total Files: ${summary.totalFiles}`);
@@ -438,22 +474,26 @@ async function main() {
   console.log(`  Duplicated Lines: ${summary.duplicatedLines.toLocaleString()}`);
   console.log(`  Duplication Percentage: ${summary.duplicationPercentage}%`);
   console.log(`  Clone Pairs: ${summary.clones.length}`);
-  
+
   console.log(`\n${colors.cyan}📁 Reports generated:${colors.reset}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'jscpd-report.json')}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'jscpd-report.html')}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'duplication-report.html')}`);
-  
+
   // Check threshold
   if (summary.duplicationPercentage > CONFIG.threshold) {
-    console.log(`\n${colors.red}❌ Duplication threshold exceeded! (${summary.duplicationPercentage}% > ${CONFIG.threshold}%)${colors.reset}`);
+    console.log(
+      `\n${colors.red}❌ Duplication threshold exceeded! (${summary.duplicationPercentage}% > ${CONFIG.threshold}%)${colors.reset}`
+    );
     process.exit(1);
   } else if (summary.duplicationPercentage > 0) {
-    console.log(`\n${colors.yellow}⚠️ Found ${summary.duplicationPercentage}% duplication (within threshold)${colors.reset}`);
+    console.log(
+      `\n${colors.yellow}⚠️ Found ${summary.duplicationPercentage}% duplication (within threshold)${colors.reset}`
+    );
   } else {
     console.log(`\n${colors.green}✅ No duplication detected!${colors.reset}`);
   }
-  
+
   process.exit(0);
 }
 

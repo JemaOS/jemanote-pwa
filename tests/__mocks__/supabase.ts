@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi } from 'vitest';
 
 /**
  * Mock for Supabase client
@@ -71,7 +71,7 @@ export const mockSupabaseClient = {
     }),
   },
   rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
-}
+};
 
 /**
  * Helper to create mock notes data
@@ -87,7 +87,7 @@ export function createMockNotes(count: number = 3) {
     is_archived: false,
     is_pinned: i === 0,
     tags: i % 2 === 0 ? ['test', 'mock'] : [],
-  }))
+  }));
 }
 
 /**
@@ -105,7 +105,7 @@ export function createMockUser(overrides = {}) {
     aud: 'authenticated',
     created_at: new Date().toISOString(),
     ...overrides,
-  }
+  };
 }
 
 /**
@@ -120,5 +120,5 @@ export function createMockSession(overrides = {}) {
     token_type: 'bearer',
     user: createMockUser(),
     ...overrides,
-  }
+  };
 }

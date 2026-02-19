@@ -1,6 +1,6 @@
 /**
  * Performance Monitoring Utilities
- * 
+ *
  * Utilitaires pour le Real User Monitoring (RUM) et le suivi des Web Vitals.
  * Collecte les métriques de performance et les envoie à un endpoint si configuré.
  */
@@ -10,16 +10,16 @@ import { useEffect, useRef } from 'react';
 // Types pour les métriques Web Vitals
 export interface WebVitalsMetrics {
   // Core Web Vitals
-  LCP?: number;  // Largest Contentful Paint (ms)
-  FID?: number;  // First Input Delay (ms)
-  CLS?: number;  // Cumulative Layout Shift
-  INP?: number;  // Interaction to Next Paint (ms)
-  
+  LCP?: number; // Largest Contentful Paint (ms)
+  FID?: number; // First Input Delay (ms)
+  CLS?: number; // Cumulative Layout Shift
+  INP?: number; // Interaction to Next Paint (ms)
+
   // Autres métriques importantes
-  FCP?: number;  // First Contentful Paint (ms)
+  FCP?: number; // First Contentful Paint (ms)
   TTFB?: number; // Time to First Byte (ms)
-  TTI?: number;  // Time to Interactive (ms)
-  
+  TTI?: number; // Time to Interactive (ms)
+
   // Métriques personnalisées
   appLoadTime?: number;
   routeChangeTime?: number;
@@ -67,22 +67,23 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
     debugLog('Metrics not sent (disabled or no endpoint):', metrics);
     return;
   }
-  
+
   // Échantillonnage
   // SECURITY NOTE: Math.random() is acceptable here for sampling purposes
   // This is not used for cryptographic operations, just for statistical sampling
   if (Math.random() > (config.sampleRate || 1)) {
     return;
   }
-  
+
   const payload = {
     metrics,
     timestamp: Date.now(),
     url: globalThis.location.href,
     userAgent: navigator.userAgent,
-    connection: (navigator as unknown as { connection?: { effectiveType: string } }).connection?.effectiveType,
+    connection: (navigator as unknown as { connection?: { effectiveType: string } }).connection
+      ?.effectiveType,
   };
-  
+
   try {
     // Utiliser sendBeacon si disponible, sinon fetch
     if (navigator.sendBeacon) {
@@ -99,7 +100,7 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
         keepalive: true,
       });
     }
-    
+
     debugLog('Metrics sent:', metrics);
   } catch (error) {
     console.error('Failed to send performance metrics:', error);
@@ -110,21 +111,23 @@ async function sendMetrics(metrics: Partial<WebVitalsMetrics>): Promise<void> {
  * Mesure le Largest Contentful Paint (LCP)
  */
 function measureLCP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
-  const observer = new PerformanceObserver((list) => {
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
+  const observer = new PerformanceObserver(list => {
     const entries = list.getEntries();
     const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
-    
+
     const lcp = lastEntry.startTime;
     metricsCollected.LCP = lcp;
-    
+
     debugLog('LCP:', lcp.toFixed(2), 'ms');
-    
+
     // Envoyer immédiatement car LCP peut évoluer
     sendMetrics({ LCP: lcp });
   });
-  
+
   observer.observe({ entryTypes: ['largest-contentful-paint'] as const });
 }
 
@@ -132,23 +135,25 @@ function measureLCP(): void {
  * Mesure le First Input Delay (FID)
  */
 function measureFID(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
-  const observer = new PerformanceObserver((list) => {
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
+  const observer = new PerformanceObserver(list => {
     const entries = list.getEntries() as (PerformanceEntry & {
       processingStart: number;
       startTime: number;
     })[];
-    
+
     for (const entry of entries) {
       const fid = entry.processingStart - entry.startTime;
       metricsCollected.FID = fid;
-      
+
       debugLog('FID:', fid.toFixed(2), 'ms');
       sendMetrics({ FID: fid });
     }
   });
-  
+
   observer.observe({ entryTypes: ['first-input'] as const });
 }
 
@@ -156,11 +161,13 @@ function measureFID(): void {
  * Mesure le Cumulative Layout Shift (CLS)
  */
 function measureCLS(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
   let clsValue = 0;
-  
-  const observer = new PerformanceObserver((list) => {
+
+  const observer = new PerformanceObserver(list => {
     for (const entry of list.getEntries()) {
       // Ignorer les shifts causés par une interaction utilisateur
       if (!(entry as unknown as { hadRecentInput: boolean }).hadRecentInput) {
@@ -168,12 +175,12 @@ function measureCLS(): void {
         metricsCollected.CLS = clsValue;
       }
     }
-    
+
     debugLog('CLS:', clsValue.toFixed(4));
   });
-  
+
   observer.observe({ entryTypes: ['layout-shift'] as const });
-  
+
   // Envoyer CLS à la fin de la session
   globalThis.addEventListener('beforeunload', () => {
     sendMetrics({ CLS: clsValue });
@@ -184,33 +191,35 @@ function measureCLS(): void {
  * Mesure l'Interaction to Next Paint (INP)
  */
 function measureINP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
   const interactions: number[] = [];
-  
-  const observer = new PerformanceObserver((list) => {
+
+  const observer = new PerformanceObserver(list => {
     const entries = list.getEntries() as (PerformanceEntry & {
       processingStart: number;
       startTime: number;
       duration: number;
     })[];
-    
+
     for (const entry of entries) {
       const duration = entry.duration;
       interactions.push(duration);
-      
+
       // Calculer l'INP (98e percentile)
       if (interactions.length >= 10) {
         const sorted = [...interactions].sort((a, b) => b - a);
         const inpIndex = Math.floor(sorted.length * 0.02);
         const inp = sorted[inpIndex] || sorted[0] || 0;
-        
+
         metricsCollected.INP = inp;
         debugLog('INP:', inp.toFixed(2), 'ms');
       }
     }
   });
-  
+
   // Observer les événements de performance
   try {
     observer.observe({ entryTypes: ['event'] as const, buffered: true });
@@ -224,19 +233,21 @@ function measureINP(): void {
  * Mesure le First Contentful Paint (FCP)
  */
 function measureFCP(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
-  const observer = new PerformanceObserver((list) => {
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
+  const observer = new PerformanceObserver(list => {
     const entries = list.getEntries() as PerformancePaintTiming[];
     const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
-    
+
     if (fcpEntry) {
       metricsCollected.FCP = fcpEntry.startTime;
       debugLog('FCP:', fcpEntry.startTime.toFixed(2), 'ms');
       sendMetrics({ FCP: fcpEntry.startTime });
     }
   });
-  
+
   observer.observe({ entryTypes: ['paint'] as const });
 }
 
@@ -245,7 +256,7 @@ function measureFCP(): void {
  */
 function measureTTFB(): void {
   const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-  
+
   if (navigation) {
     const ttfb = navigation.responseStart - navigation.startTime;
     metricsCollected.TTFB = ttfb;
@@ -259,12 +270,14 @@ function measureTTFB(): void {
  * Approximation basée sur le Long Tasks API
  */
 function measureTTI(): void {
-  if (!('PerformanceObserver' in globalThis)) {return;}
-  
+  if (!('PerformanceObserver' in globalThis)) {
+    return;
+  }
+
   let lastLongTaskEnd = 0;
   const startTime = performance.now();
-  
-  const observer = new PerformanceObserver((list) => {
+
+  const observer = new PerformanceObserver(list => {
     for (const entry of list.getEntries()) {
       const endTime = entry.startTime + (entry as unknown as { duration: number }).duration;
       if (endTime > lastLongTaskEnd) {
@@ -272,10 +285,10 @@ function measureTTI(): void {
       }
     }
   });
-  
+
   try {
     observer.observe({ entryTypes: ['longtask'] as const });
-    
+
     // Considérer TTI après 5 secondes sans long task
     setTimeout(() => {
       const tti = lastLongTaskEnd > 0 ? lastLongTaskEnd : performance.now() - startTime;
@@ -294,11 +307,12 @@ function measureTTI(): void {
  */
 export function useRenderTime(componentName: string): void {
   const startTime = useRef(performance.now());
-  
+
   useEffect(() => {
     const renderTime = performance.now() - startTime.current;
-    
-    if (renderTime > 16.67) { // Plus d'un frame (60fps)
+
+    if (renderTime > 16.67) {
+      // Plus d'un frame (60fps)
       debugLog(`Slow render detected: ${componentName} took ${renderTime.toFixed(2)}ms`);
     }
   });
@@ -309,7 +323,7 @@ export function useRenderTime(componentName: string): void {
  */
 export function useRouteTiming(): void {
   const startTime = useRef(performance.now());
-  
+
   useEffect(() => {
     const handleRouteChange = () => {
       const routeTime = performance.now() - startTime.current;
@@ -317,11 +331,13 @@ export function useRouteTiming(): void {
       debugLog('Route change time:', routeTime.toFixed(2), 'ms');
       sendMetrics({ routeChangeTime: routeTime });
     };
-    
+
     // Attendre que la route soit stable
     const timeout = setTimeout(handleRouteChange, 100);
-    
-    return () => { clearTimeout(timeout); };
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, []);
 }
 
@@ -332,7 +348,7 @@ export function markAppLoad(stage: string): void {
   const markName = `app-${stage}`;
   performance.mark(markName);
   debugLog(`App load stage: ${stage}`);
-  
+
   if (stage === 'complete') {
     // Mesurer le temps total de chargement
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
@@ -347,14 +363,11 @@ export function markAppLoad(stage: string): void {
 /**
  * Mesure le temps d'exécution d'une fonction
  */
-export function measureFunction<T extends (...args: unknown[]) => unknown>(
-  name: string,
-  fn: T
-): T {
+export function measureFunction<T extends (...args: unknown[]) => unknown>(name: string, fn: T): T {
   return ((...args: Parameters<T>): ReturnType<T> => {
     const start = performance.now();
     const result = fn(...args) as ReturnType<T>;
-    
+
     // Gérer les promesses
     if (result instanceof Promise) {
       return result.finally(() => {
@@ -362,10 +375,10 @@ export function measureFunction<T extends (...args: unknown[]) => unknown>(
         debugLog(`Function ${name} took ${duration.toFixed(2)}ms`);
       }) as ReturnType<T>;
     }
-    
+
     const duration = performance.now() - start;
     debugLog(`Function ${name} took ${duration.toFixed(2)}ms`);
-    
+
     return result;
   }) as T;
 }
@@ -377,14 +390,14 @@ export function startWebVitalsTracking(userConfig?: PerformanceConfig): void {
   if (userConfig) {
     configurePerformance(userConfig);
   }
-  
+
   if (!config.enabled) {
     debugLog('Performance tracking disabled');
     return;
   }
-  
+
   debugLog('Starting Web Vitals tracking...');
-  
+
   // Attendre que la page soit chargée
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeTracking);
@@ -401,12 +414,12 @@ function initializeTracking(): void {
   measureCLS();
   measureINP();
   measureTTI();
-  
+
   // Envoyer toutes les métriques au unload
   globalThis.addEventListener('beforeunload', () => {
     sendMetrics(metricsCollected);
   });
-  
+
   // Envoyer après 10 secondes (backup)
   setTimeout(() => {
     sendMetrics(metricsCollected);

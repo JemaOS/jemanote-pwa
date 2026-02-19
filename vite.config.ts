@@ -1,18 +1,18 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import path from "node:path"
+import path from 'node:path';
 
-import react from "@vitejs/plugin-react"
-import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig } from "vite"
-import { VitePWA } from 'vite-plugin-pwa'
-import sourceIdentifierPlugin from 'vite-plugin-source-identifier'
+import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
+import sourceIdentifierPlugin from 'vite-plugin-source-identifier';
 
-const isProd = process.env.BUILD_MODE === 'prod'
+const isProd = process.env.BUILD_MODE === 'prod';
 export default defineConfig({
   plugins: [
-    react(), 
+    react(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: false, // Don't auto-inject SW registration script - we register manually after page load
@@ -23,7 +23,8 @@ export default defineConfig({
       manifest: {
         name: 'Jemanote - Prise de Notes Intelligente',
         short_name: 'Jemanote',
-        description: 'Application de prise de notes professionnelle avec graphe de connaissances et canvas, optimisée pour JemaOS',
+        description:
+          'Application de prise de notes professionnelle avec graphe de connaissances et canvas, optimisée pour JemaOS',
         theme_color: '#5a63e9',
         background_color: '#FAFAFA',
         display: 'standalone',
@@ -35,14 +36,14 @@ export default defineConfig({
             src: 'icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any maskable',
           },
           {
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
-          }
+            purpose: 'any maskable',
+          },
         ],
         categories: ['productivity', 'utilities'],
         shortcuts: [
@@ -55,20 +56,20 @@ export default defineConfig({
               {
                 src: 'icon-192.png',
                 sizes: '192x192',
-                type: 'image/png'
-              }
-            ]
-          }
+                type: 'image/png',
+              },
+            ],
+          },
         ],
         file_handlers: [
           {
             action: '/',
             accept: {
-              'text/markdown': ['.md', '.markdown']
-            }
-          }
-        ]
-      }
+              'text/markdown': ['.md', '.markdown'],
+            },
+          },
+        ],
+      },
     }),
     sourceIdentifierPlugin({
       enabled: !isProd,
@@ -81,7 +82,7 @@ export default defineConfig({
       filename: 'dist/stats.html',
       gzipSize: true,
       brotliSize: true,
-    })
+    }),
   ],
   build: {
     sourcemap: 'hidden',
@@ -104,7 +105,14 @@ export default defineConfig({
             '@codemirror/theme-one-dark',
           ],
           'vendor-ui': ['lucide-react', 'date-fns'],
-          'vendor-markdown': ['react-markdown', 'rehype-katex', 'rehype-raw', 'remark-gfm', 'remark-math', 'katex'],
+          'vendor-markdown': [
+            'react-markdown',
+            'rehype-katex',
+            'rehype-raw',
+            'remark-gfm',
+            'remark-math',
+            'katex',
+          ],
           'vendor-mermaid': ['mermaid'],
           'vendor-pixi': ['pixi.js'],
         },
@@ -113,8 +121,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
-})
-
+});

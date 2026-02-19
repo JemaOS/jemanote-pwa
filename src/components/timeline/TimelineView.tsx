@@ -1,60 +1,62 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { format, isSameDay, parseISO } from 'date-fns'
-import { fr } from 'date-fns/locale'
-import { File, Clock, Plus } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
+import { format, isSameDay, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { File, Clock, Plus } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
-import { Note } from '@/types'
+import { Note } from '@/types';
 
-import DateFilter from './DateFilter'
+import DateFilter from './DateFilter';
 
 interface TimelineViewProps {
-  readonly notes: readonly Note[]
-  readonly onOpenNote: (noteId: string) => void
+  readonly notes: readonly Note[];
+  readonly onOpenNote: (noteId: string) => void;
 }
 
 export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
-  const [sortBy, setSortBy] = useState<'updated' | 'created'>('updated')
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [sortBy, setSortBy] = useState<'updated' | 'created'>('updated');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   // Filter notes by date if selected, and exclude deleted notes
   const filteredNotes = useMemo(() => {
-    const activeNotes = notes.filter(n => !n.deleted_at)
-    if (!selectedDate) {return activeNotes}
-    
+    const activeNotes = notes.filter(n => !n.deleted_at);
+    if (!selectedDate) {
+      return activeNotes;
+    }
+
     return activeNotes.filter(note => {
-      const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at
-      return isSameDay(parseISO(dateStr), selectedDate)
-    })
-  }, [notes, selectedDate, sortBy])
+      const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at;
+      return isSameDay(parseISO(dateStr), selectedDate);
+    });
+  }, [notes, selectedDate, sortBy]);
 
   // Group notes by date
   const groupedNotes = useMemo(() => {
-    const groups: { date: Date; notes: Note[] }[] = []
-    
+    const groups: { date: Date; notes: Note[] }[] = [];
+
     // Sort notes by selected date field desc
     const sortedNotes = [...filteredNotes].sort((a, b) => {
-      const dateA = sortBy === 'updated' ? a.updated_at : a.created_at
-      const dateB = sortBy === 'updated' ? b.updated_at : b.created_at
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
+      const dateA = sortBy === 'updated' ? a.updated_at : a.created_at;
+      const dateB = sortBy === 'updated' ? b.updated_at : b.created_at;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
 
     sortedNotes.forEach(note => {
-      const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at
-      const noteDate = parseISO(dateStr)
-      const existingGroup = groups.find(g => isSameDay(g.date, noteDate))
-      
-      if (existingGroup) {
-        existingGroup.notes.push(note)
-      } else {
-        groups.push({ date: noteDate, notes: [note] })
-      }
-    })
+      const dateStr = sortBy === 'updated' ? note.updated_at : note.created_at;
+      const noteDate = parseISO(dateStr);
+      const existingGroup = groups.find(g => isSameDay(g.date, noteDate));
 
-    return groups
-  }, [filteredNotes, sortBy])
+      if (existingGroup) {
+        existingGroup.notes.push(note);
+      } else {
+        groups.push({ date: noteDate, notes: [note] });
+      }
+    });
+
+    return groups;
+  }, [filteredNotes, sortBy]);
 
   return (
     <div className="h-full w-full overflow-y-auto bg-neutral-50 dark:bg-neutral-900 p-4 sm:p-6 md:p-8">
@@ -62,12 +64,14 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-3">
             <DateFilter selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-            {!selectedDate && "Chronologie des notes"}
+            {!selectedDate && 'Chronologie des notes'}
           </h2>
 
           <div className="flex items-center bg-white dark:bg-neutral-800 rounded-lg p-1 border border-neutral-200 dark:border-neutral-700 shadow-sm">
             <button
-              onClick={() => { setSortBy('updated'); }}
+              onClick={() => {
+                setSortBy('updated');
+              }}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
                 sortBy === 'updated'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
@@ -78,7 +82,9 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
               Modifié
             </button>
             <button
-              onClick={() => { setSortBy('created'); }}
+              onClick={() => {
+                setSortBy('created');
+              }}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
                 sortBy === 'created'
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
@@ -96,7 +102,7 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
             <div key={group.date.toISOString()} className="relative pl-8">
               {/* Date marker */}
               <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-primary-500 border-4 border-white dark:border-neutral-900" />
-              
+
               <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4 capitalize">
                 {format(group.date, 'EEEE d MMMM yyyy', { locale: fr })}
               </h3>
@@ -105,11 +111,13 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
                 {group.notes.map(note => (
                   <button
                     key={note.id}
-                    onClick={() => { onOpenNote(note.id); }}
-                    onKeyDown={(e) => {
+                    onClick={() => {
+                      onOpenNote(note.id);
+                    }}
+                    onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        onOpenNote(note.id)
+                        e.preventDefault();
+                        onOpenNote(note.id);
                       }
                     }}
                     type="button"
@@ -146,14 +154,13 @@ export default function TimelineView({ notes, onOpenNote }: TimelineViewProps) {
 
           {filteredNotes.length === 0 && (
             <div className="pl-8 text-neutral-500 dark:text-neutral-400 italic">
-              {selectedDate 
-                ? "Aucune note trouvée pour cette date."
-                : "Aucune note dans l'historique."
-              }
+              {selectedDate
+                ? 'Aucune note trouvée pour cette date.'
+                : "Aucune note dans l'historique."}
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }

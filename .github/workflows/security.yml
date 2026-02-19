@@ -78,7 +78,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
+          category: '/language:${{matrix.language}}'
 
   # CSP and Headers Check
   csp-check:
@@ -295,7 +295,7 @@ jobs:
           echo "Secret Scan: ${{ needs.secret-scan.result }}"
           echo "Static Analysis: ${{ needs.sast.result }}"
           echo ""
-          
+
           # Check if any critical checks failed
           if [[ "${{ needs.dependency-audit.result }}" == "failure" ]] || \
              [[ "${{ needs.codeql.result }}" == "failure" ]] || \
@@ -303,5 +303,5 @@ jobs:
             echo "❌ Critical security checks failed"
             exit 1
           fi
-          
+
           echo "✅ Security checks completed"

@@ -1,145 +1,151 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Play, Pause } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { Play, Pause } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 interface WaveformPlayerProps {
-  readonly blob: Blob
-  readonly height?: number
-  readonly color?: string
-  readonly progressColor?: string
+  readonly blob: Blob;
+  readonly height?: number;
+  readonly color?: string;
+  readonly progressColor?: string;
 }
 
-export default function WaveformPlayer({ 
-  blob, 
+export default function WaveformPlayer({
+  blob,
   height = 48,
   color = 'rgb(212, 212, 212)',
-  progressColor = '#5a63e9'
+  progressColor = '#5a63e9',
 }: WaveformPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [waveformData, setWaveformData] = useState<number[]>([])
-  
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [waveformData, setWaveformData] = useState<number[]>([]);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!blob) {return}
+    if (!blob) {
+      return;
+    }
 
     // Générer waveform
     const generateWaveform = async () => {
       try {
-        const arrayBuffer = await blob.arrayBuffer()
-        const audioContext = new AudioContext()
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
-        
-        const rawData = audioBuffer.getChannelData(0)
-        const samples = 60 // Moins de barres pour un affichage compact
-        const blockSize = Math.floor(rawData.length / samples)
-        const waveform: number[] = []
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioContext = new AudioContext();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const rawData = audioBuffer.getChannelData(0);
+        const samples = 60; // Moins de barres pour un affichage compact
+        const blockSize = Math.floor(rawData.length / samples);
+        const waveform: number[] = [];
 
         for (let i = 0; i < samples; i++) {
-          const start = blockSize * i
-          let sum = 0
+          const start = blockSize * i;
+          let sum = 0;
           for (let j = 0; j < blockSize; j++) {
-            sum += Math.abs(rawData[start + j])
+            sum += Math.abs(rawData[start + j]);
           }
-          waveform.push(sum / blockSize)
+          waveform.push(sum / blockSize);
         }
 
         // Normaliser
-        const max = Math.max(...waveform)
-        const normalized = waveform.map(v => v / max)
-        setWaveformData(normalized)
-        setDuration(audioBuffer.duration)
-        
-        audioContext.close()
-      } catch (error) {
-        console.error('Erreur génération waveform:', error)
-      }
-    }
+        const max = Math.max(...waveform);
+        const normalized = waveform.map(v => v / max);
+        setWaveformData(normalized);
+        setDuration(audioBuffer.duration);
 
-    generateWaveform()
+        audioContext.close();
+      } catch (error) {
+        console.error('Erreur génération waveform:', error);
+      }
+    };
+
+    generateWaveform();
 
     // Setup audio element
-    const url = URL.createObjectURL(blob)
-    const audio = new Audio(url)
-    audioRef.current = audio
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audioRef.current = audio;
 
     // Utiliser requestAnimationFrame pour une mise à jour fluide
     const updateProgress = () => {
       if (audio.paused || audio.ended) {
-        animationRef.current = null
-        return
+        animationRef.current = null;
+        return;
       }
-      setCurrentTime(audio.currentTime)
-      animationRef.current = requestAnimationFrame(updateProgress)
-    }
+      setCurrentTime(audio.currentTime);
+      animationRef.current = requestAnimationFrame(updateProgress);
+    };
 
     audio.onloadedmetadata = () => {
       if (audio.duration && Number.isFinite(audio.duration)) {
-        setDuration(audio.duration)
+        setDuration(audio.duration);
       }
-    }
-    
+    };
+
     audio.onplay = () => {
-      setIsPlaying(true)
-      animationRef.current = requestAnimationFrame(updateProgress)
-    }
-    
+      setIsPlaying(true);
+      animationRef.current = requestAnimationFrame(updateProgress);
+    };
+
     audio.onended = () => {
-      setIsPlaying(false)
-      setCurrentTime(0)
+      setIsPlaying(false);
+      setCurrentTime(0);
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-        animationRef.current = null
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
-    }
-    
+    };
+
     audio.onpause = () => {
-      setIsPlaying(false)
+      setIsPlaying(false);
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-        animationRef.current = null
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
-    }
+    };
 
     return () => {
-      audio.pause()
+      audio.pause();
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
+        cancelAnimationFrame(animationRef.current);
       }
-      URL.revokeObjectURL(url)
-    }
-  }, [blob])
+      URL.revokeObjectURL(url);
+    };
+  }, [blob]);
 
   const togglePlay = () => {
-    if (!audioRef.current) {return}
-    if (isPlaying) {
-      audioRef.current.pause()
-    } else {
-      audioRef.current.play()
+    if (!audioRef.current) {
+      return;
     }
-  }
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+  };
 
   const handleSeek = (index: number) => {
-    if (!audioRef.current || waveformData.length === 0) {return}
-    
-    const percentage = index / waveformData.length
-    const newTime = percentage * duration
-    
-    audioRef.current.currentTime = newTime
-    setCurrentTime(newTime)
-  }
+    if (!audioRef.current || waveformData.length === 0) {
+      return;
+    }
+
+    const percentage = index / waveformData.length;
+    const newTime = percentage * duration;
+
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
     <div className="flex items-center gap-3 p-2 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm select-none max-w-md">
@@ -154,44 +160,40 @@ export default function WaveformPlayer({
         )}
       </button>
 
-      <progress
-        value={(currentTime / duration) * 100}
-        max={100}
-        className="flex-1 h-8 cursor-pointer"
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          const x = e.clientX - rect.left
-          const percentage = x / rect.width
-          const index = Math.floor(percentage * waveformData.length)
-          handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)))
-        }}
-      />
+      <div
+        className="flex-1 h-8 cursor-pointer relative"
+        onClick={e => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const percentage = x / rect.width;
+          const index = Math.floor(percentage * waveformData.length);
+          handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)));
         }}
         aria-label="Audio waveform"
         tabIndex={0}
       >
         {waveformData.map((value, idx) => {
-          const progress = duration > 0 ? currentTime / duration : 0
-          const isPassed = idx / waveformData.length <= progress
-          
+          const progress = duration > 0 ? currentTime / duration : 0;
+          const isPassed = idx / waveformData.length <= progress;
+
           return (
             <div
               key={`waveform-${value}`}
               className="flex-1 rounded-full transition-all pointer-events-none"
-              style={{ 
+              style={{
                 height: `${Math.max(20, value * 100)}%`,
                 backgroundColor: isPassed ? progressColor : color,
               }}
             />
-          )
+          );
         })}
-        
+
         {/* Ligne de lecture (Playhead) */}
-        <div 
+        <div
           className="absolute top-0 bottom-0 w-0.5 bg-primary-600 pointer-events-none transition-none"
-          style={{ 
+          style={{
             left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-            willChange: 'left'
+            willChange: 'left',
           }}
         />
       </div>
@@ -200,5 +202,5 @@ export default function WaveformPlayer({
         {formatTime(currentTime)}
       </div>
     </div>
-  )
+  );
 }

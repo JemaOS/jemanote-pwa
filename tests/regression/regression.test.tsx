@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Regression Tests - Tests for previously fixed bugs
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest';
 
-import type { Note, Folder } from '@/types'
+import type { Note, Folder } from '@/types';
 
-import { waitFor } from '@/tests/utils/test-utils'
+import { waitFor } from '@/tests/utils/test-utils';
 
 describe('Regression Tests', () => {
   describe('Note Synchronization', () => {
@@ -19,7 +19,7 @@ describe('Regression Tests', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
         },
-      ]
+      ];
 
       const remoteNotes: Note[] = [
         {
@@ -30,19 +30,19 @@ describe('Regression Tests', () => {
           created_at: '2025-01-01T00:00:00Z',
           updated_at: '2025-01-01T00:00:00Z',
         },
-      ]
+      ];
 
       // Merge notes without duplicates
-      const merged = [...localNotes]
+      const merged = [...localNotes];
       remoteNotes.forEach(remote => {
-        const exists = merged.find(n => n.id === remote.id)
+        const exists = merged.find(n => n.id === remote.id);
         if (!exists) {
-          merged.push(remote)
+          merged.push(remote);
         }
-      })
+      });
 
-      expect(merged.length).toBe(1)
-    })
+      expect(merged.length).toBe(1);
+    });
 
     it('should preserve note content during sync conflict (BUG-002)', () => {
       const localNote: Note = {
@@ -52,7 +52,7 @@ describe('Regression Tests', () => {
         user_id: 'user-1',
         created_at: '2025-01-01T00:00:00Z',
         updated_at: '2025-01-02T00:00:00Z', // More recent
-      }
+      };
 
       const remoteNote: Note = {
         id: 'note-1',
@@ -61,16 +61,15 @@ describe('Regression Tests', () => {
         user_id: 'user-1',
         created_at: '2025-01-01T00:00:00Z',
         updated_at: '2025-01-01T00:00:00Z',
-      }
+      };
 
       // Keep the more recent version
-      const merged = new Date(localNote.updated_at) > new Date(remoteNote.updated_at) 
-        ? localNote 
-        : remoteNote
+      const merged =
+        new Date(localNote.updated_at) > new Date(remoteNote.updated_at) ? localNote : remoteNote;
 
-      expect(merged.content).toBe('Local Content')
-    })
-  })
+      expect(merged.content).toBe('Local Content');
+    });
+  });
 
   describe('Folder Operations', () => {
     it('should handle folder deletion with notes (BUG-003)', () => {
@@ -84,18 +83,16 @@ describe('Regression Tests', () => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
-      ]
+      ];
 
       // Delete folder and move notes to root
-      const folderId = 'folder-1'
-      const updatedNotes = notes.map(note => 
-        note.folder_id === folderId 
-          ? { ...note, folder_id: undefined }
-          : note
-      )
+      const folderId = 'folder-1';
+      const updatedNotes = notes.map(note =>
+        note.folder_id === folderId ? { ...note, folder_id: undefined } : note
+      );
 
-      expect(updatedNotes[0].folder_id).toBeUndefined()
-    })
+      expect(updatedNotes[0].folder_id).toBeUndefined();
+    });
 
     it('should prevent circular folder references (BUG-004)', () => {
       const folders: Folder[] = [
@@ -117,22 +114,24 @@ describe('Regression Tests', () => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
-      ]
+      ];
 
       // Try to set folder-1's parent to folder-2 (would create cycle)
       const wouldCreateCycle = (folderId: string, newParentId: string): boolean => {
-        let current = newParentId
+        let current = newParentId;
         while (current) {
-          if (current === folderId) {return true}
-          const parent = folders.find(f => f.id === current)
-          current = parent?.parent_id
+          if (current === folderId) {
+            return true;
+          }
+          const parent = folders.find(f => f.id === current);
+          current = parent?.parent_id;
         }
-        return false
-      }
+        return false;
+      };
 
-      expect(wouldCreateCycle('folder-1', 'folder-2')).toBe(true)
-    })
-  })
+      expect(wouldCreateCycle('folder-1', 'folder-2')).toBe(true);
+    });
+  });
 
   describe('Markdown Rendering', () => {
     it('should not break on malformed wiki links (BUG-005)', () => {
@@ -142,38 +141,37 @@ describe('Regression Tests', () => {
         'Empty []]',
         '[[Nested [[Link]]]]',
         '[[Special & Characters]]',
-      ]
+      ];
 
       contents.forEach(content => {
         // Should not throw
-        const wikiLinkPattern = /\[\[([^\]]+)\]\]/g
-        const matches = [...content.matchAll(wikiLinkPattern)]
-        expect(matches).toBeDefined()
-      })
-    })
+        const wikiLinkPattern = /\[\[([^\]]+)\]\]/g;
+        const matches = [...content.matchAll(wikiLinkPattern)];
+        expect(matches).toBeDefined();
+      });
+    });
 
     it('should handle code blocks with wiki links (BUG-006)', () => {
-      const content = "```\n[[This should not be a link]]\n```\n\n[[This should be a link]]"
+      const content = '```\n[[This should not be a link]]\n```\n\n[[This should be a link]]';
 
       // SECURITY FIX: Limit content size and use safer regex patterns to prevent ReDoS
       const MAX_CONTENT_LENGTH = 100000; // 100KB max
-      const safeContent = content.length > MAX_CONTENT_LENGTH
-        ? content.substring(0, MAX_CONTENT_LENGTH)
-        : content;
+      const safeContent =
+        content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
       // Code blocks should not process wiki links
       // Using possessive-like behavior with length limits
-      const codeBlockPattern = /```[\s\S]{0,50000}```/g
-      
-      const textWithoutCode = safeContent.replace(codeBlockPattern, '')
-      // SECURITY FIX: Limit wiki link content length
-      const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g
-      const wikiLinks = [...textWithoutCode.matchAll(wikiLinkPattern)]
+      const codeBlockPattern = /```[\s\S]{0,50000}```/g;
 
-      expect(wikiLinks.length).toBe(1)
-      expect(wikiLinks[0][1]).toBe('This should be a link')
-    })
-  })
+      const textWithoutCode = safeContent.replace(codeBlockPattern, '');
+      // SECURITY FIX: Limit wiki link content length
+      const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g;
+      const wikiLinks = [...textWithoutCode.matchAll(wikiLinkPattern)];
+
+      expect(wikiLinks.length).toBe(1);
+      expect(wikiLinks[0][1]).toBe('This should be a link');
+    });
+  });
 
   describe('Search Functionality', () => {
     it('should handle special characters in search (BUG-007)', () => {
@@ -186,62 +184,62 @@ describe('Regression Tests', () => {
         'test.',
         'test^',
         'test$',
-      ]
+      ];
 
       searchQueries.forEach(query => {
         // Should not throw when creating RegExp
         expect(() => {
-          const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-          const regex = new RegExp(escaped, 'i')
-          expect(regex).toBeInstanceOf(RegExp)
-        }).not.toThrow()
-      })
-    })
+          const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(escaped, 'i');
+          expect(regex).toBeInstanceOf(RegExp);
+        }).not.toThrow();
+      });
+    });
 
     it('should handle empty search results gracefully (BUG-008)', () => {
-      const notes: Note[] = []
-      const searchQuery = 'test'
+      const notes: Note[] = [];
+      const searchQuery = 'test';
 
-      const results = notes.filter(note => 
+      const results = notes.filter(note =>
         note.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      );
 
-      expect(results).toEqual([])
-      expect(results.length).toBe(0)
-    })
-  })
+      expect(results).toEqual([]);
+      expect(results.length).toBe(0);
+    });
+  });
 
   describe('LocalStorage', () => {
     it('should handle corrupted localStorage data (BUG-009)', () => {
-      const corruptedData = 'not valid json{['
+      const corruptedData = 'not valid json{[';
 
-      let parsed
+      let parsed;
       try {
-        parsed = JSON.parse(corruptedData)
+        parsed = JSON.parse(corruptedData);
       } catch {
-        parsed = []
+        parsed = [];
       }
 
-      expect(parsed).toEqual([])
-    })
+      expect(parsed).toEqual([]);
+    });
 
     it('should handle quota exceeded error (BUG-010)', () => {
       const saveToStorage = (key: string, data: unknown): boolean => {
         try {
-          localStorage.setItem(key, JSON.stringify(data))
-          return true
+          localStorage.setItem(key, JSON.stringify(data));
+          return true;
         } catch (e) {
           if (e instanceof Error && e.name === 'QuotaExceededError') {
-            return false
+            return false;
           }
-          throw e
+          throw e;
         }
-      }
+      };
 
       // Should return false on quota exceeded
-      const result = saveToStorage('test', 'small data')
-      expect(result).toBe(true)
-    })
+      const result = saveToStorage('test', 'small data');
+      expect(result).toBe(true);
+    });
 
     it('should migrate old data format (BUG-011)', () => {
       const oldFormat = {
@@ -249,7 +247,7 @@ describe('Regression Tests', () => {
         title: 'Old Note',
         body: 'Content', // Old field name
         createdAt: '2025-01-01', // Old field name
-      }
+      };
 
       // Migration function
       const migrateNote = (old: any): Note => ({
@@ -259,13 +257,13 @@ describe('Regression Tests', () => {
         user_id: 'user-1',
         created_at: old.createdAt || old.created_at || new Date().toISOString(),
         updated_at: old.updatedAt || old.updated_at || new Date().toISOString(),
-      })
+      });
 
-      const migrated = migrateNote(oldFormat)
-      expect(migrated.content).toBe('Content')
-      expect(migrated).toHaveProperty('user_id')
-    })
-  })
+      const migrated = migrateNote(oldFormat);
+      expect(migrated.content).toBe('Content');
+      expect(migrated).toHaveProperty('user_id');
+    });
+  });
 
   describe('UI State', () => {
     it('should preserve sidebar state on refresh (BUG-012)', () => {
@@ -273,65 +271,69 @@ describe('Regression Tests', () => {
         leftOpen: true,
         rightOpen: false,
         activeFolder: 'folder-1',
-      }
+      };
 
-      localStorage.setItem('sidebar-state', JSON.stringify(sidebarState))
+      localStorage.setItem('sidebar-state', JSON.stringify(sidebarState));
 
-      const restored = JSON.parse(localStorage.getItem('sidebar-state') || '{}')
-      expect(restored.leftOpen).toBe(true)
-      expect(restored.activeFolder).toBe('folder-1')
-    })
+      const restored = JSON.parse(localStorage.getItem('sidebar-state') || '{}');
+      expect(restored.leftOpen).toBe(true);
+      expect(restored.activeFolder).toBe('folder-1');
+    });
 
     it('should handle rapid view switching (BUG-013)', async () => {
-      const views = ['workspace', 'canvas', 'timeline', 'settings']
-      const switchView = vi.fn()
+      const views = ['workspace', 'canvas', 'timeline', 'settings'];
+      const switchView = vi.fn();
 
       // Simulate rapid switching
-      views.forEach(view => switchView(view))
+      views.forEach(view => switchView(view));
 
       await waitFor(() => {
-        expect(switchView).toHaveBeenCalledTimes(4)
-      })
-    })
-  })
+        expect(switchView).toHaveBeenCalledTimes(4);
+      });
+    });
+  });
 
   describe('AI Features', () => {
     it('should handle AI service timeout (BUG-014)', async () => {
-      const timeout = 30000
+      const timeout = 30000;
 
       // Should timeout before completion
       const quickCall = new Promise((_, reject) => {
-        setTimeout(() => { reject(new Error('Timeout')); }, timeout)
-      })
+        setTimeout(() => {
+          reject(new Error('Timeout'));
+        }, timeout);
+      });
 
-      await expect(quickCall).rejects.toThrow('Timeout')
-    })
+      await expect(quickCall).rejects.toThrow('Timeout');
+    });
 
     it('should handle empty AI response (BUG-015)', async () => {
-      const emptyResponse = ''
-      
-      const processResponse = (response: string): string[] => {
-        if (!response.trim()) {return []}
-        return response.split('\n').filter(line => line.trim())
-      }
+      const emptyResponse = '';
 
-      const result = processResponse(emptyResponse)
-      expect(result).toEqual([])
-    })
-  })
+      const processResponse = (response: string): string[] => {
+        if (!response.trim()) {
+          return [];
+        }
+        return response.split('\n').filter(line => line.trim());
+      };
+
+      const result = processResponse(emptyResponse);
+      expect(result).toEqual([]);
+    });
+  });
 
   describe('Offline Mode', () => {
     it('should queue changes when offline (BUG-016)', () => {
-      const isOnline = false
-      const pendingChanges: unknown[] = []
+      const isOnline = false;
+      const pendingChanges: unknown[] = [];
 
       const saveNote = (note: Note) => {
         if (!isOnline) {
-          pendingChanges.push(note)
-          return { queued: true }
+          pendingChanges.push(note);
+          return { queued: true };
         }
-        return { saved: true }
-      }
+        return { saved: true };
+      };
 
       const result = saveNote({
         id: 'note-1',
@@ -340,147 +342,151 @@ describe('Regression Tests', () => {
         user_id: 'user-1',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      })
+      });
 
-      expect(result).toEqual({ queued: true })
-      expect(pendingChanges.length).toBe(1)
-    })
+      expect(result).toEqual({ queued: true });
+      expect(pendingChanges.length).toBe(1);
+    });
 
     it('should sync queued changes when back online (BUG-017)', async () => {
       const pendingChanges = [
         { id: 'note-1', action: 'create' },
         { id: 'note-2', action: 'update' },
-      ]
+      ];
 
       const syncChanges = async () => {
-        const results = []
+        const results = [];
         for (const change of pendingChanges) {
-          results.push({ synced: true, id: change.id })
+          results.push({ synced: true, id: change.id });
         }
-        return results
-      }
+        return results;
+      };
 
-      const results = await syncChanges()
-      expect(results.length).toBe(2)
-      expect(results.every(r => r.synced)).toBe(true)
-    })
-  })
+      const results = await syncChanges();
+      expect(results.length).toBe(2);
+      expect(results.every(r => r.synced)).toBe(true);
+    });
+  });
 
   describe('Graph View', () => {
     it('should not crash on circular note references (BUG-018)', () => {
       const notes = [
         { id: 'note-1', title: 'Note 1', links: ['note-2'] },
         { id: 'note-2', title: 'Note 2', links: ['note-1'] },
-      ]
+      ];
 
       const buildGraph = (notes: typeof notes, visited = new Set<string>()) => {
-        return notes.map(note => {
-          if (visited.has(note.id)) {return null}
-          visited.add(note.id)
-          return {
-            ...note,
-            linkedNotes: note.links
-              .map(id => notes.find(n => n.id === id))
-              .filter(Boolean),
-          }
-        }).filter(Boolean)
-      }
+        return notes
+          .map(note => {
+            if (visited.has(note.id)) {
+              return null;
+            }
+            visited.add(note.id);
+            return {
+              ...note,
+              linkedNotes: note.links.map(id => notes.find(n => n.id === id)).filter(Boolean),
+            };
+          })
+          .filter(Boolean);
+      };
 
-      expect(() => buildGraph(notes)).not.toThrow()
-    })
+      expect(() => buildGraph(notes)).not.toThrow();
+    });
 
     it('should handle empty graph gracefully (BUG-019)', () => {
-      const notes: Note[] = []
-      
+      const notes: Note[] = [];
+
       const buildGraph = (notes: Note[]) => {
         return notes.map(note => ({
           id: note.id,
           links: [],
-        }))
-      }
+        }));
+      };
 
-      const graph = buildGraph(notes)
-      expect(graph).toEqual([])
-    })
-  })
+      const graph = buildGraph(notes);
+      expect(graph).toEqual([]);
+    });
+  });
 
   describe('Drag and Drop', () => {
     it('should handle invalid drop targets (BUG-020)', () => {
       const validDrop = (target: string | null): boolean => {
-        return target !== null && target !== ''
-      }
+        return target !== null && target !== '';
+      };
 
-      expect(validDrop(null)).toBe(false)
-      expect(validDrop('')).toBe(false)
-      expect(validDrop('folder-1')).toBe(true)
-    })
+      expect(validDrop(null)).toBe(false);
+      expect(validDrop('')).toBe(false);
+      expect(validDrop('folder-1')).toBe(true);
+    });
 
     it('should prevent dropping note into itself (BUG-021)', () => {
       const canDrop = (draggedId: string, targetId: string): boolean => {
-        return draggedId !== targetId
-      }
+        return draggedId !== targetId;
+      };
 
-      expect(canDrop('note-1', 'note-1')).toBe(false)
-      expect(canDrop('note-1', 'folder-1')).toBe(true)
-    })
-  })
+      expect(canDrop('note-1', 'note-1')).toBe(false);
+      expect(canDrop('note-1', 'folder-1')).toBe(true);
+    });
+  });
 
   describe('Mobile Responsiveness', () => {
     it('should handle touch events correctly (BUG-022)', () => {
       const touchEvent = {
         touches: [{ clientX: 100, clientY: 200 }],
         preventDefault: vi.fn(),
-      }
+      };
 
       const handleTouch = (e: typeof touchEvent) => {
-        e.preventDefault()
-        return { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      }
+        e.preventDefault();
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      };
 
-      const result = handleTouch(touchEvent)
-      expect(result).toEqual({ x: 100, y: 200 })
-    })
+      const result = handleTouch(touchEvent);
+      expect(result).toEqual({ x: 100, y: 200 });
+    });
 
     it('should handle viewport changes (BUG-023)', () => {
       const viewports = [
-        { width: 320, height: 568 },   // iPhone SE
-        { width: 375, height: 667 },   // iPhone 8
-        { width: 768, height: 1024 },  // iPad
+        { width: 320, height: 568 }, // iPhone SE
+        { width: 375, height: 667 }, // iPhone 8
+        { width: 768, height: 1024 }, // iPad
         { width: 1920, height: 1080 }, // Desktop
-      ]
+      ];
 
       viewports.forEach(vp => {
-        expect(vp.width).toBeGreaterThan(0)
-        expect(vp.height).toBeGreaterThan(0)
-      })
-    })
-  })
+        expect(vp.width).toBeGreaterThan(0);
+        expect(vp.height).toBeGreaterThan(0);
+      });
+    });
+  });
 
   describe('Memory Leaks', () => {
     it('should clean up event listeners on unmount (BUG-024)', () => {
-      const listeners: (() => void)[] = []
-      
+      const listeners: (() => void)[] = [];
+
       const addListener = (fn: () => void) => {
-        listeners.push(fn)
+        listeners.push(fn);
         return () => {
-          const index = listeners.indexOf(fn)
-          if (index > -1) {listeners.splice(index, 1)}
-        }
-      }
+          const index = listeners.indexOf(fn);
+          if (index > -1) {
+            listeners.splice(index, 1);
+          }
+        };
+      };
 
-      const removeListener = addListener(() => {})
-      removeListener()
+      const removeListener = addListener(() => {});
+      removeListener();
 
-      expect(listeners.length).toBe(0)
-    })
+      expect(listeners.length).toBe(0);
+    });
 
     it('should cancel pending requests on unmount (BUG-025)', () => {
-      let aborted = false
-      const controller = new AbortController()
+      let aborted = false;
+      const controller = new AbortController();
 
       // Simulate unmount
-      controller.abort()
-      expect(controller.signal.aborted).toBe(true)
-    })
-  })
-})
+      controller.abort();
+      expect(controller.signal.aborted).toBe(true);
+    });
+  });
+});

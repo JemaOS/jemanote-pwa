@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi } from 'vitest';
 
 /**
  * Mock for Mistral AI Service
@@ -37,12 +37,12 @@ export const mockMistralService = {
   }),
 
   streamCompletion: vi.fn().mockImplementation(async function* () {
-    const chunks = ['This', ' is', ' a', ' streaming', ' response', '.']
+    const chunks = ['This', ' is', ' a', ' streaming', ' response', '.'];
     for (const chunk of chunks) {
-      yield { content: chunk }
+      yield { content: chunk };
     }
   }),
-}
+};
 
 /**
  * Helper to create mock AI responses
@@ -64,9 +64,9 @@ export function createMockAIResponse(type: 'summary' | 'tags' | 'answer' | 'sent
       sentiment: 'neutral',
       score: 0.5,
     },
-  }
+  };
 
-  return responses[type]
+  return responses[type];
 }
 
 /**
@@ -90,5 +90,5 @@ export function mockMistralFetch() {
           ],
         }),
     })
-  )
+  );
 }

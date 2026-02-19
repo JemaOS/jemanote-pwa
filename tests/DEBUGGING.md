@@ -62,13 +62,13 @@ import { screen } from '@testing-library/react'
 
 it('should render component', () => {
   render(<MyComponent />)
-  
+
   // Affiche le DOM dans la console
   screen.debug()
-  
+
   // Affiche un élément spécifique
   screen.debug(screen.getByRole('button'))
-  
+
   // Affiche avec un formatage étendu
   screen.debug(undefined, 30000) // maxLength de 30000
 })
@@ -78,19 +78,19 @@ it('should render component', () => {
 
 ```typescript
 it('should call API', async () => {
-  const mockFn = vi.fn()
-  vi.mocked(api.fetchData).mockImplementation(mockFn)
-  
-  await fetchUserData()
-  
+  const mockFn = vi.fn();
+  vi.mocked(api.fetchData).mockImplementation(mockFn);
+
+  await fetchUserData();
+
   // Afficher l'historique des appels
-  console.log(mockFn.mock.calls)
-  console.log(mockFn.mock.results)
-  
+  console.log(mockFn.mock.calls);
+  console.log(mockFn.mock.results);
+
   // Afficher avec plus de détails
-  expect(mockFn).toHaveBeenCalled()
-  expect(mockFn.mock.calls[0]).toEqual(['expected-arg'])
-})
+  expect(mockFn).toHaveBeenCalled();
+  expect(mockFn.mock.calls[0]).toEqual(['expected-arg']);
+});
 ```
 
 ---
@@ -149,7 +149,7 @@ export default defineConfig({
     // ou
     trace: 'on-first-retry', // Par défaut
   },
-})
+});
 ```
 
 Pour voir une trace :
@@ -162,19 +162,19 @@ npx playwright show-trace test-results/trace.zip
 ### Pause et inspection
 
 ```typescript
-import { test, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test';
 
 test('debug example', async ({ page }) => {
-  await page.goto('/')
-  
+  await page.goto('/');
+
   // Pause le test pour inspection manuelle
-  await page.pause()
-  
+  await page.pause();
+
   // Ou utiliser un point d'arrêt
-  await page.getByRole('button').click()
-  
+  await page.getByRole('button').click();
+
   // Le test attendra ici en mode debug
-})
+});
 ```
 
 ### Logs de la page
@@ -183,25 +183,25 @@ test('debug example', async ({ page }) => {
 test('capture page logs', async ({ page }) => {
   // Écouter les console.log de la page
   page.on('console', msg => {
-    console.log(`[${msg.type()}] ${msg.text()}`)
-  })
-  
+    console.log(`[${msg.type()}] ${msg.text()}`);
+  });
+
   // Écouter les erreurs
   page.on('pageerror', error => {
-    console.log(`[PAGE ERROR] ${error.message}`)
-  })
-  
+    console.log(`[PAGE ERROR] ${error.message}`);
+  });
+
   // Écouter les requêtes réseau
   page.on('request', request => {
-    console.log(`[REQUEST] ${request.method()} ${request.url()}`)
-  })
-  
+    console.log(`[REQUEST] ${request.method()} ${request.url()}`);
+  });
+
   page.on('response', response => {
-    console.log(`[RESPONSE] ${response.status()} ${response.url()}`)
-  })
-  
-  await page.goto('/')
-})
+    console.log(`[RESPONSE] ${response.status()} ${response.url()}`);
+  });
+
+  await page.goto('/');
+});
 ```
 
 ---
@@ -218,7 +218,7 @@ import { logRoles } from '@testing-library/dom'
 
 it('debug queries', () => {
   const { container } = render(<MyComponent />)
-  
+
   // Affiche tous les rôles disponibles
   logRoles(container)
 })
@@ -289,15 +289,15 @@ it('should show data', async () => {
 
 ```typescript
 // ❌ Mauvais
-await page.click('button')
-expect(await page.textContent('.result')).toBe('Done')
+await page.click('button');
+expect(await page.textContent('.result')).toBe('Done');
 
 // ✅ Bon
-await page.click('button')
-await expect(page.locator('.result')).toHaveText('Done')
+await page.click('button');
+await expect(page.locator('.result')).toHaveText('Done');
 
 // ✅ Avec timeout personnalisé
-await expect(page.locator('.result')).toHaveText('Done', { timeout: 10000 })
+await expect(page.locator('.result')).toHaveText('Done', { timeout: 10000 });
 ```
 
 ### Timeouts
@@ -325,18 +325,18 @@ export default defineConfig({
 // ✅ Solution - Toujours nettoyer
 describe('MyTests', () => {
   beforeEach(() => {
-    vi.clearAllMocks() // Réinitialise l'historique
-  })
-  
+    vi.clearAllMocks(); // Réinitialise l'historique
+  });
+
   afterEach(() => {
-    vi.restoreAllMocks() // Restaure les implémentations originales
-  })
-  
+    vi.restoreAllMocks(); // Restaure les implémentations originales
+  });
+
   // Ou pour un mock spécifique
   beforeEach(() => {
-    mockFn.mockReset() // Réinitialise tout
-  })
-})
+    mockFn.mockReset(); // Réinitialise tout
+  });
+});
 ```
 
 ### Problèmes de mémoire
@@ -357,12 +357,14 @@ npm run test
 **Causes possibles :**
 
 1. **Timing différent** - Le CI est plus lent
+
    ```typescript
    // Augmenter les timeouts
-   await expect(locator).toBeVisible({ timeout: 10000 })
+   await expect(locator).toBeVisible({ timeout: 10000 });
    ```
 
 2. **Résolution d'écran** - Le CI utilise une taille différente
+
    ```typescript
    // Forcer une taille dans playwright.config.ts
    use: {
@@ -373,9 +375,9 @@ npm run test
 3. **État non nettoyé** - Les tests ne sont pas isolés
    ```typescript
    test.afterEach(async ({ page }) => {
-     await page.evaluate(() => localStorage.clear())
-     await page.evaluate(() => sessionStorage.clear())
-   })
+     await page.evaluate(() => localStorage.clear());
+     await page.evaluate(() => sessionStorage.clear());
+   });
    ```
 
 ### Erreurs "Unable to find element"
@@ -424,34 +426,34 @@ Object.defineProperty(window, 'matchMedia', {
 
 ```typescript
 // Intercepter et inspecter les requêtes
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw';
 
 const server = setupServer(
-  http.get('/api/data', (req) => {
-    console.log('Request headers:', req.headers)
-    console.log('Request params:', req.params)
-    
-    return HttpResponse.json({ data: 'test' })
+  http.get('/api/data', req => {
+    console.log('Request headers:', req.headers);
+    console.log('Request params:', req.params);
+
+    return HttpResponse.json({ data: 'test' });
   })
-)
+);
 ```
 
 ### Débogage des hooks
 
 ```typescript
-import { renderHook } from '@testing-library/react'
+import { renderHook } from '@testing-library/react';
 
 it('debug hook', () => {
-  const { result, rerender } = renderHook(() => useMyHook())
-  
-  console.log('Initial state:', result.current)
-  
+  const { result, rerender } = renderHook(() => useMyHook());
+
+  console.log('Initial state:', result.current);
+
   act(() => {
-    result.current.increment()
-  })
-  
-  console.log('After increment:', result.current)
-})
+    result.current.increment();
+  });
+
+  console.log('After increment:', result.current);
+});
 ```
 
 ### Débogage du Provider
@@ -506,12 +508,12 @@ render(
 ```typescript
 it('should render quickly', async () => {
   const start = performance.now()
-  
+
   render(<HeavyComponent />)
-  
+
   const end = performance.now()
   console.log(`Render time: ${end - start}ms`)
-  
+
   expect(end - start).toBeLessThan(100)
 })
 ```

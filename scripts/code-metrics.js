@@ -30,7 +30,7 @@ const CONFIG = {
     cognitiveComplexity: 15,
     maintainabilityIndex: 80,
     technicalDebtRatio: 5,
-    commentRatio: 10 // Minimum 10% comments
+    commentRatio: 10, // Minimum 10% comments
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -41,8 +41,8 @@ const CONFIG = {
     '**/mocks/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // ANSI colors
@@ -52,7 +52,7 @@ const colors = {
   yellow: '\x1b[33m',
   green: '\x1b[32m',
   blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 // Utility to safely create regex patterns from keywords
@@ -66,15 +66,15 @@ function createSafeKeywordRegex(keyword) {
 function getSourceFiles() {
   const files = [];
   const extensions = ['*.ts', '*.tsx'];
-  
+
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
-  
+
   return files.filter(file => !file.includes('node_modules'));
 }
 
@@ -100,7 +100,7 @@ function countLines(content) {
   let commentLines = 0;
   let blankLines = 0;
   let inBlockComment = false;
-  
+
   for (const line of lines) {
     const result = classifyLine(line.trim(), inBlockComment);
     inBlockComment = result.inBlockComment;
@@ -108,13 +108,13 @@ function countLines(content) {
     else if (result.type === 'comment') commentLines++;
     else codeLines++;
   }
-  
+
   return {
     total: totalLines,
     code: codeLines,
     comments: commentLines,
     blank: blankLines,
-    commentRatio: totalLines > 0 ? (commentLines / totalLines) * 100 : 0
+    commentRatio: totalLines > 0 ? (commentLines / totalLines) * 100 : 0,
   };
 }
 
@@ -134,18 +134,18 @@ function calculateCyclomaticComplexity(content) {
     /\b&&\b/g,
     /\|\|/g,
     /\?\s*:/g, // ternary
-    /\breturn\s+.*\?/g // conditional return
+    /\breturn\s+.*\?/g, // conditional return
   ];
-  
+
   let complexity = 1; // Base complexity
-  
+
   for (const pattern of patterns) {
     const matches = content.match(pattern);
     if (matches) {
       complexity += matches.length;
     }
   }
-  
+
   return complexity;
 }
 
@@ -168,33 +168,33 @@ function calculateCognitiveComplexity(content) {
   let complexity = 0;
   const lines = content.split('\n');
   let nestingLevel = 0;
-  
+
   const nestingKeywords = ['if', 'while', 'for', 'switch', 'catch'];
   const incrementKeywords = ['if', 'else', 'while', 'for', 'switch', 'case', 'catch', '?:'];
-  
+
   for (const line of lines) {
     const trimmed = line.trim();
-    
+
     // Nesting increase
     if (matchesKeyword(trimmed, nestingKeywords) && trimmed.endsWith('{')) {
       nestingLevel++;
       complexity += nestingLevel;
     }
-    
+
     // Nesting decrease
     if (trimmed === '}' && nestingLevel > 0) nestingLevel--;
-    
+
     // Increments without nesting
     if (matchesKeyword(trimmed, incrementKeywords) && !trimmed.endsWith('{')) complexity++;
-    
+
     // Ternary operators
     if (/\?\s*[^:]*:/.test(trimmed)) complexity++;
-    
+
     // Logical operators
     complexity += (trimmed.match(/&&/g) || []).length;
     complexity += (trimmed.match(/\|\|/g) || []).length;
   }
-  
+
   return Math.max(1, complexity);
 }
 
@@ -206,13 +206,13 @@ function calculateMaintainabilityIndex(metrics) {
   const halsteadVolume = metrics.halstead?.volume || 100;
   const cyclomatic = metrics.cyclomatic || 1;
   const loc = metrics.lines?.code || 1;
-  
+
   // Original formula
   let mi = 171 - 5.2 * Math.log(halsteadVolume) - 0.23 * cyclomatic - 16.2 * Math.log(loc);
-  
+
   // Normalize to 0-100 scale
   mi = Math.max(0, Math.min(100, mi));
-  
+
   return Math.round(mi * 100) / 100;
 }
 
@@ -224,30 +224,30 @@ function calculateTechnicalDebt(metrics, violations) {
   // Simplified calculation
   // Each violation adds to debt based on severity
   const debtPerViolation = {
-    critical: 60,  // 1 hour
-    high: 30,      // 30 minutes
-    medium: 10,    // 10 minutes
-    low: 5         // 5 minutes
+    critical: 60, // 1 hour
+    high: 30, // 30 minutes
+    medium: 10, // 10 minutes
+    low: 5, // 5 minutes
   };
-  
+
   let totalDebtMinutes = 0;
-  
+
   for (const violation of violations) {
     totalDebtMinutes += debtPerViolation[violation.severity] || debtPerViolation.low;
   }
-  
+
   // Convert to hours
   const debtHours = totalDebtMinutes / 60;
-  
+
   // Calculate ratio: Debt / (LOC * Cost per line)
   // Assuming 0.5 hours per 100 LOC as baseline
   const loc = metrics.lines?.code || 1;
   const estimatedDevTime = loc * 0.005; // hours
   const debtRatio = estimatedDevTime > 0 ? (debtHours / estimatedDevTime) * 100 : 0;
-  
+
   return {
     hours: Math.round(debtHours * 100) / 100,
-    ratio: Math.round(debtRatio * 100) / 100
+    ratio: Math.round(debtRatio * 100) / 100,
   };
 }
 
@@ -257,14 +257,14 @@ function calculateTechnicalDebt(metrics, violations) {
 function analyzeFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const relativePath = path.relative(ROOT_DIR, filePath);
-  
+
   // Line counts
   const lines = countLines(content);
-  
+
   // Complexity
   const cyclomatic = calculateCyclomaticComplexity(content);
   const cognitive = calculateCognitiveComplexity(content);
-  
+
   // Try to get more accurate metrics from escomplex
   let escomplexMetrics = null;
   try {
@@ -272,83 +272,85 @@ function analyzeFile(filePath) {
   } catch {
     // Fallback to calculated metrics
   }
-  
+
   // Calculate maintainability index
   const mi = calculateMaintainabilityIndex({
     halstead: escomplexMetrics?.halstead,
     cyclomatic,
-    lines
+    lines,
   });
-  
+
   // Detect violations
   const violations = [];
-  
+
   if (lines.total > CONFIG.thresholds.locPerFile) {
     violations.push({
       type: 'LOC',
       severity: 'medium',
       message: `File has ${lines.total} lines (threshold: ${CONFIG.thresholds.locPerFile})`,
       value: lines.total,
-      threshold: CONFIG.thresholds.locPerFile
+      threshold: CONFIG.thresholds.locPerFile,
     });
   }
-  
+
   if (cyclomatic > CONFIG.thresholds.cyclomaticComplexity) {
     violations.push({
       type: 'Cyclomatic',
       severity: 'high',
       message: `Cyclomatic complexity is ${cyclomatic} (threshold: ${CONFIG.thresholds.cyclomaticComplexity})`,
       value: cyclomatic,
-      threshold: CONFIG.thresholds.cyclomaticComplexity
+      threshold: CONFIG.thresholds.cyclomaticComplexity,
     });
   }
-  
+
   if (cognitive > CONFIG.thresholds.cognitiveComplexity) {
     violations.push({
       type: 'Cognitive',
       severity: 'medium',
       message: `Cognitive complexity is ${cognitive} (threshold: ${CONFIG.thresholds.cognitiveComplexity})`,
       value: cognitive,
-      threshold: CONFIG.thresholds.cognitiveComplexity
+      threshold: CONFIG.thresholds.cognitiveComplexity,
     });
   }
-  
+
   if (mi < CONFIG.thresholds.maintainabilityIndex) {
     violations.push({
       type: 'Maintainability',
       severity: 'high',
       message: `Maintainability index is ${mi} (threshold: ${CONFIG.thresholds.maintainabilityIndex})`,
       value: mi,
-      threshold: CONFIG.thresholds.maintainabilityIndex
+      threshold: CONFIG.thresholds.maintainabilityIndex,
     });
   }
-  
+
   if (lines.commentRatio < CONFIG.thresholds.commentRatio) {
     violations.push({
       type: 'Comments',
       severity: 'low',
       message: `Comment ratio is ${lines.commentRatio.toFixed(1)}% (threshold: ${CONFIG.thresholds.commentRatio}%)`,
       value: lines.commentRatio,
-      threshold: CONFIG.thresholds.commentRatio
+      threshold: CONFIG.thresholds.commentRatio,
     });
   }
-  
+
   const debt = calculateTechnicalDebt({ lines }, violations);
-  
+
   return {
     file: relativePath,
     lines,
     complexity: {
       cyclomatic,
-      cognitive
+      cognitive,
     },
     maintainabilityIndex: mi,
     violations,
     debt,
-    escomplex: escomplexMetrics ? {
-      methods: escomplexMetrics.methods?.length || 0,
-      classes: escomplexMetrics.classes?.length || 0
-    } : null
+    escomplex: escomplexMetrics
+      ? {
+          methods: escomplexMetrics.methods?.length || 0,
+          classes: escomplexMetrics.classes?.length || 0,
+        }
+      : null,
   };
 }
 
@@ -373,23 +375,23 @@ function generateSummary(results) {
       Cyclomatic: 0,
       Cognitive: 0,
       Maintainability: 0,
-      Comments: 0
+      Comments: 0,
     },
     filesByMaintainability: {
       excellent: 0, // 90-100
-      good: 0,      // 80-89
-      moderate: 0,  // 70-79
-      poor: 0,      // 60-69
-      bad: 0        // <60
-    }
+      good: 0, // 80-89
+      moderate: 0, // 70-79
+      poor: 0, // 60-69
+      bad: 0, // <60
+    },
   };
-  
+
   let totalCyclomatic = 0;
   let totalCognitive = 0;
   let totalMaintainability = 0;
   let totalCommentRatio = 0;
   let totalDebtRatio = 0;
-  
+
   for (const result of results) {
     summary.totalLines += result.lines.total;
     summary.totalCodeLines += result.lines.code;
@@ -400,12 +402,12 @@ function generateSummary(results) {
     totalCommentRatio += result.lines.commentRatio;
     totalDebtRatio += result.debt.ratio;
     summary.totalDebtHours += result.debt.hours;
-    
+
     // Count violations
     for (const violation of result.violations) {
       summary.violations[violation.type]++;
     }
-    
+
     // Categorize by maintainability
     const mi = result.maintainabilityIndex;
     if (mi >= 90) summary.filesByMaintainability.excellent++;
@@ -414,7 +416,7 @@ function generateSummary(results) {
     else if (mi >= 60) summary.filesByMaintainability.poor++;
     else summary.filesByMaintainability.bad++;
   }
-  
+
   if (results.length > 0) {
     summary.avgLocPerFile = Math.round(summary.totalLines / results.length);
     summary.avgCyclomatic = Math.round((totalCyclomatic / results.length) * 100) / 100;
@@ -423,7 +425,7 @@ function generateSummary(results) {
     summary.avgCommentRatio = Math.round((totalCommentRatio / results.length) * 100) / 100;
     summary.avgDebtRatio = Math.round((totalDebtRatio / results.length) * 100) / 100;
   }
-  
+
   return summary;
 }
 
@@ -640,10 +642,11 @@ function generateHTMLReport(results, summary) {
         </tr>
       </thead>
       <tbody>
-        ${results.map(r => {
-          const hasViolations = r.violations.length > 0;
-          const rowClass = hasViolations ? 'violation-row' : '';
-          return `
+        ${results
+          .map(r => {
+            const hasViolations = r.violations.length > 0;
+            const rowClass = hasViolations ? 'violation-row' : '';
+            return `
             <tr class="${rowClass}">
               <td>${r.file}</td>
               <td>${r.lines.total}</td>
@@ -653,20 +656,27 @@ function generateHTMLReport(results, summary) {
               <td class="${r.complexity.cognitive > CONFIG.thresholds.cognitiveComplexity ? 'warning' : 'good'}">${r.complexity.cognitive}</td>
               <td class="${r.maintainabilityIndex < CONFIG.thresholds.maintainabilityIndex ? 'warning' : 'good'}">${r.maintainabilityIndex}</td>
               <td class="${r.debt.ratio > CONFIG.thresholds.technicalDebtRatio ? 'danger' : 'good'}">${r.debt.ratio}%</td>
-              <td>${hasViolations ? r.violations.map(v => {
-                let badgeClass;
-                if (v.severity === 'high') {
-                  badgeClass = 'danger';
-                } else if (v.severity === 'medium') {
-                  badgeClass = 'warning';
-                } else {
-                  badgeClass = 'success';
-                }
-                return `<span class="badge badge-${badgeClass}">${v.type}</span>`;
-              }).join(' ') : '-'}</td>
+              <td>${
+                hasViolations
+                  ? r.violations
+                      .map(v => {
+                        let badgeClass;
+                        if (v.severity === 'high') {
+                          badgeClass = 'danger';
+                        } else if (v.severity === 'medium') {
+                          badgeClass = 'warning';
+                        } else {
+                          badgeClass = 'success';
+                        }
+                        return `<span class="badge badge-${badgeClass}">${v.type}</span>`;
+                      })
+                      .join(' ')
+                  : '-'
+              }</td>
             </tr>
           `;
-        }).join('')}
+          })
+          .join('')}
       </tbody>
     </table>
   </div>
@@ -681,52 +691,49 @@ function generateHTMLReport(results, summary) {
  */
 async function main() {
   console.log(`${colors.cyan}📊 Starting code metrics analysis...${colors.reset}\n`);
-  
+
   // Ensure output directory exists
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
+
   // Get source files
   console.log(`${colors.blue}📁 Scanning source files...${colors.reset}`);
   const files = getSourceFiles();
   console.log(`Found ${files.length} files to analyze\n`);
-  
+
   // Analyze each file
   console.log(`${colors.blue}📈 Calculating metrics...${colors.reset}`);
   const results = [];
-  
+
   for (const file of files) {
     const result = analyzeFile(file);
     results.push(result);
   }
-  
+
   // Generate summary
   console.log(`${colors.blue}📊 Generating summary...${colors.reset}`);
   const summary = generateSummary(results);
-  
+
   // Generate reports
   console.log(`${colors.blue}📝 Generating reports...${colors.reset}`);
-  
+
   // JSON report
   const jsonReport = {
     summary,
     files: results,
     thresholds: CONFIG.thresholds,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   };
   fs.writeFileSync(
     path.join(CONFIG.outputDir, 'metrics-report.json'),
     JSON.stringify(jsonReport, null, 2)
   );
-  
+
   // HTML report
   const htmlReport = generateHTMLReport(results, summary);
-  fs.writeFileSync(
-    path.join(CONFIG.outputDir, 'metrics-report.html'),
-    htmlReport
-  );
-  
+  fs.writeFileSync(path.join(CONFIG.outputDir, 'metrics-report.html'), htmlReport);
+
   // Print summary
   console.log(`\n${colors.cyan}📊 Metrics Summary:${colors.reset}`);
   console.log(`  Total Files: ${summary.totalFiles}`);
@@ -739,7 +746,7 @@ async function main() {
   console.log(`  Avg Maintainability: ${summary.avgMaintainability}`);
   console.log(`  Avg Debt Ratio: ${summary.avgDebtRatio}%`);
   console.log(`  Total Debt: ${summary.totalDebtHours.toFixed(1)} hours`);
-  
+
   const totalViolations = Object.values(summary.violations).reduce((a, b) => a + b, 0);
   console.log(`\n${colors.cyan}⚠️ Violations:${colors.reset}`);
   console.log(`  LOC: ${summary.violations.LOC}`);
@@ -747,11 +754,11 @@ async function main() {
   console.log(`  Cognitive: ${summary.violations.Cognitive}`);
   console.log(`  Maintainability: ${summary.violations.Maintainability}`);
   console.log(`  Comments: ${summary.violations.Comments}`);
-  
+
   console.log(`\n${colors.cyan}📁 Reports generated:${colors.reset}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'metrics-report.json')}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'metrics-report.html')}`);
-  
+
   // Exit code based on violations
   if (totalViolations > 0 || summary.avgDebtRatio > CONFIG.thresholds.technicalDebtRatio) {
     console.log(`\n${colors.yellow}⚠️ Found ${totalViolations} violations${colors.reset}`);

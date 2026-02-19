@@ -14,12 +14,12 @@ const SEVERITY_LEVELS = ['critical', 'high', 'moderate', 'low', 'info'];
  */
 function runNpmAudit() {
   console.log('🔍 Running npm audit...\n');
-  
+
   try {
     // Run npm audit with JSON output
-    const result = execSync('npm audit --json', { 
+    const result = execSync('npm audit --json', {
       encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
     return JSON.parse(result);
   } catch (error) {
@@ -44,16 +44,16 @@ function runNpmAudit() {
 function filterBySeverity(vulnerabilities, minSeverity = 'low') {
   const minIndex = SEVERITY_LEVELS.indexOf(minSeverity);
   const filtered = {};
-  
+
   for (const [pkg, info] of Object.entries(vulnerabilities)) {
     const severity = info.severity || 'info';
     const severityIndex = SEVERITY_LEVELS.indexOf(severity);
-    
+
     if (severityIndex <= minIndex) {
       filtered[pkg] = info;
     }
   }
-  
+
   return filtered;
 }
 
@@ -62,7 +62,7 @@ function filterBySeverity(vulnerabilities, minSeverity = 'low') {
  */
 function formatReport(auditData) {
   const { vulnerabilities, metadata } = auditData;
-  
+
   const report = {
     timestamp: new Date().toISOString(),
     summary: {
@@ -76,29 +76,29 @@ function formatReport(auditData) {
     vulnerabilities: {},
     recommendations: [],
   };
-  
+
   if (vulnerabilities) {
     for (const [pkgName, info] of Object.entries(vulnerabilities)) {
       report.vulnerabilities[pkgName] = {
         severity: info.severity,
         range: info.range,
-        fixAvailable: info.fixAvailable ? {
-          name: info.fixAvailable.name,
-          version: info.fixAvailable.version,
-        } : null,
-        via: Array.isArray(info.via) 
-          ? info.via.map(v => typeof v === 'string' ? v : v.title).filter(Boolean)
+        fixAvailable: info.fixAvailable
+          ? {
+              name: info.fixAvailable.name,
+              version: info.fixAvailable.version,
+            }
+          : null,
+        via: Array.isArray(info.via)
+          ? info.via.map(v => (typeof v === 'string' ? v : v.title)).filter(Boolean)
           : [info.via],
       };
-      
+
       if (info.fixAvailable) {
-        report.recommendations.push(
-          `Update ${pkgName} to version ${info.fixAvailable.version}`
-        );
+        report.recommendations.push(`Update ${pkgName} to version ${info.fixAvailable.version}`);
       }
     }
   }
-  
+
   return report;
 }
 
@@ -108,7 +108,7 @@ function formatReport(auditData) {
 function printReport(report) {
   console.log('\n📊 Security Audit Report');
   console.log('========================\n');
-  
+
   console.log('Summary:');
   console.log(`  Total vulnerabilities: ${report.summary.total}`);
   console.log(`  🔴 Critical: ${report.summary.critical}`);
@@ -116,28 +116,29 @@ function printReport(report) {
   console.log(`  🟡 Moderate: ${report.summary.moderate}`);
   console.log(`  🟢 Low: ${report.summary.low}`);
   console.log(`  ℹ️  Info: ${report.summary.info}`);
-  
+
   if (Object.keys(report.vulnerabilities).length > 0) {
     console.log('\n📋 Vulnerability Details:');
     console.log('------------------------\n');
-    
+
     for (const [pkg, info] of Object.entries(report.vulnerabilities)) {
-      const severityEmoji = {
-        critical: '🔴',
-        high: '🟠',
-        moderate: '🟡',
-        low: '🟢',
-        info: 'ℹ️',
-      }[info.severity] || '⚪';
-      
+      const severityEmoji =
+        {
+          critical: '🔴',
+          high: '🟠',
+          moderate: '🟡',
+          low: '🟢',
+          info: 'ℹ️',
+        }[info.severity] || '⚪';
+
       console.log(`${severityEmoji} ${pkg}`);
       console.log(`   Severity: ${info.severity.toUpperCase()}`);
       console.log(`   Affected versions: ${info.range}`);
-      
+
       if (info.via && info.via.length > 0) {
         console.log(`   Issues: ${info.via.join(', ')}`);
       }
-      
+
       if (info.fixAvailable) {
         console.log(`   ✅ Fix available: ${info.fixAvailable.name}@${info.fixAvailable.version}`);
       } else {
@@ -146,7 +147,7 @@ function printReport(report) {
       console.log('');
     }
   }
-  
+
   if (report.recommendations.length > 0) {
     console.log('\n💡 Recommendations:');
     console.log('-------------------\n');
@@ -154,7 +155,7 @@ function printReport(report) {
       console.log(`${i + 1}. ${rec}`);
     });
   }
-  
+
   console.log('\n');
 }
 
@@ -172,7 +173,7 @@ function saveReport(report) {
  */
 function loadNsprcExceptions() {
   const nsprcPath = path.join(process.cwd(), '.nsprc');
-  
+
   if (fs.existsSync(nsprcPath)) {
     try {
       const content = fs.readFileSync(nsprcPath, 'utf-8');
@@ -181,7 +182,7 @@ function loadNsprcExceptions() {
       console.warn('⚠️  Failed to parse .nsprc:', error.message);
     }
   }
-  
+
   return { exceptions: [] };
 }
 
@@ -192,15 +193,13 @@ function applyExceptions(report, exceptions) {
   if (!exceptions.exceptions || exceptions.exceptions.length === 0) {
     return report;
   }
-  
+
   const filteredVulnerabilities = {};
   const ignored = [];
-  
+
   for (const [pkg, info] of Object.entries(report.vulnerabilities)) {
-    const exception = exceptions.exceptions.find(e => 
-      e.package === pkg || pkg.includes(e.package)
-    );
-    
+    const exception = exceptions.exceptions.find(e => e.package === pkg || pkg.includes(e.package));
+
     if (exception) {
       ignored.push({
         package: pkg,
@@ -211,7 +210,7 @@ function applyExceptions(report, exceptions) {
       filteredVulnerabilities[pkg] = info;
     }
   }
-  
+
   return {
     ...report,
     vulnerabilities: filteredVulnerabilities,
@@ -227,27 +226,27 @@ async function main() {
   const saveToFile = args.has('--save');
   const failOnCritical = args.has('--fail-on-critical');
   const failOnHigh = args.has('--fail-on-high');
-  
+
   console.log('🛡️  Jemanote Security Audit Tool\n');
-  
+
   // Run audit
   const auditData = runNpmAudit();
-  
+
   // Format report
   let report = formatReport(auditData);
-  
+
   // Apply .nsprc exceptions
   const exceptions = loadNsprcExceptions();
   report = applyExceptions(report, exceptions);
-  
+
   // Print report
   printReport(report);
-  
+
   // Save if requested
   if (saveToFile) {
     saveReport(report);
   }
-  
+
   // Print ignored vulnerabilities
   if (report.ignored && report.ignored.length > 0) {
     console.log('🚫 Ignored Vulnerabilities (.nsprc):');
@@ -259,20 +258,20 @@ async function main() {
       console.log('');
     });
   }
-  
+
   // Determine exit code
   let exitCode = 0;
-  
+
   if (failOnCritical && report.summary.critical > 0) {
     console.error('❌ Failing due to critical vulnerabilities');
     exitCode = 1;
   }
-  
+
   if (failOnHigh && (report.summary.critical > 0 || report.summary.high > 0)) {
     console.error('❌ Failing due to high/critical vulnerabilities');
     exitCode = 1;
   }
-  
+
   // Summary
   const totalIssues = Object.keys(report.vulnerabilities).length;
   if (totalIssues === 0) {
@@ -280,7 +279,7 @@ async function main() {
   } else {
     console.log(`⚠️  Found ${totalIssues} unaddressed vulnerabilities`);
   }
-  
+
   process.exit(exitCode);
 }
 

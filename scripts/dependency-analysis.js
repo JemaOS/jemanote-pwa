@@ -20,9 +20,9 @@ const CONFIG = {
   outputDir: path.join(ROOT_DIR, 'reports', 'dependencies'),
   thresholds: {
     maxDependencies: 10, // Max imports per file
-    maxDependents: 10,   // Max files importing a module
+    maxDependents: 10, // Max files importing a module
     maxCircularDepth: 3, // Max depth for circular dependencies
-    instabilityThreshold: 0.7 // Max instability (I = Ce / (Ca + Ce))
+    instabilityThreshold: 0.7, // Max instability (I = Ce / (Ca + Ce))
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -32,8 +32,8 @@ const CONFIG = {
     '**/__mocks__/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // ANSI colors
@@ -43,7 +43,7 @@ const colors = {
   yellow: '\x1b[33m',
   green: '\x1b[32m',
   blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 /**
@@ -52,15 +52,15 @@ const colors = {
 function getSourceFiles() {
   const files = [];
   const extensions = ['*.ts', '*.tsx'];
-  
+
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
-  
+
   return files.filter(file => !file.includes('node_modules'));
 }
 
@@ -70,7 +70,7 @@ function getSourceFiles() {
 function parseImports(filePath, content) {
   const imports = [];
   const dirName = path.dirname(filePath);
-  
+
   // ES6 imports - simplified regex to avoid complexity issues
   // Match: import x from 'path' or import { x } from 'path' or import * as x from 'path'
   const importFromRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g;
@@ -79,21 +79,21 @@ function parseImports(filePath, content) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));
   }
-  
+
   // Dynamic imports
   const dynamicRegex = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   while ((match = dynamicRegex.exec(content)) !== null) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));
   }
-  
+
   // Require statements
   const requireRegex = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   while ((match = requireRegex.exec(content)) !== null) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));
   }
-  
+
   return imports.filter(imp => imp && !isExternalDependency(imp));
 }
 
@@ -105,16 +105,16 @@ function resolveImportPath(importPath, currentDir) {
   if (!importPath.startsWith('.') && !importPath.startsWith('@/')) {
     return null;
   }
-  
+
   // Handle alias imports (@/)
   if (importPath.startsWith('@/')) {
     return importPath.replace('@/', '');
   }
-  
+
   // Resolve relative imports
   const resolved = path.resolve(currentDir, importPath);
   const relativeToSrc = path.relative(CONFIG.sourceDir, resolved);
-  
+
   // Remove extension
   return relativeToSrc.replace(/\.(ts|tsx|js|jsx)$/, '');
 }
@@ -124,19 +124,40 @@ function resolveImportPath(importPath, currentDir) {
  */
 function isExternalDependency(importPath) {
   const externals = [
-    'react', 'react-dom', 'react-router-dom',
-    '@radix-ui', '@supabase', '@codemirror',
-    'lucide-react', 'zod', 'class-variance-authority',
-    'clsx', 'tailwind-merge', 'date-fns',
-    'fuse.js', 'mermaid', 'katex',
-    'recharts', 'embla-carousel-react',
-    'sonner', 'vaul', 'cmdk',
-    'localforage', 'cytoscape', 'pixi.js',
-    'next-themes', 'react-hook-form', '@hookform/resolvers',
-    'react-markdown', 'rehype-', 'remark-',
-    'input-otp', 'react-day-picker', 'react-resizable-panels'
+    'react',
+    'react-dom',
+    'react-router-dom',
+    '@radix-ui',
+    '@supabase',
+    '@codemirror',
+    'lucide-react',
+    'zod',
+    'class-variance-authority',
+    'clsx',
+    'tailwind-merge',
+    'date-fns',
+    'fuse.js',
+    'mermaid',
+    'katex',
+    'recharts',
+    'embla-carousel-react',
+    'sonner',
+    'vaul',
+    'cmdk',
+    'localforage',
+    'cytoscape',
+    'pixi.js',
+    'next-themes',
+    'react-hook-form',
+    '@hookform/resolvers',
+    'react-markdown',
+    'rehype-',
+    'remark-',
+    'input-otp',
+    'react-day-picker',
+    'react-resizable-panels',
   ];
-  
+
   return externals.some(ext => importPath.startsWith(ext));
 }
 
@@ -154,17 +175,17 @@ function buildDependencyGraph(files) {
       fullPath: file,
       dependencies: new Set(),
       dependents: new Set(),
-      externalDeps: new Set()
+      externalDeps: new Set(),
     });
   }
-  
+
   // Second pass: build relationships
   for (const file of files) {
     const relativePath = path.relative(CONFIG.sourceDir, file).replace(/\.(ts|tsx)$/, '');
     const content = fs.readFileSync(file, 'utf-8');
     const imports = parseImports(file, content);
     const node = graph.get(relativePath);
-    
+
     for (const imp of imports) {
       if (graph.has(imp)) {
         node.dependencies.add(imp);
@@ -173,7 +194,7 @@ function buildDependencyGraph(files) {
       }
     }
   }
-  
+
   return graph;
 }
 
@@ -184,7 +205,7 @@ function detectCycles(graph) {
   const cycles = [];
   const visited = new Set();
   const recursionStack = new Set();
-  
+
   function dfs(node, path) {
     if (recursionStack.has(node)) {
       // Found cycle
@@ -193,34 +214,34 @@ function detectCycles(graph) {
       cycles.push(cycle);
       return;
     }
-    
+
     if (visited.has(node)) {
       return;
     }
-    
+
     visited.add(node);
     recursionStack.add(node);
-    
+
     const nodeData = graph.get(node);
     if (nodeData) {
       for (const dep of nodeData.dependencies) {
         dfs(dep, [...path, node]);
       }
     }
-    
+
     recursionStack.delete(node);
   }
-  
+
   for (const [key] of graph) {
     if (!visited.has(key)) {
       dfs(key, []);
     }
   }
-  
+
   // Remove duplicate cycles
   const uniqueCycles = [];
   const seen = new Set();
-  
+
   for (const cycle of cycles) {
     const normalized = cycle.slice(0, -1).sort().join(',');
     if (!seen.has(normalized)) {
@@ -228,7 +249,7 @@ function detectCycles(graph) {
       uniqueCycles.push(cycle);
     }
   }
-  
+
   return uniqueCycles;
 }
 
@@ -237,20 +258,20 @@ function detectCycles(graph) {
  */
 function calculateMetrics(graph) {
   const metrics = [];
-  
+
   for (const [path, node] of graph) {
     const ca = node.dependents.size; // Afferent coupling (incoming)
     const ce = node.dependencies.size; // Efferent coupling (outgoing)
-    
+
     // Instability: I = Ce / (Ca + Ce)
     const instability = ca + ce === 0 ? 0 : ce / (ca + ce);
-    
+
     // Abstractness: A = abstract classes / total classes (simplified)
     const abstractness = 0; // Would need AST parsing for accurate calculation
-    
+
     // Distance from main sequence: D = |A + I - 1|
     const distance = Math.abs(abstractness + instability - 1);
-    
+
     metrics.push({
       path,
       ca,
@@ -259,10 +280,10 @@ function calculateMetrics(graph) {
       abstractness: Math.round(abstractness * 100) / 100,
       distance: Math.round(distance * 100) / 100,
       dependencies: Array.from(node.dependencies),
-      dependents: Array.from(node.dependents)
+      dependents: Array.from(node.dependents),
     });
   }
-  
+
   return metrics.sort((a, b) => b.instability - a.instability);
 }
 
@@ -277,9 +298,9 @@ function identifyLayers(graph) {
     lib: [],
     utils: [],
     types: [],
-    contexts: []
+    contexts: [],
   };
-  
+
   for (const [path] of graph) {
     if (path.startsWith('components/')) layers.components.push(path);
     else if (path.startsWith('hooks/')) layers.hooks.push(path);
@@ -289,7 +310,7 @@ function identifyLayers(graph) {
     else if (path.startsWith('types/')) layers.types.push(path);
     else if (path.startsWith('contexts/')) layers.contexts.push(path);
   }
-  
+
   return layers;
 }
 
@@ -298,7 +319,7 @@ function identifyLayers(graph) {
  */
 function checkLayerViolations(graph, layers) {
   const violations = [];
-  
+
   // Rules: Services should not depend on Components
   for (const service of layers.services) {
     const node = graph.get(service);
@@ -308,12 +329,12 @@ function checkLayerViolations(graph, layers) {
           rule: 'Services should not depend on Components',
           from: service,
           to: dep,
-          severity: 'error'
+          severity: 'error',
         });
       }
     }
   }
-  
+
   // Rules: Utils should not depend on Components or Services
   for (const util of layers.utils) {
     const node = graph.get(util);
@@ -323,12 +344,12 @@ function checkLayerViolations(graph, layers) {
           rule: 'Utils should not depend on Components or Services',
           from: util,
           to: dep,
-          severity: 'warning'
+          severity: 'warning',
         });
       }
     }
   }
-  
+
   return violations;
 }
 
@@ -336,9 +357,11 @@ function checkLayerViolations(graph, layers) {
  * Generate HTML report
  */
 function generateHTMLReport(graph, cycles, metrics, layers, violations) {
-  const highInstability = metrics.filter(m => m.instability > CONFIG.thresholds.instabilityThreshold);
+  const highInstability = metrics.filter(
+    m => m.instability > CONFIG.thresholds.instabilityThreshold
+  );
   const highDependencies = metrics.filter(m => m.ce > CONFIG.thresholds.maxDependencies);
-  
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -501,29 +524,49 @@ function generateHTMLReport(graph, cycles, metrics, layers, violations) {
       </div>
     </div>
 
-    ${cycles.length > 0 ? `
+    ${
+      cycles.length > 0
+        ? `
     <h2>🔄 Circular Dependencies (${cycles.length})</h2>
-    ${cycles.map((cycle, i) => `
+    ${cycles
+      .map(
+        (cycle, i) => `
       <div class="cycle-block">
         <strong>Cycle #${i + 1}</strong>
         <div class="cycle-path">
-          ${cycle.map((node, j) => `
+          ${cycle
+            .map(
+              (node, j) => `
             ${node}${j < cycle.length - 1 ? '<span class="cycle-arrow">→</span>' : ''}
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
-    `).join('')}
-    ` : ''}
+    `
+      )
+      .join('')}
+    `
+        : ''
+    }
 
-    ${violations.length > 0 ? `
+    ${
+      violations.length > 0
+        ? `
     <h2>⚠️ Architecture Violations (${violations.length})</h2>
-    ${violations.map(v => `
+    ${violations
+      .map(
+        v => `
       <div class="violation-block ${v.severity}">
         <strong>${v.rule}</strong>
         <div>${v.from} → ${v.to}</div>
       </div>
-    `).join('')}
-    ` : ''}
+    `
+      )
+      .join('')}
+    `
+        : ''
+    }
 
     <h2>📈 Module Metrics</h2>
     <table>
@@ -537,7 +580,9 @@ function generateHTMLReport(graph, cycles, metrics, layers, violations) {
         </tr>
       </thead>
       <tbody>
-        ${metrics.map(m => `
+        ${metrics
+          .map(
+            m => `
           <tr>
             <td>${m.path}</td>
             <td>${m.ca}</td>
@@ -545,7 +590,9 @@ function generateHTMLReport(graph, cycles, metrics, layers, violations) {
             <td class="${m.instability > CONFIG.thresholds.instabilityThreshold ? 'warning' : 'good'}">${m.instability}</td>
             <td>${m.distance}</td>
           </tr>
-        `).join('')}
+        `
+          )
+          .join('')}
       </tbody>
     </table>
 
@@ -559,13 +606,20 @@ function generateHTMLReport(graph, cycles, metrics, layers, violations) {
         </tr>
       </thead>
       <tbody>
-        ${highDependencies.map(m => `
+        ${
+          highDependencies
+            .map(
+              m => `
           <tr>
             <td>${m.path}</td>
             <td>${m.dependencies.slice(0, 5).join(', ')}${m.dependencies.length > 5 ? '...' : ''}</td>
             <td class="warning">${m.ce}</td>
           </tr>
-        `).join('') || '<tr><td colspan="3" style="text-align: center;">No high dependency modules found</td></tr>'}
+        `
+            )
+            .join('') ||
+          '<tr><td colspan="3" style="text-align: center;">No high dependency modules found</td></tr>'
+        }
       </tbody>
     </table>
   </div>
@@ -580,97 +634,96 @@ function generateHTMLReport(graph, cycles, metrics, layers, violations) {
  */
 async function main() {
   console.log(`${colors.cyan}🔗 Starting dependency analysis...${colors.reset}\n`);
-  
+
   // Ensure output directory exists
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
+
   // Get source files
   console.log(`${colors.blue}📁 Scanning source files...${colors.reset}`);
   const files = getSourceFiles();
   console.log(`Found ${files.length} files to analyze\n`);
-  
+
   // Build dependency graph
   console.log(`${colors.blue}📊 Building dependency graph...${colors.reset}`);
   const graph = buildDependencyGraph(files);
-  
+
   // Detect cycles
   console.log(`${colors.blue}🔄 Detecting circular dependencies...${colors.reset}`);
   const cycles = detectCycles(graph);
-  
+
   // Calculate metrics
   console.log(`${colors.blue}📈 Calculating metrics...${colors.reset}`);
   const metrics = calculateMetrics(graph);
-  
+
   // Identify layers
   console.log(`${colors.blue}🏗️ Identifying architecture layers...${colors.reset}`);
   const layers = identifyLayers(graph);
-  
+
   // Check violations
   console.log(`${colors.blue}⚠️ Checking architecture violations...${colors.reset}`);
   const violations = checkLayerViolations(graph, layers);
-  
+
   // Generate reports
   console.log(`${colors.blue}📝 Generating reports...${colors.reset}`);
-  
+
   // JSON report
   const jsonReport = {
     summary: {
       totalModules: graph.size,
       circularDependencies: cycles.length,
-      layers: Object.fromEntries(Object.entries(layers).map(([k, v]) => [k, v.length]))
+      layers: Object.fromEntries(Object.entries(layers).map(([k, v]) => [k, v.length])),
     },
     cycles,
     metrics,
     layers,
     violations,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   };
-  
+
   fs.writeFileSync(
     path.join(CONFIG.outputDir, 'dependency-report.json'),
     JSON.stringify(jsonReport, null, 2)
   );
-  
+
   // HTML report
   const htmlReport = generateHTMLReport(graph, cycles, metrics, layers, violations);
-  fs.writeFileSync(
-    path.join(CONFIG.outputDir, 'dependency-report.html'),
-    htmlReport
-  );
-  
+  fs.writeFileSync(path.join(CONFIG.outputDir, 'dependency-report.html'), htmlReport);
+
   // Print summary
   console.log(`\n${colors.cyan}📊 Analysis Summary:${colors.reset}`);
   console.log(`  Total Modules: ${graph.size}`);
   console.log(`  Circular Dependencies: ${cycles.length}`);
   console.log(`  Architecture Violations: ${violations.length}`);
-  
+
   console.log(`\n${colors.cyan}🏗️ Layer Distribution:${colors.reset}`);
   for (const [layer, count] of Object.entries(layers)) {
     if (count.length > 0) {
       console.log(`  ${layer}: ${count.length}`);
     }
   }
-  
+
   if (cycles.length > 0) {
     console.log(`\n${colors.red}❌ Found ${cycles.length} circular dependencies!${colors.reset}`);
     for (const cycle of cycles) {
       console.log(`  ${cycle.join(' → ')}`);
     }
   }
-  
+
   if (violations.length > 0) {
-    console.log(`\n${colors.yellow}⚠️ Found ${violations.length} architecture violations!${colors.reset}`);
+    console.log(
+      `\n${colors.yellow}⚠️ Found ${violations.length} architecture violations!${colors.reset}`
+    );
     for (const v of violations) {
       console.log(`  ${v.rule}: ${v.from} → ${v.to}`);
     }
   }
-  
+
   console.log(`\n${colors.cyan}📁 Reports generated:${colors.reset}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'dependency-report.json')}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'dependency-report.html')}`);
-  
+
   // Exit code
   if (cycles.length > 0 || violations.some(v => v.severity === 'error')) {
     console.log(`\n${colors.red}❌ Analysis failed due to critical issues${colors.reset}`);

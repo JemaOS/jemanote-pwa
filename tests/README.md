@@ -32,15 +32,15 @@ Cette documentation décrit l'infrastructure de tests complète de **JemaNote**,
 
 ### 📊 Métriques de couverture
 
-| Type de test | Nombre | Couverture cible | Outil |
-|--------------|--------|------------------|-------|
-| Tests unitaires | 50+ | 70% | Vitest |
-| Tests d'intégration | 30+ | - | Vitest + MSW |
-| Tests de composants | 25+ | 80% | React Testing Library |
-| Tests E2E | 40+ | - | Playwright |
-| Tests de sécurité | 100+ | - | Playwright |
-| Tests de performance | 20+ | - | Lighthouse + Playwright |
-| Tests de refactoring | 15+ | - | Scripts custom |
+| Type de test         | Nombre | Couverture cible | Outil                   |
+| -------------------- | ------ | ---------------- | ----------------------- |
+| Tests unitaires      | 50+    | 70%              | Vitest                  |
+| Tests d'intégration  | 30+    | -                | Vitest + MSW            |
+| Tests de composants  | 25+    | 80%              | React Testing Library   |
+| Tests E2E            | 40+    | -                | Playwright              |
+| Tests de sécurité    | 100+   | -                | Playwright              |
+| Tests de performance | 20+    | -                | Lighthouse + Playwright |
+| Tests de refactoring | 15+    | -                | Scripts custom          |
 
 ---
 
@@ -71,12 +71,14 @@ Cette documentation décrit l'infrastructure de tests complète de **JemaNote**,
 Tests rapides et isolés pour les fonctions, hooks et utilitaires.
 
 **Caractéristiques :**
+
 - Exécution en millisecondes
 - Pas de dépendances externes
 - Mock complet des dépendances
 - Couverture de code élevée
 
 **Exemples :**
+
 - [`tests/unit/hooks/useAuth.test.ts`](unit/hooks/useAuth.test.ts)
 - [`tests/unit/lib/utils.test.ts`](unit/lib/utils.test.ts)
 - [`tests/unit/services/graphIndexer.test.ts`](unit/services/graphIndexer.test.ts)
@@ -86,12 +88,14 @@ Tests rapides et isolés pour les fonctions, hooks et utilitaires.
 Tests des interactions entre modules et services externes.
 
 **Caractéristiques :**
+
 - Mock des API avec MSW (Mock Service Worker)
 - Tests de flux complets
 - Validation des schémas de données
 - Tests de synchronisation
 
 **Exemples :**
+
 - [`tests/integration/supabase/auth.test.ts`](integration/supabase/auth.test.ts)
 - [`tests/integration/storage/localStorage.test.ts`](integration/storage/localStorage.test.ts)
 - [`tests/integration/sync/offlineSync.test.ts`](integration/sync/offlineSync.test.ts)
@@ -101,12 +105,14 @@ Tests des interactions entre modules et services externes.
 Tests des composants React avec interactions utilisateur.
 
 **Caractéristiques :**
+
 - Rendu dans un DOM virtuel (jsdom)
 - Simulation des événements utilisateur
 - Tests d'accessibilité
 - Tests de snapshots (optionnel)
 
 **Exemples :**
+
 - [`tests/components/editor/MarkdownEditor.test.tsx`](components/editor/MarkdownEditor.test.tsx)
 - [`tests/components/layout/Sidebar.test.tsx`](components/layout/Sidebar.test.tsx)
 - [`tests/components/ai/AIPanel.test.tsx`](components/ai/AIPanel.test.tsx)
@@ -116,12 +122,14 @@ Tests des composants React avec interactions utilisateur.
 Tests de bout en bout dans un vrai navigateur.
 
 **Caractéristiques :**
+
 - Exécution dans Chrome, Firefox, Safari
 - Tests sur mobile et desktop
 - Tests hors-ligne (PWA)
 - Captures d'écran et vidéos
 
 **Exemples :**
+
 - [`tests/e2e/auth.spec.ts`](e2e/auth.spec.ts)
 - [`tests/e2e/notes.spec.ts`](e2e/notes.spec.ts)
 - [`tests/e2e/offline.spec.ts`](e2e/offline.spec.ts)
@@ -131,12 +139,14 @@ Tests de bout en bout dans un vrai navigateur.
 Tests de vulnérabilités et de conformité sécuritaire.
 
 **Caractéristiques :**
+
 - Tests XSS, CSP, headers HTTP
 - Injection SQL et NoSQL
 - Sanitization des entrées
 - Authentification et autorisation
 
 **Exemples :**
+
 - [`tests/security/xss.spec.ts`](security/xss.spec.ts)
 - [`tests/security/csp.spec.ts`](security/csp.spec.ts)
 - [`tests/security/headers.spec.ts`](security/headers.spec.ts)
@@ -146,12 +156,14 @@ Tests de vulnérabilités et de conformité sécuritaire.
 Tests de performance et de mémoire.
 
 **Caractéristiques :**
+
 - Audits Lighthouse
 - Tests de bundle size
 - Tests de mémoire
 - Tests d'interactions
 
 **Exemples :**
+
 - [`tests/performance/lighthouse.spec.ts`](performance/lighthouse.spec.ts)
 - [`tests/performance/bundle.spec.ts`](performance/bundle.spec.ts)
 
@@ -160,12 +172,14 @@ Tests de performance et de mémoire.
 Tests de qualité du code et de métriques.
 
 **Caractéristiques :**
+
 - Analyse de complexité cyclomatique
 - Détection de duplication
 - Analyse de couplage
 - Analyse de cohésion
 
 **Exemples :**
+
 - [`tests/refactoring/complexity.spec.ts`](refactoring/complexity.spec.ts)
 - [`tests/refactoring/duplication.spec.ts`](refactoring/duplication.spec.ts)
 
@@ -259,61 +273,61 @@ tests/
 
 ### Tests unitaires et d'intégration (Vitest)
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test` | Lancer tous les tests unitaires une fois |
-| `npm run test:watch` | Lancer les tests en mode watch |
+| Commande                | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `npm run test`          | Lancer tous les tests unitaires une fois    |
+| `npm run test:watch`    | Lancer les tests en mode watch              |
 | `npm run test:coverage` | Lancer les tests avec rapport de couverture |
 
 ### Tests E2E (Playwright)
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test:e2e` | Lancer tous les tests E2E |
-| `npm run test:e2e:ui` | Lancer avec l'interface utilisateur |
-| `npm run test:e2e:debug` | Lancer en mode débogage |
+| Commande                 | Description                         |
+| ------------------------ | ----------------------------------- |
+| `npm run test:e2e`       | Lancer tous les tests E2E           |
+| `npm run test:e2e:ui`    | Lancer avec l'interface utilisateur |
+| `npm run test:e2e:debug` | Lancer en mode débogage             |
 
 ### Tests de régression visuelle
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test:visual` | Lancer les tests de régression visuelle |
-| `npm run test:visual:update` | Mettre à jour les snapshots |
-| `npm run test:visual:report` | Générer le rapport visuel |
+| Commande                     | Description                             |
+| ---------------------------- | --------------------------------------- |
+| `npm run test:visual`        | Lancer les tests de régression visuelle |
+| `npm run test:visual:update` | Mettre à jour les snapshots             |
+| `npm run test:visual:report` | Générer le rapport visuel               |
 
 ### Tests de performance
 
-| Commande | Description |
-|----------|-------------|
+| Commande                   | Description                     |
+| -------------------------- | ------------------------------- |
 | `npm run test:performance` | Lancer les tests de performance |
-| `npm run test:lighthouse` | Lancer les audits Lighthouse |
-| `npm run benchmark` | Lancer les benchmarks |
+| `npm run test:lighthouse`  | Lancer les audits Lighthouse    |
+| `npm run benchmark`        | Lancer les benchmarks           |
 
 ### Tests de sécurité
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test:security` | Lancer les tests de sécurité |
+| Commande                    | Description                        |
+| --------------------------- | ---------------------------------- |
+| `npm run test:security`     | Lancer les tests de sécurité       |
 | `npm run test:security:all` | Lancer tous les audits de sécurité |
-| `npm run security:audit` | Audit des dépendances |
-| `npm run security:csp` | Vérification CSP |
+| `npm run security:audit`    | Audit des dépendances              |
+| `npm run security:csp`      | Vérification CSP                   |
 
 ### Tests de refactoring
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test:refactoring` | Lancer tous les tests de refactoring |
-| `npm run analyze:complexity` | Analyser la complexité |
-| `npm run analyze:duplication` | Détecter la duplication |
-| `npm run analyze:all` | Toutes les analyses |
+| Commande                      | Description                          |
+| ----------------------------- | ------------------------------------ |
+| `npm run test:refactoring`    | Lancer tous les tests de refactoring |
+| `npm run analyze:complexity`  | Analyser la complexité               |
+| `npm run analyze:duplication` | Détecter la duplication              |
+| `npm run analyze:all`         | Toutes les analyses                  |
 
 ### Commandes globales
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test:all` | Lancer tous les tests (lint + types + unit + e2e) |
-| `npm run test:all:visual` | Tous les tests + régression visuelle |
-| `npm run test:quality` | Tests de refactoring + analyses |
+| Commande                  | Description                                       |
+| ------------------------- | ------------------------------------------------- |
+| `npm run test:all`        | Lancer tous les tests (lint + types + unit + e2e) |
+| `npm run test:all:visual` | Tous les tests + régression visuelle              |
+| `npm run test:quality`    | Tests de refactoring + analyses                   |
 
 ---
 
@@ -337,7 +351,7 @@ export default defineConfig({
       },
     },
   },
-})
+});
 ```
 
 ### Playwright ([`playwright.config.ts`](../playwright.config.ts))
@@ -355,7 +369,7 @@ export default defineConfig({
     { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
     { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
   ],
-})
+});
 ```
 
 ---
@@ -364,12 +378,12 @@ export default defineConfig({
 
 ### Seuils actuels
 
-| Métrique | Seuil | Statut |
-|----------|-------|--------|
-| Statements | 70% | ✅ |
-| Branches | 60% | ✅ |
-| Functions | 70% | ✅ |
-| Lines | 70% | ✅ |
+| Métrique   | Seuil | Statut |
+| ---------- | ----- | ------ |
+| Statements | 70%   | ✅     |
+| Branches   | 60%   | ✅     |
+| Functions  | 70%   | ✅     |
+| Lines      | 70%   | ✅     |
 
 ### Générer le rapport
 
@@ -397,22 +411,22 @@ Le rapport HTML est généré dans le dossier [`coverage/`](../coverage/).
 // ✅ Bon
 it('should return user data when authenticated', async () => {
   // Arrange
-  mockAuthService.getUser.mockResolvedValue(mockUser)
-  
+  mockAuthService.getUser.mockResolvedValue(mockUser);
+
   // Act
-  const result = await getUser()
-  
+  const result = await getUser();
+
   // Assert
-  expect(result).toEqual(mockUser)
-})
+  expect(result).toEqual(mockUser);
+});
 
 // ❌ Mauvais
 it('test user', async () => {
-  const x = await getUser()
+  const x = await getUser();
   if (x) {
-    expect(x.id).toBeDefined()
+    expect(x.id).toBeDefined();
   }
-})
+});
 ```
 
 ### Tests de composants
@@ -421,11 +435,11 @@ it('test user', async () => {
 // ✅ Bon
 it('should display error message when form submission fails', async () => {
   render(<LoginForm />)
-  
+
   await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
   await userEvent.type(screen.getByLabelText(/password/i), 'wrong')
   await userEvent.click(screen.getByRole('button', { name: /login/i }))
-  
+
   expect(await screen.findByText(/invalid credentials/i)).toBeInTheDocument()
 })
 
@@ -441,16 +455,16 @@ test('form', () => {
 ```typescript
 // ✅ Bon
 test('user can create and delete a note', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: /new note/i }).click()
-  await page.getByPlaceholder(/title/i).fill('Test Note')
-  await page.getByRole('button', { name: /save/i }).click()
-  
-  await expect(page.getByText('Test Note')).toBeVisible()
-  
-  await page.getByRole('button', { name: /delete/i }).click()
-  await expect(page.getByText('Test Note')).not.toBeVisible()
-})
+  await page.goto('/');
+  await page.getByRole('button', { name: /new note/i }).click();
+  await page.getByPlaceholder(/title/i).fill('Test Note');
+  await page.getByRole('button', { name: /save/i }).click();
+
+  await expect(page.getByText('Test Note')).toBeVisible();
+
+  await page.getByRole('button', { name: /delete/i }).click();
+  await expect(page.getByText('Test Note')).not.toBeVisible();
+});
 ```
 
 ---

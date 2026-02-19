@@ -1,24 +1,24 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import * as Popover from '@radix-ui/react-popover'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
-import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight } from 'lucide-react'
-import React from 'react'
-import { DayPicker } from 'react-day-picker'
-import 'react-day-picker/dist/style.css'
+import * as Popover from '@radix-ui/react-popover';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 interface DateFilterProps {
-  readonly selectedDate: Date | undefined
-  readonly onSelectDate: (date: Date | undefined) => void
+  readonly selectedDate: Date | undefined;
+  readonly onSelectDate: (date: Date | undefined) => void;
 }
 
 // IconLeft component extracted to avoid nested function declaration
-const IconLeftComponent = () => <ChevronLeft className="h-4 w-4" />
+const IconLeftComponent = () => <ChevronLeft className="h-4 w-4" />;
 
 // IconRight component extracted to avoid nested function declaration
-const IconRightComponent = () => <ChevronRight className="h-4 w-4" />
+const IconRightComponent = () => <ChevronRight className="h-4 w-4" />;
 
 export default function DateFilter({ selectedDate, onSelectDate }: DateFilterProps) {
   // Custom styling for DayPicker to match the app theme
@@ -52,17 +52,17 @@ export default function DateFilter({ selectedDate, onSelectDate }: DateFilterPro
       width: 32px;
       height: 32px;
     }
-  `
+  `;
 
   return (
     <>
       <style>{css}</style>
       <Popover.Root>
         <Popover.Trigger asChild>
-          <button 
+          <button
             className={`flex items-center gap-3 transition-colors rounded-lg p-1 -ml-1 ${
-              selectedDate 
-                ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' 
+              selectedDate
+                ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20'
                 : 'text-primary-500 hover:bg-neutral-100 dark:hover:bg-neutral-800'
             }`}
             title="Filtrer par date"
@@ -76,18 +76,20 @@ export default function DateFilter({ selectedDate, onSelectDate }: DateFilterPro
           </button>
         </Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content 
+          <Popover.Content
             className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl p-4 z-50 animate-in fade-in zoom-in-95 duration-200"
             sideOffset={8}
             align="start"
           >
             <div className="flex justify-between items-center mb-4 px-2">
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Choisir une date</h3>
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                Choisir une date
+              </h3>
               {selectedDate && (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSelectDate(undefined)
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    onSelectDate(undefined);
                   }}
                   className="text-xs font-medium text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
@@ -96,7 +98,7 @@ export default function DateFilter({ selectedDate, onSelectDate }: DateFilterPro
                 </button>
               )}
             </div>
-            
+
             <DayPicker
               mode="single"
               selected={selectedDate}
@@ -114,5 +116,5 @@ export default function DateFilter({ selectedDate, onSelectDate }: DateFilterPro
         </Popover.Portal>
       </Popover.Root>
     </>
-  )
+  );
 }

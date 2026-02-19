@@ -5,7 +5,7 @@
 
 /**
  * Quality Check Script
- * 
+ *
  * This script runs all quality checks in sequence:
  * - ESLint
  * - TypeScript type checking
@@ -13,10 +13,10 @@
  * - Unit tests
  * - Dependency check (depcheck)
  * - Dead code detection (knip)
- * 
+ *
  * Usage:
  *   node scripts/quality-check.js [--fix]
- * 
+ *
  * Options:
  *   --fix    Auto-fix issues where possible
  */
@@ -87,7 +87,7 @@ function runCommand(command, args = [], options = {}) {
     let stdout = '';
     let stderr = '';
 
-    child.stdout?.on('data', (data) => {
+    child.stdout?.on('data', data => {
       const output = data.toString();
       stdout += output;
       if (options.verbose !== false) {
@@ -95,7 +95,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.stderr?.on('data', (data) => {
+    child.stderr?.on('data', data => {
       const output = data.toString();
       stderr += output;
       if (options.verbose !== false) {
@@ -103,7 +103,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0 || options.ignoreError) {
         resolve({ code, stdout, stderr });
       } else {
@@ -111,7 +111,7 @@ function runCommand(command, args = [], options = {}) {
       }
     });
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       reject(error);
     });
   });
@@ -181,9 +181,7 @@ async function runTypeCheck() {
 async function runPrettier() {
   printHeader('Running Prettier Check');
   try {
-    const args = shouldFix 
-      ? ['--write', '.'] 
-      : ['--check', '.'];
+    const args = shouldFix ? ['--write', '.'] : ['--check', '.'];
     await runCommand('npx', ['prettier', ...args]);
     printSuccess(shouldFix ? 'Prettier formatting applied' : 'Prettier check passed');
     results.passed.push('Prettier');
@@ -260,19 +258,25 @@ function printSummary() {
   console.log(colors.cyan + colors.bright + '━'.repeat(60) + colors.reset + '\n');
 
   if (results.passed.length > 0) {
-    console.log(colors.green + colors.bright + '✓ Passed (' + results.passed.length + '):' + colors.reset);
+    console.log(
+      colors.green + colors.bright + '✓ Passed (' + results.passed.length + '):' + colors.reset
+    );
     results.passed.forEach(item => console.log(colors.green + '  • ' + item + colors.reset));
     console.log('');
   }
 
   if (results.warnings.length > 0) {
-    console.log(colors.yellow + colors.bright + '⚠ Warnings (' + results.warnings.length + '):' + colors.reset);
+    console.log(
+      colors.yellow + colors.bright + '⚠ Warnings (' + results.warnings.length + '):' + colors.reset
+    );
     results.warnings.forEach(item => console.log(colors.yellow + '  • ' + item + colors.reset));
     console.log('');
   }
 
   if (results.failed.length > 0) {
-    console.log(colors.red + colors.bright + '✗ Failed (' + results.failed.length + '):' + colors.reset);
+    console.log(
+      colors.red + colors.bright + '✗ Failed (' + results.failed.length + '):' + colors.reset
+    );
     results.failed.forEach(item => console.log(colors.red + '  • ' + item + colors.reset));
     console.log('');
   }
@@ -281,13 +285,18 @@ function printSummary() {
   const success = results.failed.length === 0;
 
   console.log(colors.cyan + colors.bright + '━'.repeat(60) + colors.reset);
-  
+
   if (success) {
     console.log(colors.green + colors.bright + '  ✓ All quality checks passed!' + colors.reset);
     console.log(colors.cyan + colors.bright + '━'.repeat(60) + colors.reset + '\n');
     return 0;
   } else {
-    console.log(colors.red + colors.bright + `  ✗ ${results.failed.length}/${total} checks failed` + colors.reset);
+    console.log(
+      colors.red +
+        colors.bright +
+        `  ✗ ${results.failed.length}/${total} checks failed` +
+        colors.reset
+    );
     console.log(colors.cyan + colors.bright + '━'.repeat(60) + colors.reset + '\n');
     return 1;
   }
@@ -297,16 +306,23 @@ function printSummary() {
  * Main function
  */
 async function main() {
-  console.log(colors.blue + colors.bright + `
+  console.log(
+    colors.blue +
+      colors.bright +
+      `
 ╔══════════════════════════════════════════════════════════╗
 ║                                                          ║
 ║           JEMANOTE QUALITY CHECK SUITE                   ║
 ║                                                          ║
 ╚══════════════════════════════════════════════════════════╝
-  ` + colors.reset);
+  ` +
+      colors.reset
+  );
 
   if (shouldFix) {
-    console.log(colors.yellow + '⚠ Running in FIX mode - will auto-fix issues where possible\n' + colors.reset);
+    console.log(
+      colors.yellow + '⚠ Running in FIX mode - will auto-fix issues where possible\n' + colors.reset
+    );
   }
 
   const startTime = Date.now();

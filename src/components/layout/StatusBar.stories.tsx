@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import StatusBar from './StatusBar'
+import StatusBar from './StatusBar';
 
 const meta: Meta<typeof StatusBar> = {
   title: 'Layout/StatusBar',
@@ -17,17 +17,17 @@ const meta: Meta<typeof StatusBar> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <Story />
       </ThemeProvider>
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof StatusBar>
+export default meta;
+type Story = StoryObj<typeof StatusBar>;
 
 const defaultProps = {
   userId: null as string | null,
@@ -37,15 +37,15 @@ const defaultProps = {
   onShowAuth: () => {},
   onEnableSync: () => {},
   onManualSync: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const LocalMode: Story = {
   args: defaultProps,
-}
+};
 
 export const WithUserDisconnected: Story = {
   args: {
@@ -53,7 +53,7 @@ export const WithUserDisconnected: Story = {
     userId: 'user-123',
     syncEnabled: false,
   },
-}
+};
 
 export const WithUserSyncing: Story = {
   args: {
@@ -62,7 +62,7 @@ export const WithUserSyncing: Story = {
     syncing: true,
     syncEnabled: true,
   },
-}
+};
 
 export const WithUserSynced: Story = {
   args: {
@@ -71,7 +71,7 @@ export const WithUserSynced: Story = {
     syncing: false,
     syncEnabled: true,
   },
-}
+};
 
 export const WithActiveNote: Story = {
   args: {
@@ -81,7 +81,7 @@ export const WithActiveNote: Story = {
     syncing: false,
     syncEnabled: true,
   },
-}
+};
 
 export const MobileViewport: Story = {
   args: defaultProps,
@@ -90,7 +90,7 @@ export const MobileViewport: Story = {
       defaultViewport: 'mobile',
     },
   },
-}
+};
 
 export const TabletViewport: Story = {
   args: defaultProps,
@@ -99,4 +99,4 @@ export const TabletViewport: Story = {
       defaultViewport: 'tablet',
     },
   },
-}
+};

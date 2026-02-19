@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import InstallPrompt from './InstallPrompt'
+import InstallPrompt from './InstallPrompt';
 
 const meta: Meta<typeof InstallPrompt> = {
   title: 'Components/InstallPrompt',
@@ -17,7 +17,7 @@ const meta: Meta<typeof InstallPrompt> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-screen w-full relative">
           <div className="p-4">Contenu de la page</div>
@@ -27,14 +27,14 @@ const meta: Meta<typeof InstallPrompt> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof InstallPrompt>
+export default meta;
+type Story = StoryObj<typeof InstallPrompt>;
 
 export const Default: Story = {
   args: {},
-}
+};
 
 export const MobileViewport: Story = {
   args: {},
@@ -43,7 +43,7 @@ export const MobileViewport: Story = {
       defaultViewport: 'mobile',
     },
   },
-}
+};
 
 export const TabletViewport: Story = {
   args: {},
@@ -52,4 +52,4 @@ export const TabletViewport: Story = {
       defaultViewport: 'tablet',
     },
   },
-}
+};

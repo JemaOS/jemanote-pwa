@@ -1,44 +1,46 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Mail, Lock } from 'lucide-react'
-import { useState } from 'react'
+import { Mail, Lock } from 'lucide-react';
+import { useState } from 'react';
 
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth';
 
 // Helper function to get button text based on state
 function getButtonText(loading: boolean, isLogin: boolean): string {
-  if (loading) {return 'Chargement...';}
+  if (loading) {
+    return 'Chargement...';
+  }
   return isLogin ? 'Se connecter' : "S'inscrire";
 }
 
 export default function AuthView() {
-  const { signIn, signUp } = useAuth()
-  const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { signIn, signUp } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
       const { error: authError } = isLogin
         ? await signIn(email, password)
-        : await signUp(email, password)
+        : await signUp(email, password);
 
       if (authError) {
-        setError(authError.message)
+        setError(authError.message);
       }
     } catch {
-      setError('Une erreur est survenue')
+      setError('Une erreur est survenue');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 dark:bg-neutral-900 px-4">
@@ -55,23 +57,29 @@ export default function AuthView() {
         <div className="bg-surface-bg dark:bg-neutral-800 rounded-lg shadow-card p-8">
           <div className="mb-6 flex gap-2">
             <button
-              onClick={() => { setIsLogin(true); }}
+              onClick={() => {
+                setIsLogin(true);
+              }}
               className={(() => {
-                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors'
-                const activeClasses = 'bg-primary-500 text-white'
-                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-                return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`
+                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors';
+                const activeClasses = 'bg-primary-500 text-white';
+                const inactiveClasses =
+                  'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600';
+                return `${baseClasses} ${isLogin ? activeClasses : inactiveClasses}`;
               })()}
             >
               Connexion
             </button>
             <button
-              onClick={() => { setIsLogin(false); }}
+              onClick={() => {
+                setIsLogin(false);
+              }}
               className={(() => {
-                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors'
-                const activeClasses = 'bg-primary-500 text-white'
-                const inactiveClasses = 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-                return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`
+                const baseClasses = 'flex-1 py-2 px-4 rounded-md font-semibold transition-colors';
+                const activeClasses = 'bg-primary-500 text-white';
+                const inactiveClasses =
+                  'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600';
+                return `${baseClasses} ${isLogin ? inactiveClasses : activeClasses}`;
               })()}
             >
               Inscription
@@ -80,7 +88,10 @@ export default function AuthView() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+              >
                 Email
               </label>
               <div className="relative">
@@ -89,7 +100,9 @@ export default function AuthView() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); }}
+                  onChange={e => {
+                    setEmail(e.target.value);
+                  }}
                   required
                   className="w-full h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-md text-body focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
                   placeholder="votre@email.com"
@@ -98,7 +111,10 @@ export default function AuthView() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-body-small font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+              >
                 Mot de passe
               </label>
               <div className="relative">
@@ -107,7 +123,9 @@ export default function AuthView() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); }}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                  }}
                   required
                   minLength={6}
                   className="w-full h-12 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-md text-body focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
@@ -133,5 +151,5 @@ export default function AuthView() {
         </div>
       </div>
     </div>
-  )
+  );
 }

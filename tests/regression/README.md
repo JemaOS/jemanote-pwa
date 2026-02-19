@@ -23,11 +23,11 @@ Les tests de régression visuelle permettent de détecter les changements visuel
 
 ### Seuils de tolérance configurés
 
-| Paramètre | Valeur | Description |
-|-----------|--------|-------------|
-| `threshold` | 0.2% | Pourcentage maximal de pixels différents |
-| `maxDiffPixels` | 100 | Nombre maximal de pixels différents |
-| `animations` | disabled | Animations désactivées pour la cohérence |
+| Paramètre       | Valeur   | Description                              |
+| --------------- | -------- | ---------------------------------------- |
+| `threshold`     | 0.2%     | Pourcentage maximal de pixels différents |
+| `maxDiffPixels` | 100      | Nombre maximal de pixels différents      |
+| `animations`    | disabled | Animations désactivées pour la cohérence |
 
 ## Architecture
 
@@ -69,10 +69,10 @@ Les tests utilisent la configuration existante dans [`playwright.config.ts`](../
 ```typescript
 // tests/regression/visual.spec.ts
 const VISUAL_CONFIG = {
-  threshold: 0.2,        // 0.2% de différence maximale
-  maxDiffPixels: 100,    // Maximum 100 pixels différents
-  animations: 'disabled' // Désactiver les animations
-}
+  threshold: 0.2, // 0.2% de différence maximale
+  maxDiffPixels: 100, // Maximum 100 pixels différents
+  animations: 'disabled', // Désactiver les animations
+};
 ```
 
 ## Utilisation
@@ -138,11 +138,13 @@ Lors d'une PR, le workflow CI exécute automatiquement les tests visuels :
 Si les changements sont intentionnels :
 
 **Option A - Via GitHub CLI :**
+
 ```bash
 gh workflow run visual.yml -f update_baselines=true
 ```
 
 **Option B - Via l'interface GitHub :**
+
 1. Aller dans l'onglet "Actions"
 2. Sélectionner "Visual Regression Tests"
 3. Cliquer "Run workflow"
@@ -160,16 +162,19 @@ gh workflow run visual.yml -f update_baselines=true
 ### Méthodes de mise à jour
 
 **1. Localement (développement) :**
+
 ```bash
 npm run test:visual:update
 ```
 
 **2. Via le script :**
+
 ```bash
 node scripts/visual-regression.js --update
 ```
 
 **3. Via CI/CD :**
+
 ```bash
 gh workflow run visual.yml -f update_baselines=true --ref <branch-name>
 ```
@@ -202,8 +207,8 @@ await page.addStyleTag({
     [data-testid="random-id"] {
       visibility: hidden !important;
     }
-  `
-})
+  `,
+});
 ```
 
 ### Désactiver les animations
@@ -218,9 +223,9 @@ test.beforeEach(async ({ page }) => {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
       }
-    `
-  })
-})
+    `,
+  });
+});
 ```
 
 ### Ignorer des zones spécifiques
@@ -231,8 +236,8 @@ Pour ignorer une zone spécifique d'un screenshot :
 await expect(page).toHaveScreenshot('page.png', {
   mask: [page.locator('.dynamic-content')],
   threshold: 0.2,
-  maxDiffPixels: 100
-})
+  maxDiffPixels: 100,
+});
 ```
 
 ## Dépannage
@@ -242,21 +247,24 @@ await expect(page).toHaveScreenshot('page.png', {
 **Problème :** Les tests échouent aléatoirement
 
 **Solutions :**
+
 1. Augmenter le délai d'attente :
+
    ```typescript
-   await page.waitForTimeout(1000)
+   await page.waitForTimeout(1000);
    ```
 
 2. Attendre le chargement complet :
+
    ```typescript
-   await page.waitForLoadState('networkidle')
+   await page.waitForLoadState('networkidle');
    ```
 
 3. Masquer les éléments instables :
    ```typescript
    await page.addStyleTag({
-     content: '.unstable-element { visibility: hidden !important; }'
-   })
+     content: '.unstable-element { visibility: hidden !important; }',
+   });
    ```
 
 ### Différences de rendu entre OS
@@ -264,7 +272,9 @@ await expect(page).toHaveScreenshot('page.png', {
 **Problème :** Les screenshots diffèrent entre macOS/Linux/Windows
 
 **Solutions :**
+
 1. Utiliser Docker pour la cohérence :
+
    ```bash
    docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/playwright:v1.40.0-jammy npm run test:visual
    ```
@@ -277,7 +287,9 @@ await expect(page).toHaveScreenshot('page.png', {
 **Problème :** Les baselines prennent trop de place
 
 **Solutions :**
+
 1. Utiliser Git LFS :
+
    ```bash
    git lfs track "tests/regression/snapshots/**/*.png"
    ```
@@ -290,7 +302,9 @@ await expect(page).toHaveScreenshot('page.png', {
 **Problème :** Les tests visuels prennent trop de temps
 
 **Solutions :**
+
 1. Paralléliser les tests :
+
    ```bash
    npx playwright test --workers=4
    ```

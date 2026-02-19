@@ -1,9 +1,9 @@
 /**
  * Configuration globale pour les tests
- * 
+ *
  * Ce fichier centralise les constantes, timeouts et données de test
  * utilisées dans l'ensemble de la suite de tests.
- * 
+ *
  * @example
  * import { TEST_CONFIG, MOCK_DATA, TIMEOUTS } from '@/tests/config'
  */
@@ -19,37 +19,37 @@
 export const TIMEOUTS = {
   /** Timeout par défaut pour les tests unitaires (ms) */
   UNIT: process.env.CI ? 30000 : 10000,
-  
+
   /** Timeout pour les tests d'intégration (ms) */
   INTEGRATION: process.env.CI ? 60000 : 30000,
-  
+
   /** Timeout pour les tests de composants (ms) */
   COMPONENT: process.env.CI ? 30000 : 15000,
-  
+
   /** Timeout pour les tests E2E (ms) */
   E2E: process.env.CI ? 60000 : 30000,
-  
+
   /** Timeout pour les actions Playwright (ms) */
   ACTION: process.env.CI ? 15000 : 10000,
-  
+
   /** Timeout pour la navigation Playwright (ms) */
   NAVIGATION: process.env.CI ? 30000 : 15000,
-  
+
   /** Timeout pour les tests de performance (ms) */
   PERFORMANCE: process.env.CI ? 120000 : 60000,
-  
+
   /** Timeout pour les tests de sécurité (ms) */
   SECURITY: process.env.CI ? 60000 : 30000,
-  
+
   /** Délai de debounce pour les inputs (ms) */
   DEBOUNCE: 300,
-  
+
   /** Délai d'animation (ms) */
   ANIMATION: 300,
-  
+
   /** Délai de polling pour les attentes (ms) */
   POLLING: 100,
-} as const
+} as const;
 
 // =============================================================================
 // URLS DE TEST
@@ -63,12 +63,12 @@ export const TEST_URLS = {
   // SECURITY NOTE: Using HTTP for localhost development is acceptable
   // These are local development server URLs, not production endpoints
   BASE: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
-  
+
   /** URL de base pour l'API */
   // SECURITY NOTE: Using HTTP for localhost Supabase is acceptable
   // This is a local development Supabase instance, not production
   API: process.env.VITE_SUPABASE_URL || 'http://localhost:54321',
-  
+
   /** Routes de l'application */
   ROUTES: {
     HOME: '/',
@@ -81,7 +81,7 @@ export const TEST_URLS = {
     SEARCH: '/search',
     AI: '/ai',
   },
-  
+
   /** Endpoints API */
   API_ENDPOINTS: {
     AUTH: '/auth/v1',
@@ -89,7 +89,7 @@ export const TEST_URLS = {
     REALTIME: '/realtime/v1',
     STORAGE: '/storage/v1',
   },
-} as const
+} as const;
 
 // =============================================================================
 // DONNÉES DE TEST
@@ -110,7 +110,7 @@ export const MOCK_DATA = {
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
   },
-  
+
   /** Session de test - Mock tokens for testing purposes only, NOT real credentials */
   SESSION: {
     /** Mock access token for testing - NOT a real credential */
@@ -121,7 +121,7 @@ export const MOCK_DATA = {
     token_type: 'bearer',
     user: null as any, // Sera défini avec MOCK_DATA.USER
   },
-  
+
   /** Note de test */
   NOTE: {
     id: 'test-note-id-789',
@@ -135,7 +135,7 @@ export const MOCK_DATA = {
     tags: ['test', 'example'],
     folder_id: null,
   },
-  
+
   /** Dossier de test */
   FOLDER: {
     id: 'test-folder-id-abc',
@@ -145,7 +145,7 @@ export const MOCK_DATA = {
     updated_at: '2024-01-01T00:00:00Z',
     parent_id: null,
   },
-  
+
   /** Tag de test */
   TAG: {
     id: 'test-tag-id-def',
@@ -153,7 +153,7 @@ export const MOCK_DATA = {
     user_id: 'test-user-id-123',
     color: '#3b82f6',
   },
-  
+
   /** Paramètres de test */
   SETTINGS: {
     theme: 'system',
@@ -164,7 +164,7 @@ export const MOCK_DATA = {
     spellCheck: true,
     defaultView: 'list',
   },
-  
+
   /** Réponse API de test */
   API_RESPONSE: {
     success: { success: true, message: 'Operation completed' },
@@ -172,7 +172,7 @@ export const MOCK_DATA = {
     notFound: { error: 'Resource not found', code: 'NOT_FOUND' },
     unauthorized: { error: 'Unauthorized', code: 'UNAUTHORIZED' },
   },
-} as const
+} as const;
 
 // =============================================================================
 // SÉLECTEURS
@@ -181,7 +181,7 @@ export const MOCK_DATA = {
 /**
  * Sélecteurs de test data attributes
  * Utiliser ces attributs dans les composants pour les tests
- * 
+ *
  * @example
  * <button data-testid={TEST_SELECTORS.BUTTON.SUBMIT}>Submit</button>
  */
@@ -202,7 +202,7 @@ export const TEST_SELECTORS = {
     SYNC: 'sync-button',
     OFFLINE: 'offline-button',
   },
-  
+
   /** Inputs - These are test selectors for form input elements, NOT actual credentials */
   INPUT: {
     /** Test selector for title input field */
@@ -218,7 +218,7 @@ export const TEST_SELECTORS = {
     /** Test selector for tag input field */
     TAG: 'tag-input',
   },
-  
+
   /** Conteneurs */
   CONTAINER: {
     SIDEBAR: 'sidebar-container',
@@ -229,7 +229,7 @@ export const TEST_SELECTORS = {
     GRAPH: 'graph-container',
     CANVAS: 'canvas-container',
   },
-  
+
   /** Listes */
   LIST: {
     NOTES: 'notes-list',
@@ -237,14 +237,14 @@ export const TEST_SELECTORS = {
     TAGS: 'tags-list',
     SEARCH_RESULTS: 'search-results-list',
   },
-  
+
   /** Items */
   ITEM: {
     NOTE: 'note-item',
     FOLDER: 'folder-item',
     TAG: 'tag-item',
   },
-  
+
   /** Navigation */
   NAV: {
     ROOT: 'navigation',
@@ -255,7 +255,7 @@ export const TEST_SELECTORS = {
     LINK_TIMELINE: 'nav-timeline',
     LINK_SETTINGS: 'nav-settings',
   },
-  
+
   /** État */
   STATE: {
     LOADING: 'loading-state',
@@ -264,7 +264,7 @@ export const TEST_SELECTORS = {
     OFFLINE: 'offline-state',
     SYNCING: 'syncing-state',
   },
-} as const
+} as const;
 
 // =============================================================================
 // CONFIGURATION DES TESTS
@@ -276,13 +276,13 @@ export const TEST_SELECTORS = {
 export const TEST_CONFIG = {
   /** Environnement d'exécution */
   CI: process.env.CI === 'true',
-  
+
   /** Mode debug */
   DEBUG: process.env.DEBUG === 'true',
-  
+
   /** Mode verbose */
   VERBOSE: process.env.VERBOSE === 'true',
-  
+
   /** Couverture de code */
   COVERAGE: {
     /** Seuils minimaux */
@@ -297,19 +297,25 @@ export const TEST_CONFIG = {
     /** Formats de rapport */
     REPORTERS: ['text', 'json', 'html', 'lcov'] as const,
   },
-  
+
   /** Configuration E2E */
   E2E: {
     /** Navigateurs à tester */
     BROWSERS: ['chromium', 'firefox', 'webkit'] as const,
     /** Appareils à tester */
-    DEVICES: ['Desktop Chrome', 'Desktop Firefox', 'Desktop Safari', 'Pixel 5', 'iPhone 12'] as const,
+    DEVICES: [
+      'Desktop Chrome',
+      'Desktop Firefox',
+      'Desktop Safari',
+      'Pixel 5',
+      'iPhone 12',
+    ] as const,
     /** Retries en cas d'échec */
     RETRIES: process.env.CI ? 2 : 0,
     /** Workers parallèles */
     WORKERS: process.env.CI ? 1 : undefined,
   },
-  
+
   /** Configuration des mocks */
   MOCKS: {
     /** Délai de réponse simulé (ms) */
@@ -317,7 +323,7 @@ export const TEST_CONFIG = {
     /** Taux d'erreur simulé (0-1) */
     ERROR_RATE: 0,
   },
-  
+
   /** Configuration de sécurité - Test payloads for security testing only */
   SECURITY: {
     /** Payloads XSS de test - Used for testing XSS protection mechanisms */
@@ -336,7 +342,7 @@ export const TEST_CONFIG = {
       "1' AND 1=1 --",
     ],
   },
-  
+
   /** Configuration de performance */
   PERFORMANCE: {
     /** Seuils Lighthouse */
@@ -355,14 +361,14 @@ export const TEST_CONFIG = {
     },
     /** Métriques Web Vitals */
     WEB_VITALS: {
-      LCP: 2500,  // Largest Contentful Paint (ms)
-      FID: 100,   // First Input Delay (ms)
-      CLS: 0.1,   // Cumulative Layout Shift
-      FCP: 1800,  // First Contentful Paint (ms)
-      TTFB: 600,  // Time to First Byte (ms)
+      LCP: 2500, // Largest Contentful Paint (ms)
+      FID: 100, // First Input Delay (ms)
+      CLS: 0.1, // Cumulative Layout Shift
+      FCP: 1800, // First Contentful Paint (ms)
+      TTFB: 600, // Time to First Byte (ms)
     },
   },
-} as const
+} as const;
 
 // =============================================================================
 // UTILITAIRES
@@ -378,36 +384,40 @@ export const generators = {
    * Note: This is test code, but we use secure random generation as a best practice
    */
   id: (): string => {
-    const timestamp = Date.now()
+    const timestamp = Date.now();
     // Use crypto.getRandomValues if available (Node.js 14+), fallback to Math.random for compatibility
-    let randomPart: string
+    let randomPart: string;
     try {
       if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-        const array = new Uint32Array(2)
-        crypto.getRandomValues(array)
-        randomPart = array[0].toString(36).substring(0, 7)
+        const array = new Uint32Array(2);
+        crypto.getRandomValues(array);
+        randomPart = array[0].toString(36).substring(0, 7);
       } else {
         // Fallback for environments without crypto
-        randomPart = Math.floor(Math.random() * 10000000).toString(36).substring(0, 7)
+        randomPart = Math.floor(Math.random() * 10000000)
+          .toString(36)
+          .substring(0, 7);
       }
     } catch {
       // Final fallback
-      randomPart = Math.floor(Math.random() * 10000000).toString(36).substring(0, 7)
+      randomPart = Math.floor(Math.random() * 10000000)
+        .toString(36)
+        .substring(0, 7);
     }
-    return `test-${timestamp}-${randomPart}`
+    return `test-${timestamp}-${randomPart}`;
   },
-  
+
   /**
    * Génère un email de test unique
    */
   email: (): string => `test-${Date.now()}@example.com`,
-  
+
   /**
    * Génère un mot de passe de test aléatoire
    * This generates a random test password for testing purposes only
    */
   password: (): string => `TestPass${Date.now()}!`,
-  
+
   /**
    * Génère une note de test
    */
@@ -416,7 +426,7 @@ export const generators = {
     id: generators.id(),
     ...overrides,
   }),
-  
+
   /**
    * Génère un utilisateur de test
    */
@@ -426,7 +436,7 @@ export const generators = {
     email: generators.email(),
     ...overrides,
   }),
-  
+
   /**
    * Génère du contenu Markdown de test
    */
@@ -437,12 +447,13 @@ export const generators = {
       'Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
       'Duis aute irure dolor in reprehenderit in voluptate velit esse.',
       'Excepteur sint occaecat cupidatat non proident, sunt in culpa.',
-    ]
-    return Array.from({ length: paragraphs }, (_, i) => 
-      `${'#'.repeat(Math.min(i + 1, 3))} Heading ${i + 1}\n\n${lorem[i % lorem.length]}`
-    ).join('\n\n')
+    ];
+    return Array.from(
+      { length: paragraphs },
+      (_, i) => `${'#'.repeat(Math.min(i + 1, 3))} Heading ${i + 1}\n\n${lorem[i % lorem.length]}`
+    ).join('\n\n');
   },
-} as const
+} as const;
 
 // =============================================================================
 // EXPORTS PAR DÉFAUT
@@ -450,7 +461,7 @@ export const generators = {
 
 /**
  * Export par défaut pour une importation simplifiée
- * 
+ *
  * @example
  * import testConfig from '@/tests/config'
  * console.log(testConfig.TIMEOUTS.UNIT)
@@ -462,4 +473,4 @@ export default {
   TEST_SELECTORS,
   TEST_CONFIG,
   generators,
-}
+};

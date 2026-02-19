@@ -27,7 +27,7 @@ const CONFIG = {
     halstead: 20,
     maintainability: 80,
     linesPerFunction: 50,
-    paramsPerFunction: 4
+    paramsPerFunction: 4,
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -38,8 +38,8 @@ const CONFIG = {
     '**/mocks/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // ANSI colors for console output
@@ -49,7 +49,7 @@ const colors = {
   yellow: '\x1b[33m',
   green: '\x1b[32m',
   blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+  cyan: '\x1b[36m',
 };
 
 /**
@@ -58,15 +58,15 @@ const colors = {
 function getSourceFiles() {
   const files = [];
   const extensions = ['*.ts', '*.tsx', '*.js', '*.jsx'];
-  
+
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
-  
+
   return files.filter(file => !file.includes('node_modules'));
 }
 
@@ -76,7 +76,7 @@ function getSourceFiles() {
 function analyzeFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const relativePath = path.relative(ROOT_DIR, filePath);
-  
+
   try {
     const result = escomplex.analyzeModule(content, {
       commonjs: true,
@@ -84,16 +84,18 @@ function analyzeFile(filePath) {
       logicalor: true,
       switchcase: true,
       trycatch: true,
-      newmi: true
+      newmi: true,
     });
-    
+
     return {
       file: relativePath,
       path: filePath,
-      ...result
+      ...result,
     };
   } catch (error) {
-    console.warn(`${colors.yellow}Warning: Could not analyze ${relativePath}: ${error.message}${colors.reset}`);
+    console.warn(
+      `${colors.yellow}Warning: Could not analyze ${relativePath}: ${error.message}${colors.reset}`
+    );
     return null;
   }
 }
@@ -103,17 +105,17 @@ function analyzeFile(filePath) {
  */
 function calculateCognitiveComplexity(method) {
   let complexity = 1;
-  
+
   // Simple heuristic based on cyclomatic complexity and other factors
   if (method.cyclomatic) {
     complexity = method.cyclomatic;
   }
-  
+
   // Adjust for nesting
   if (method.maxNestedMethodDepth) {
     complexity += method.maxNestedMethodDepth;
   }
-  
+
   return complexity;
 }
 
@@ -135,30 +137,42 @@ function generateSummary(results) {
       cognitive: 0,
       maintainability: 0,
       linesPerFunction: 0,
-      paramsPerFunction: 0
-    }
+      paramsPerFunction: 0,
+    },
   };
-  
+
   let totalCyclomatic = 0;
   let totalCognitive = 0;
   let totalMaintainability = 0;
-  
+
   const checkMethodViolations = (method, file) => {
     const cyclomatic = method.cyclomatic || 1;
     const cognitive = calculateCognitiveComplexity(method);
     const lines = method.sloc?.logical || 0;
     const params = method.paramCount || 0;
-    
+
     totalCyclomatic += cyclomatic;
     totalCognitive += cognitive;
-    
+
     if (cyclomatic > CONFIG.thresholds.cyclomatic) {
       summary.violations.cyclomatic++;
-      summary.highComplexityFunctions.push({ file, function: method.name, type: 'cyclomatic', value: cyclomatic, threshold: CONFIG.thresholds.cyclomatic });
+      summary.highComplexityFunctions.push({
+        file,
+        function: method.name,
+        type: 'cyclomatic',
+        value: cyclomatic,
+        threshold: CONFIG.thresholds.cyclomatic,
+      });
     }
     if (cognitive > CONFIG.thresholds.cognitive) {
       summary.violations.cognitive++;
-      summary.highComplexityFunctions.push({ file, function: method.name, type: 'cognitive', value: cognitive, threshold: CONFIG.thresholds.cognitive });
+      summary.highComplexityFunctions.push({
+        file,
+        function: method.name,
+        type: 'cognitive',
+        value: cognitive,
+        threshold: CONFIG.thresholds.cognitive,
+      });
     }
     if (lines > CONFIG.thresholds.linesPerFunction) summary.violations.linesPerFunction++;
     if (params > CONFIG.thresholds.paramsPerFunction) summary.violations.paramsPerFunction++;
@@ -171,33 +185,34 @@ function generateSummary(results) {
         checkMethodViolations(method, result.file);
       }
     }
-    
+
     if (result.classes) {
       summary.totalClasses += result.classes.length;
     }
-    
+
     const maintainability = result.maintainability || 100;
     totalMaintainability += maintainability;
-    
+
     if (maintainability < CONFIG.thresholds.maintainability) {
       summary.violations.maintainability++;
       summary.lowMaintainabilityFiles.push({
         file: result.file,
         maintainability: Math.round(maintainability),
-        threshold: CONFIG.thresholds.maintainability
+        threshold: CONFIG.thresholds.maintainability,
       });
     }
   }
-  
+
   if (summary.totalFunctions > 0) {
     summary.averageCyclomatic = Math.round((totalCyclomatic / summary.totalFunctions) * 100) / 100;
     summary.averageCognitive = Math.round((totalCognitive / summary.totalFunctions) * 100) / 100;
   }
-  
+
   if (results.length > 0) {
-    summary.averageMaintainability = Math.round((totalMaintainability / results.length) * 100) / 100;
+    summary.averageMaintainability =
+      Math.round((totalMaintainability / results.length) * 100) / 100;
   }
-  
+
   return summary;
 }
 
@@ -336,7 +351,10 @@ function generateHTMLReport(results, summary) {
         </tr>
       </thead>
       <tbody>
-        ${summary.highComplexityFunctions.map(func => `
+        ${
+          summary.highComplexityFunctions
+            .map(
+              func => `
           <tr>
             <td>${func.file}</td>
             <td>${func.function}</td>
@@ -345,7 +363,11 @@ function generateHTMLReport(results, summary) {
             <td>${func.threshold}</td>
             <td><span class="badge badge-danger">VIOLATION</span></td>
           </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align: center;">No violations found! 🎉</td></tr>'}
+        `
+            )
+            .join('') ||
+          '<tr><td colspan="6" style="text-align: center;">No violations found! 🎉</td></tr>'
+        }
       </tbody>
     </table>
 
@@ -360,14 +382,21 @@ function generateHTMLReport(results, summary) {
         </tr>
       </thead>
       <tbody>
-        ${summary.lowMaintainabilityFiles.map(file => `
+        ${
+          summary.lowMaintainabilityFiles
+            .map(
+              file => `
           <tr>
             <td>${file.file}</td>
             <td>${file.maintainability}</td>
             <td>${file.threshold}</td>
             <td><span class="badge badge-warning">WARNING</span></td>
           </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align: center;">No warnings found! 🎉</td></tr>'}
+        `
+            )
+            .join('') ||
+          '<tr><td colspan="4" style="text-align: center;">No warnings found! 🎉</td></tr>'
+        }
       </tbody>
     </table>
 
@@ -383,10 +412,13 @@ function generateHTMLReport(results, summary) {
         </tr>
       </thead>
       <tbody>
-        ${results.map(result => {
-          const maxComplexity = result.methods ? Math.max(...result.methods.map(m => m.cyclomatic || 1)) : 0;
-          const maintainability = Math.round(result.maintainability || 100);
-          return `
+        ${results
+          .map(result => {
+            const maxComplexity = result.methods
+              ? Math.max(...result.methods.map(m => m.cyclomatic || 1))
+              : 0;
+            const maintainability = Math.round(result.maintainability || 100);
+            return `
             <tr>
               <td>${result.file}</td>
               <td>${result.methods?.length || 0}</td>
@@ -395,7 +427,8 @@ function generateHTMLReport(results, summary) {
               <td class="${maxComplexity > CONFIG.thresholds.cyclomatic ? 'warning' : 'good'}">${maxComplexity}</td>
             </tr>
           `;
-        }).join('')}
+          })
+          .join('')}
       </tbody>
     </table>
   </div>
@@ -410,53 +443,50 @@ function generateHTMLReport(results, summary) {
  */
 async function main() {
   console.log(`${colors.cyan}🔍 Starting complexity analysis...${colors.reset}\n`);
-  
+
   // Ensure output directory exists
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
-  
+
   // Get source files
   console.log(`${colors.blue}📁 Scanning source files...${colors.reset}`);
   const files = getSourceFiles();
   console.log(`Found ${files.length} files to analyze\n`);
-  
+
   // Analyze each file
   console.log(`${colors.blue}📊 Analyzing complexity...${colors.reset}`);
   const results = [];
-  
+
   for (const file of files) {
     const result = analyzeFile(file);
     if (result) {
       results.push(result);
     }
   }
-  
+
   // Generate summary
   console.log(`${colors.blue}📈 Generating summary...${colors.reset}`);
   const summary = generateSummary(results);
-  
+
   // Generate reports
   console.log(`${colors.blue}📝 Generating reports...${colors.reset}`);
-  
+
   // JSON report
   const jsonReport = {
     summary,
     files: results,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   };
   fs.writeFileSync(
     path.join(CONFIG.outputDir, 'complexity-report.json'),
     JSON.stringify(jsonReport, null, 2)
   );
-  
+
   // HTML report
   const htmlReport = generateHTMLReport(results, summary);
-  fs.writeFileSync(
-    path.join(CONFIG.outputDir, 'complexity-report.html'),
-    htmlReport
-  );
-  
+  fs.writeFileSync(path.join(CONFIG.outputDir, 'complexity-report.html'), htmlReport);
+
   // Print summary
   console.log(`\n${colors.cyan}📊 Analysis Summary:${colors.reset}`);
   console.log(`  Total Files: ${summary.totalFiles}`);
@@ -465,7 +495,7 @@ async function main() {
   console.log(`  Avg Cyclomatic Complexity: ${summary.averageCyclomatic}`);
   console.log(`  Avg Cognitive Complexity: ${summary.averageCognitive}`);
   console.log(`  Avg Maintainability Index: ${summary.averageMaintainability}`);
-  
+
   const totalViolations = Object.values(summary.violations).reduce((a, b) => a + b, 0);
   console.log(`\n${colors.cyan}⚠️ Violations:${colors.reset}`);
   console.log(`  High Cyclomatic Complexity: ${summary.violations.cyclomatic}`);
@@ -473,14 +503,16 @@ async function main() {
   console.log(`  Low Maintainability: ${summary.violations.maintainability}`);
   console.log(`  Long Functions: ${summary.violations.linesPerFunction}`);
   console.log(`  Too Many Parameters: ${summary.violations.paramsPerFunction}`);
-  
+
   // Exit code based on violations
   console.log(`\n${colors.cyan}📁 Reports generated:${colors.reset}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'complexity-report.json')}`);
   console.log(`  - ${path.join(CONFIG.outputDir, 'complexity-report.html')}`);
-  
+
   if (totalViolations > 0) {
-    console.log(`\n${colors.yellow}⚠️ Found ${totalViolations} complexity violations${colors.reset}`);
+    console.log(
+      `\n${colors.yellow}⚠️ Found ${totalViolations} complexity violations${colors.reset}`
+    );
     process.exit(1);
   } else {
     console.log(`\n${colors.green}✅ No complexity violations found!${colors.reset}`);

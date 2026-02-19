@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright configuration for E2E testing
@@ -105,4 +105,4 @@ export default defineConfig({
   /* Global setup/teardown */
   // globalSetup: require.resolve('./tests/e2e/global-setup'),
   // globalTeardown: require.resolve('./tests/e2e/global-teardown'),
-})
+});

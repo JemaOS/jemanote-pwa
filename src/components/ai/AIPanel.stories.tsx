@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import { Note } from '@/types'
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { Note } from '@/types';
 
-import AIPanel from './AIPanel'
+import AIPanel from './AIPanel';
 
 const meta: Meta<typeof AIPanel> = {
   title: 'AI/AIPanel',
@@ -18,7 +18,7 @@ const meta: Meta<typeof AIPanel> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-screen w-96">
           <Story />
@@ -27,10 +27,10 @@ const meta: Meta<typeof AIPanel> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof AIPanel>
+export default meta;
+type Story = StoryObj<typeof AIPanel>;
 
 const mockNote: Note = {
   id: 'note-1',
@@ -53,7 +53,7 @@ Cette note montre comment l'IA peut aider à résumer et analyser le contenu.`,
   is_archived: false,
   created_at: '2025-01-15T10:00:00Z',
   updated_at: '2025-01-15T10:00:00Z',
-}
+};
 
 const mockNotes: Note[] = [
   mockNote,
@@ -77,7 +77,7 @@ const mockNotes: Note[] = [
     created_at: '2025-01-13T10:00:00Z',
     updated_at: '2025-01-13T10:00:00Z',
   },
-]
+];
 
 const defaultProps = {
   currentNote: mockNote,
@@ -87,35 +87,38 @@ const defaultProps = {
   onUpdateNoteTags: () => {},
   onUpdateNoteContent: async () => {},
   onNavigateToNote: () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const NoCurrentNote: Story = {
   args: {
     ...defaultProps,
     currentNote: null,
   },
-}
+};
 
 export const EmptyNotes: Story = {
   args: {
     ...defaultProps,
     notes: [],
   },
-}
+};
 
 export const LongNote: Story = {
   args: {
     ...defaultProps,
     currentNote: {
       ...mockNote,
-      content: Array.from({ length: 50 }, (_, i) => `Paragraphe ${i + 1} avec du contenu intéressant à analyser.`).join('\n\n'),
+      content: Array.from(
+        { length: 50 },
+        (_, i) => `Paragraphe ${i + 1} avec du contenu intéressant à analyser.`
+      ).join('\n\n'),
     },
   },
-}
+};
 
 export const ManyNotes: Story = {
   args: {
@@ -131,4 +134,4 @@ export const ManyNotes: Story = {
       updated_at: '2025-01-15T10:00:00Z',
     })),
   },
-}
+};

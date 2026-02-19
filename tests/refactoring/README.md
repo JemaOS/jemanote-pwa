@@ -6,20 +6,21 @@ Ce dossier contient les tests et outils d'analyse de la qualité du code pour l'
 
 ### Seuils Recommandés
 
-| Métrique | Seuil | Description |
-|----------|-------|-------------|
-| **Cyclomatic Complexity** | < 10 | Complexité cyclomatique par fonction |
-| **Cognitive Complexity** | < 15 | Complexité cognitive par fonction |
-| **Duplication** | < 3% | Pourcentage de code dupliqué |
-| **Lines of Code (par fichier)** | < 300 | Lignes de code par fichier |
-| **Maintainability Index** | > 80 | Indice de maintenabilité |
-| **Technical Debt Ratio** | < 5% | Ratio de dette technique |
+| Métrique                        | Seuil | Description                          |
+| ------------------------------- | ----- | ------------------------------------ |
+| **Cyclomatic Complexity**       | < 10  | Complexité cyclomatique par fonction |
+| **Cognitive Complexity**        | < 15  | Complexité cognitive par fonction    |
+| **Duplication**                 | < 3%  | Pourcentage de code dupliqué         |
+| **Lines of Code (par fichier)** | < 300 | Lignes de code par fichier           |
+| **Maintainability Index**       | > 80  | Indice de maintenabilité             |
+| **Technical Debt Ratio**        | < 5%  | Ratio de dette technique             |
 
 ## 🧪 Tests de Factorisation
 
 ### [`complexity.spec.ts`](complexity.spec.ts)
 
 Tests de complexité du code :
+
 - Complexité cyclomatique des fonctions
 - Complexité cognitive
 - Taille des fonctions (lignes)
@@ -34,6 +35,7 @@ npm run test:refactoring:complexity
 ### [`coupling.spec.ts`](coupling.spec.ts)
 
 Tests de couplage entre modules :
+
 - Nombre de dépendances par fichier
 - Instabilité des modules (I = Ce / (Ca + Ce))
 - Détection des "god modules"
@@ -47,6 +49,7 @@ npm run test:refactoring:coupling
 ### [`cohesion.spec.ts`](cohesion.spec.ts)
 
 Tests de cohésion des modules :
+
 - Principe de responsabilité unique
 - Nombre d'exports par fichier
 - Cohésion des composants React
@@ -62,6 +65,7 @@ npm run test:refactoring:cohesion
 ### [`duplication.spec.ts`](duplication.spec.ts)
 
 Tests de duplication de code :
+
 - Pourcentage de duplication global
 - Blocs de code dupliqués
 - Fonctions identiques
@@ -85,6 +89,7 @@ npm run analyze:complexity
 ```
 
 **Fonctionnalités :**
+
 - Analyse avec `typhonjs-escomplex`
 - Calcul de la complexité cyclomatique
 - Calcul de la complexité cognitive
@@ -100,6 +105,7 @@ npm run analyze:duplication
 ```
 
 **Fonctionnalités :**
+
 - Détection de clones
 - Seuil configurable (3%)
 - Rapports HTML, JSON, console
@@ -114,6 +120,7 @@ npm run analyze:dependencies
 ```
 
 **Fonctionnalités :**
+
 - Graphe de dépendances
 - Détection de cycles
 - Calcul du couplage (Ca, Ce, Instabilité)
@@ -129,6 +136,7 @@ npm run analyze:metrics
 ```
 
 **Fonctionnalités :**
+
 - Lines of Code (LOC)
 - Complexité cyclomatique
 - Complexité cognitive
@@ -151,6 +159,7 @@ sonar.typescript.lcov.reportPaths=coverage/lcov.info
 ```
 
 **Seuils SonarCloud :**
+
 - Coverage > 80%
 - Duplication < 3%
 - Critical issues = 0
@@ -233,6 +242,7 @@ Le workflow GitHub Actions [`.github/workflows/code-quality.yml`](../../.github/
 ### Techniques de Refactoring
 
 #### Extraire une Fonction
+
 ```typescript
 // Avant
 function processData(data: Data) {
@@ -248,9 +258,10 @@ function processData(data: Data) {
 ```
 
 #### Introduire un Paramètre Object
+
 ```typescript
 // Avant
-function createUser(name: string, email: string, age: number, address: string) { }
+function createUser(name: string, email: string, age: number, address: string) {}
 
 // Après
 interface UserData {
@@ -259,10 +270,11 @@ interface UserData {
   age: number;
   address: string;
 }
-function createUser(data: UserData) { }
+function createUser(data: UserData) {}
 ```
 
 #### Déplacer une Méthode
+
 ```typescript
 // Déplacer une méthode vers la classe qui l'utilise le plus
 class Order {
@@ -292,16 +304,19 @@ class Customer {
 ### Erreurs Courantes
 
 **"Complexity threshold exceeded"**
+
 - Diviser les fonctions complexes en sous-fonctions
 - Utiliser des stratégies pour remplacer les switch/case
 - Extraire les conditions complexes en fonctions
 
 **"Circular dependency detected"**
+
 - Introduire une abstraction (interface)
 - Déplacer le code partagé dans un module commun
 - Utiliser l'injection de dépendances
 
 **"Code duplication found"**
+
 - Extraire le code commun dans une fonction utilitaire
 - Utiliser des hooks personnalisés pour la logique partagée
 - Créer des composants réutilisables
@@ -309,6 +324,7 @@ class Customer {
 ## 📞 Support
 
 Pour toute question concernant l'analyse de code :
+
 - Consulter les rapports générés dans `reports/`
 - Vérifier la documentation des outils
 - Ouvrir une issue sur le dépôt

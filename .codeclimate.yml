@@ -1,7 +1,7 @@
 # Code Climate Configuration for Jemanote PWA
 # https://docs.codeclimate.com/docs/advanced-configuration
 
-version: "2"
+version: '2'
 
 # Global configuration
 checks:
@@ -10,55 +10,55 @@ checks:
     enabled: true
     config:
       threshold: 10
-  
+
   method-lines:
     enabled: true
     config:
       threshold: 50
-  
+
   file-lines:
     enabled: true
     config:
       threshold: 300
-  
+
   argument-count:
     enabled: true
     config:
       threshold: 4
-  
+
   return-statements:
     enabled: true
     config:
       threshold: 4
-  
+
   similar-code:
     enabled: true
     config:
       threshold: 50
-  
+
   identical-code:
     enabled: true
     config:
       threshold: 30
-  
+
   # Cognitive complexity
   cognitive-complexity:
     enabled: true
     config:
       threshold: 15
-  
+
   # Maintainability
   maintainability:
     enabled: true
     config:
-      threshold: "B"
+      threshold: 'B'
 
 # Plugins configuration
 plugins:
   # ESLint integration
   eslint:
     enabled: true
-    channel: "eslint-8"
+    channel: 'eslint-8'
     config:
       config: eslint.config.js
       extensions:
@@ -98,10 +98,10 @@ plugins:
     config:
       tests_patterns:
         - tests/**/
-        - "**/*.test.ts"
-        - "**/*.test.tsx"
-        - "**/*.spec.ts"
-        - "**/*.spec.tsx"
+        - '**/*.test.ts'
+        - '**/*.test.tsx'
+        - '**/*.spec.ts'
+        - '**/*.spec.tsx'
 
   # Duplication detection
   duplication:
@@ -139,51 +139,51 @@ plugins:
 # Exclude patterns
 exclude_patterns:
   # Dependencies
-  - "**/node_modules/"
-  
+  - '**/node_modules/'
+
   # Build outputs
-  - "**/dist/"
-  - "**/build/"
-  - "**/.next/"
-  - "**/out/"
-  
+  - '**/dist/'
+  - '**/build/'
+  - '**/.next/'
+  - '**/out/'
+
   # Coverage
-  - "**/coverage/"
-  
+  - '**/coverage/'
+
   # Configuration files
-  - "**/*.config.ts"
-  - "**/*.config.js"
-  - "**/*.config.json"
-  - "**/vite-env.d.ts"
-  
+  - '**/*.config.ts'
+  - '**/*.config.js'
+  - '**/*.config.json'
+  - '**/vite-env.d.ts'
+
   # Test files
-  - "**/*.test.ts"
-  - "**/*.test.tsx"
-  - "**/*.spec.ts"
-  - "**/*.spec.tsx"
-  - "tests/**/__mocks__/"
-  - "tests/**/mocks/"
-  
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - 'tests/**/__mocks__/'
+  - 'tests/**/mocks/'
+
   # Storybook files
-  - "**/*.stories.tsx"
-  - "**/*.stories.ts"
-  
+  - '**/*.stories.tsx'
+  - '**/*.stories.ts'
+
   # Scripts
-  - "scripts/"
-  
+  - 'scripts/'
+
   # Public assets
-  - "public/"
-  
+  - 'public/'
+
   # Documentation
-  - "**/*.md"
-  
+  - '**/*.md'
+
   # Type definitions
-  - "**/types/*.d.ts"
+  - '**/types/*.d.ts'
 
 # Ratings configuration
 ratings:
   paths:
-    - "src/**"
+    - 'src/**'
 
 # Maintainability thresholds
 maintainability:
@@ -192,7 +192,7 @@ maintainability:
   # C: 10-20%
   # D: 20-50%
   # E: 50-100%
-  threshold: "C"
+  threshold: 'C'
 
 # Test coverage thresholds
 coverage:

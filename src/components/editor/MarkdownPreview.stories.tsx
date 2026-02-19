@@ -1,11 +1,11 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
-import MarkdownPreview from './MarkdownPreview'
+import MarkdownPreview from './MarkdownPreview';
 
 const meta: Meta<typeof MarkdownPreview> = {
   title: 'Editor/MarkdownPreview',
@@ -17,7 +17,7 @@ const meta: Meta<typeof MarkdownPreview> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <ThemeProvider>
         <div className="h-[600px] w-full p-8">
           <Story />
@@ -26,19 +26,19 @@ const meta: Meta<typeof MarkdownPreview> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof MarkdownPreview>
+export default meta;
+type Story = StoryObj<typeof MarkdownPreview>;
 
 const defaultProps = {
   content: '',
   onWikiLinkClick: () => {},
-}
+};
 
 export const Empty: Story = {
   args: defaultProps,
-}
+};
 
 export const BasicFormatting: Story = {
   args: {
@@ -52,7 +52,7 @@ Ceci est un paragraphe avec du **texte en gras**, du *texte en italique*, et du 
 Voici un [lien externe](https://example.com).
 `,
   },
-}
+};
 
 export const Lists: Story = {
   args: {
@@ -74,7 +74,7 @@ export const Lists: Story = {
    2. Sous-item 2
 `,
   },
-}
+};
 
 export const CodeBlocks: Story = {
   args: {
@@ -100,7 +100,7 @@ const user: User = {
 \`\`\`
 `,
   },
-}
+};
 
 export const WikiLinks: Story = {
   args: {
@@ -112,7 +112,7 @@ Cette note fait référence à [[Note importante]] et [[Projet Alpha]].
 Vous pouvez aussi consulter [[Réunion équipe]] pour plus de détails sur les décisions prises.
 `,
   },
-}
+};
 
 export const MathEquations: Story = {
   args: {
@@ -132,7 +132,7 @@ $$
 $$
 `,
   },
-}
+};
 
 export const Tables: Story = {
   args: {
@@ -153,7 +153,7 @@ export const Tables: Story = {
 | D      | E      | F      |
 `,
   },
-}
+};
 
 export const Blockquotes: Story = {
   args: {
@@ -169,7 +169,7 @@ export const Blockquotes: Story = {
 > **Note importante:** N'oubliez pas de sauvegarder vos modifications !
 `,
   },
-}
+};
 
 export const MermaidDiagram: Story = {
   args: {
@@ -186,7 +186,7 @@ graph TD
 \`\`\`
 `,
   },
-}
+};
 
 export const FullDocument: Story = {
   args: {
@@ -222,4 +222,4 @@ function hello() {
 > "La simplicité est la sophistication suprême." - Leonardo da Vinci
 `,
   },
-}
+};

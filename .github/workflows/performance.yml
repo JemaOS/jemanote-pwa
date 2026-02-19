@@ -93,11 +93,11 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Lire les stats du bundle
             const statsPath = path.join(process.cwd(), 'dist', 'stats.html');
             let bundleSizeComment = '## 📦 Bundle Size Analysis\n\n';
-            
+
             if (fs.existsSync(statsPath)) {
               const statsContent = fs.readFileSync(statsPath, 'utf-8');
               
@@ -109,13 +109,13 @@ jobs:
               
               bundleSizeComment += 'View detailed analysis in the [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n';
             }
-            
+
             // Vérifier les budgets
             bundleSizeComment += '### Budgets:\n';
             bundleSizeComment += '- JavaScript: < 300KB (gzipped)\n';
             bundleSizeComment += '- CSS: < 50KB (gzipped)\n';
             bundleSizeComment += '- Total: < 500KB (gzipped)\n';
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -257,19 +257,19 @@ jobs:
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('performance-report.md', 'utf-8');
-            
+
             // Trouver un commentaire existant
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number
             });
-            
+
             const botComment = comments.find(comment => 
               comment.user.type === 'Bot' && 
               comment.body.includes('Performance Test Results')
             );
-            
+
             if (botComment) {
               // Mettre à jour le commentaire existant
               await github.rest.issues.updateComment({

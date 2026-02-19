@@ -2,127 +2,127 @@
 // Distributed under the license specified in the root directory of this project.
 
 export interface Note {
-  id: string
-  user_id: string
-  title: string
-  content: string
-  folder_id?: string
-  is_pinned: boolean
-  is_archived: boolean
-  deleted_at?: string | null
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  folder_id?: string;
+  is_pinned: boolean;
+  is_archived: boolean;
+  deleted_at?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Folder {
-  id: string
-  user_id: string
-  name: string
-  parent_id?: string
-  path: string
-  icon?: string
-  color?: string
-  deleted_at?: string | null
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  name: string;
+  parent_id?: string;
+  path: string;
+  icon?: string;
+  color?: string;
+  deleted_at?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Tag {
-  id: string
-  user_id: string
-  name: string
-  color?: string
-  created_at: string
+  id: string;
+  user_id: string;
+  name: string;
+  color?: string;
+  created_at: string;
 }
 
 export interface NoteTag {
-  id: string
-  note_id: string
-  tag_id: string
-  created_at: string
+  id: string;
+  note_id: string;
+  tag_id: string;
+  created_at: string;
 }
 
 export interface Link {
-  id: string
-  user_id: string
-  source_note_id: string
-  target_note_id: string
-  link_type: string
-  created_at: string
+  id: string;
+  user_id: string;
+  source_note_id: string;
+  target_note_id: string;
+  link_type: string;
+  created_at: string;
 }
 
 export interface Attachment {
-  id: string
-  user_id: string
-  note_id?: string
-  file_name: string
-  file_path: string
-  file_type?: string
-  file_size?: number
-  created_at: string
+  id: string;
+  user_id: string;
+  note_id?: string;
+  file_name: string;
+  file_path: string;
+  file_type?: string;
+  file_size?: number;
+  created_at: string;
 }
 
 export interface Canvas {
-  id: string
-  user_id: string
-  name: string
-  width: number
-  height: number
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  name: string;
+  width: number;
+  height: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CanvasItem {
-  id: string
-  canvas_id: string
-  user_id: string
-  item_type: string
-  note_id?: string
-  position_x: number
-  position_y: number
-  width: number
-  height: number
-  content?: string
-  style?: Record<string, any>
-  created_at: string
-  updated_at: string
+  id: string;
+  canvas_id: string;
+  user_id: string;
+  item_type: string;
+  note_id?: string;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  content?: string;
+  style?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserSettings {
-  user_id: string
-  theme: 'light' | 'dark' | 'auto'
-  editor_font_size: number
-  editor_vim_mode: boolean
-  editor_line_numbers: boolean
-  editor_auto_save: boolean
-  sync_enabled: boolean
-  sync_interval: number
-  preferences: Record<string, any>
-  created_at: string
-  updated_at: string
+  user_id: string;
+  theme: 'light' | 'dark' | 'auto';
+  editor_font_size: number;
+  editor_vim_mode: boolean;
+  editor_line_numbers: boolean;
+  editor_auto_save: boolean;
+  sync_enabled: boolean;
+  sync_interval: number;
+  preferences: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface GraphData {
   nodes: Array<{
-    id: string
-    title: string
-    created_at: string
-    updated_at: string
-    is_pinned: boolean
-  }>
+    id: string;
+    title: string;
+    created_at: string;
+    updated_at: string;
+    is_pinned: boolean;
+  }>;
   edges: Array<{
-    id: string
-    source: string
-    target: string
-    type: string
-  }>
+    id: string;
+    source: string;
+    target: string;
+    type: string;
+  }>;
 }
 
 export interface User {
-  id: string
-  email?: string
-  created_at?: string
-  updated_at?: string
+  id: string;
+  email?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export type ViewMode = 'workspace' | 'graph' | 'search' | 'settings' | 'canvas' | 'timeline'
+export type ViewMode = 'workspace' | 'graph' | 'search' | 'settings' | 'canvas' | 'timeline';

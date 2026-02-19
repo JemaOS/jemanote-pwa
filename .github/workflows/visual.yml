@@ -120,21 +120,21 @@ jobs:
         with:
           script: |
             const message = `## 📸 Visual Regression Tests
-            
+
             Des différences visuelles ont été détectées dans cette PR.
-            
+
             ### Actions requises:
             1. Téléchargez et examinez le rapport: [Visual Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             2. Si les changements sont intentionnels, mettez à jour les baselines avec la commande:
                \`\`\`
                gh workflow run visual.yml -f update_baselines=true
                \`\`\`
-            
+
             ### Détails:
             - **Commit:** ${{ github.sha }}
             - **Branch:** ${{ github.head_ref || github.ref_name }}
             - **Workflow:** ${{ github.workflow }}`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

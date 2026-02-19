@@ -5,19 +5,19 @@
 
 /**
  * Script de comparaison visuelle pour les tests de régression
- * 
+ *
  * Ce script compare les screenshots générés par Playwright avec les baselines
  * et génère un rapport HTML des différences détectées.
- * 
+ *
  * Usage:
  *   node scripts/visual-regression.js
  *   node scripts/visual-regression.js --update
  *   node scripts/visual-regression.js --report
  */
 
-const fs = require('node:fs')
-const path = require('node:path')
-const { execSync } = require('node:child_process')
+const fs = require('node:fs');
+const path = require('node:path');
+const { execSync } = require('node:child_process');
 
 // Configuration
 const CONFIG = {
@@ -26,7 +26,7 @@ const CONFIG = {
   diffDir: path.join(__dirname, '..', 'visual-regression-report'),
   threshold: 0.2, // 0.2% de différence
   maxDiffPixels: 100,
-}
+};
 
 // Couleurs pour la console
 const colors = {
@@ -36,109 +36,104 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   cyan: '\x1b[36m',
-}
+};
 
 // Utilitaires
 const log = (message, color = 'reset') => {
-  console.log(`${colors[color]}${message}${colors.reset}`)
-}
+  console.log(`${colors[color]}${message}${colors.reset}`);
+};
 
-const ensureDir = (dir) => {
+const ensureDir = dir => {
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
+    fs.mkdirSync(dir, { recursive: true });
   }
-}
+};
 
 const getAllFiles = (dir, pattern = /.*/) => {
-  const files = []
-  if (!fs.existsSync(dir)) return files
-  
-  const items = fs.readdirSync(dir)
+  const files = [];
+  if (!fs.existsSync(dir)) return files;
+
+  const items = fs.readdirSync(dir);
   for (const item of items) {
-    const fullPath = path.join(dir, item)
-    const stat = fs.statSync(fullPath)
+    const fullPath = path.join(dir, item);
+    const stat = fs.statSync(fullPath);
     if (stat.isDirectory()) {
-      files.push(...getAllFiles(fullPath, pattern))
+      files.push(...getAllFiles(fullPath, pattern));
     } else if (pattern.test(item)) {
-      files.push(fullPath)
+      files.push(fullPath);
     }
   }
-  return files
-}
+  return files;
+};
 
 // Comparer deux images (simplifié - utilise pixelmatch si disponible)
 const compareImages = async (baselinePath, actualPath) => {
   try {
     // Essayer d'utiliser pixelmatch si disponible
-    const pixelmatch = require('pixelmatch')
-    const PNG = require('pngjs').PNG
-    
-    const baseline = PNG.sync.read(fs.readFileSync(baselinePath))
-    const actual = PNG.sync.read(fs.readFileSync(actualPath))
-    
-    const { width, height } = baseline
-    const diff = new PNG({ width, height })
-    
-    const numDiffPixels = pixelmatch(
-      baseline.data,
-      actual.data,
-      diff.data,
-      width,
-      height,
-      { threshold: 0.1 }
-    )
-    
-    const diffPercentage = (numDiffPixels / (width * height)) * 100
-    
+    const pixelmatch = require('pixelmatch');
+    const PNG = require('pngjs').PNG;
+
+    const baseline = PNG.sync.read(fs.readFileSync(baselinePath));
+    const actual = PNG.sync.read(fs.readFileSync(actualPath));
+
+    const { width, height } = baseline;
+    const diff = new PNG({ width, height });
+
+    const numDiffPixels = pixelmatch(baseline.data, actual.data, diff.data, width, height, {
+      threshold: 0.1,
+    });
+
+    const diffPercentage = (numDiffPixels / (width * height)) * 100;
+
     return {
       match: diffPercentage <= CONFIG.threshold && numDiffPixels <= CONFIG.maxDiffPixels,
       diffPercentage,
       numDiffPixels,
       diffImage: diff,
-    }
+    };
   } catch {
     // Fallback: comparaison simple de taille de fichier
-    const baselineStat = fs.statSync(baselinePath)
-    const actualStat = fs.statSync(actualPath)
-    const sizeDiff = Math.abs(baselineStat.size - actualStat.size)
-    const diffPercentage = (sizeDiff / baselineStat.size) * 100
-    
+    const baselineStat = fs.statSync(baselinePath);
+    const actualStat = fs.statSync(actualPath);
+    const sizeDiff = Math.abs(baselineStat.size - actualStat.size);
+    const diffPercentage = (sizeDiff / baselineStat.size) * 100;
+
     return {
       match: diffPercentage <= CONFIG.threshold,
       diffPercentage,
       numDiffPixels: 0,
       diffImage: null,
       fallback: true,
-    }
+    };
   }
-}
+};
 
 // Helper function to render diff image HTML
-const renderDiffImage = (diffPath) => {
+const renderDiffImage = diffPath => {
   if (!diffPath) {
-    return ''
+    return '';
   }
   return `<div class="image-box">
             <h4>Différence</h4>
             <img src="${diffPath}" alt="Diff" loading="lazy">
-          </div>`
-}
+          </div>`;
+};
 
 // Helper function to render error message HTML
-const renderErrorMessage = (error) => {
+const renderErrorMessage = error => {
   if (!error) {
-    return ''
+    return '';
   }
-  return `<p><strong>Erreur:</strong> ${error}</p>`
-}
+  return `<p><strong>Erreur:</strong> ${error}</p>`;
+};
 
 // Générer le rapport HTML
-const generateReport = (results) => {
-  const timestamp = new Date().toISOString()
-  const totalTests = results.length
-  const passedTests = results.filter(r => r.passed).length
-  const failedTests = totalTests - passedTests
-  
+const generateReport = results => {
+  const timestamp = new Date().toISOString();
+  const totalTests = results.length;
+  const passedTests = results.filter(r => r.passed).length;
+  const failedTests = totalTests - passedTests;
+
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -279,7 +274,9 @@ const generateReport = (results) => {
   </div>
   
   <div class="container">
-    ${results.map(result => `
+    ${results
+      .map(
+        result => `
       <div class="test-result">
         <div class="test-header ${result.passed ? 'passed' : 'failed'}">
           <div class="test-title">${result.name}</div>
@@ -287,7 +284,10 @@ const generateReport = (results) => {
             ${result.passed ? '✓ Passé' : '✗ Échoué'}
           </div>
         </div>
-        ${result.passed ? '' : `
+        ${
+          result.passed
+            ? ''
+            : `
           <div class="test-details">
             <div class="comparison">
               <div class="image-box">
@@ -306,179 +306,190 @@ const generateReport = (results) => {
               ${renderErrorMessage(result.error)}
             </div>
           </div>
-        ` : ''}
+        `
+        }
       </div>
-    `).join('')}
+    `
+      )
+      .join('')}
   </div>
   
   <div class="footer">
     <p>Jemanote Visual Regression Testing</p>
   </div>
 </body>
-</html>`
+</html>`;
 
-  fs.writeFileSync(path.join(CONFIG.diffDir, 'index.html'), html)
-  log(`Rapport généré: ${path.join(CONFIG.diffDir, 'index.html')}`, 'cyan')
-}
+  fs.writeFileSync(path.join(CONFIG.diffDir, 'index.html'), html);
+  log(`Rapport généré: ${path.join(CONFIG.diffDir, 'index.html')}`, 'cyan');
+};
 
 // Mettre à jour les baselines
 const updateBaselines = () => {
-  log('Mise à jour des baselines...', 'yellow')
-  
-  ensureDir(CONFIG.baselineDir)
-  
+  log('Mise à jour des baselines...', 'yellow');
+
+  ensureDir(CONFIG.baselineDir);
+
   // Copier tous les screenshots actuels comme nouvelles baselines
-  const actualFiles = getAllFiles(CONFIG.actualDir, /\.png$/)
-  
+  const actualFiles = getAllFiles(CONFIG.actualDir, /\.png$/);
+
   for (const file of actualFiles) {
-    const relativePath = path.relative(CONFIG.actualDir, file)
-    const baselinePath = path.join(CONFIG.baselineDir, relativePath)
-    
-    ensureDir(path.dirname(baselinePath))
-    fs.copyFileSync(file, baselinePath)
-    log(`Baseline mise à jour: ${relativePath}`, 'green')
+    const relativePath = path.relative(CONFIG.actualDir, file);
+    const baselinePath = path.join(CONFIG.baselineDir, relativePath);
+
+    ensureDir(path.dirname(baselinePath));
+    fs.copyFileSync(file, baselinePath);
+    log(`Baseline mise à jour: ${relativePath}`, 'green');
   }
-  
-  log(`${actualFiles.length} baselines mises à jour`, 'green')
-}
+
+  log(`${actualFiles.length} baselines mises à jour`, 'green');
+};
 
 // Fonction principale
 const main = async () => {
-  const args = new Set(process.argv.slice(2))
-  const shouldUpdate = args.has('--update')
-  const shouldReport = args.has('--report')
-  
-  ensureDir(CONFIG.diffDir)
-  
+  const args = new Set(process.argv.slice(2));
+  const shouldUpdate = args.has('--update');
+  const shouldReport = args.has('--report');
+
+  ensureDir(CONFIG.diffDir);
+
   if (shouldUpdate) {
-    updateBaselines()
-    return
-  }
-  
-  log('Analyse des tests de régression visuelle...', 'blue')
-  
-  // Récupérer tous les screenshots
-  const baselineFiles = getAllFiles(CONFIG.baselineDir, /\.png$/)
-  const actualFiles = getAllFiles(CONFIG.actualDir, /\.png$/)
-  
-  log(`${baselineFiles.length} baselines trouvées`, 'cyan')
-  log(`${actualFiles.length} screenshots actuels trouvés`, 'cyan')
-  
-  const results = []
-  let hasFailures = false
-  
-  const processNewScreenshot = (relativePath) => {
-    log(`Nouveau screenshot (pas de baseline): ${relativePath}`, 'yellow')
-    return { name: relativePath, passed: false, error: 'Nouveau screenshot - aucune baseline', baselinePath: null, actualPath: relativePath }
+    updateBaselines();
+    return;
   }
 
+  log('Analyse des tests de régression visuelle...', 'blue');
+
+  // Récupérer tous les screenshots
+  const baselineFiles = getAllFiles(CONFIG.baselineDir, /\.png$/);
+  const actualFiles = getAllFiles(CONFIG.actualDir, /\.png$/);
+
+  log(`${baselineFiles.length} baselines trouvées`, 'cyan');
+  log(`${actualFiles.length} screenshots actuels trouvés`, 'cyan');
+
+  const results = [];
+  let hasFailures = false;
+
+  const processNewScreenshot = relativePath => {
+    log(`Nouveau screenshot (pas de baseline): ${relativePath}`, 'yellow');
+    return {
+      name: relativePath,
+      passed: false,
+      error: 'Nouveau screenshot - aucune baseline',
+      baselinePath: null,
+      actualPath: relativePath,
+    };
+  };
+
   const processDiffResult = (comparison, relativePath, baselineFile, actualFile) => {
-    log(`Différence détectée: ${relativePath} (${comparison.diffPercentage.toFixed(2)}%)`, 'red')
-    let diffPath = null
+    log(`Différence détectée: ${relativePath} (${comparison.diffPercentage.toFixed(2)}%)`, 'red');
+    let diffPath = null;
     if (comparison.diffImage) {
-      diffPath = path.join(CONFIG.diffDir, 'diffs', relativePath)
-      ensureDir(path.dirname(diffPath))
-      fs.writeFileSync(diffPath, PNG.sync.write(comparison.diffImage))
+      diffPath = path.join(CONFIG.diffDir, 'diffs', relativePath);
+      ensureDir(path.dirname(diffPath));
+      fs.writeFileSync(diffPath, PNG.sync.write(comparison.diffImage));
     }
     return {
-      name: relativePath, passed: false,
-      diffPercentage: comparison.diffPercentage, numDiffPixels: comparison.numDiffPixels,
+      name: relativePath,
+      passed: false,
+      diffPercentage: comparison.diffPercentage,
+      numDiffPixels: comparison.numDiffPixels,
       baselinePath: path.relative(CONFIG.diffDir, baselineFile),
       actualPath: path.relative(CONFIG.diffDir, actualFile),
       diffPath: diffPath ? path.relative(CONFIG.diffDir, diffPath) : null,
-    }
-  }
+    };
+  };
 
   // Comparer chaque screenshot avec sa baseline
   for (const actualFile of actualFiles) {
-    const relativePath = path.relative(CONFIG.actualDir, actualFile)
-    const baselineFile = path.join(CONFIG.baselineDir, relativePath)
-    
+    const relativePath = path.relative(CONFIG.actualDir, actualFile);
+    const baselineFile = path.join(CONFIG.baselineDir, relativePath);
+
     if (!fs.existsSync(baselineFile)) {
-      results.push(processNewScreenshot(relativePath))
-      hasFailures = true
-      continue
+      results.push(processNewScreenshot(relativePath));
+      hasFailures = true;
+      continue;
     }
-    
+
     try {
-      const comparison = await compareImages(baselineFile, actualFile)
-      
+      const comparison = await compareImages(baselineFile, actualFile);
+
       if (comparison.match === false) {
-        hasFailures = true
-        results.push(processDiffResult(comparison, relativePath, baselineFile, actualFile))
+        hasFailures = true;
+        results.push(processDiffResult(comparison, relativePath, baselineFile, actualFile));
       } else {
-        log(`✓ ${relativePath}`, 'green')
+        log(`✓ ${relativePath}`, 'green');
         results.push({
           name: relativePath,
           passed: true,
           diffPercentage: comparison.diffPercentage,
           numDiffPixels: comparison.numDiffPixels,
-        })
+        });
       }
     } catch (error) {
-      hasFailures = true
-      log(`Erreur lors de la comparaison: ${relativePath}`, 'red')
+      hasFailures = true;
+      log(`Erreur lors de la comparaison: ${relativePath}`, 'red');
       results.push({
         name: relativePath,
         passed: false,
         error: error.message,
         baselinePath: path.relative(CONFIG.diffDir, baselineFile),
         actualPath: path.relative(CONFIG.diffDir, actualFile),
-      })
+      });
     }
   }
-  
+
   // Vérifier les baselines manquantes
   for (const baselineFile of baselineFiles) {
-    const relativePath = path.relative(CONFIG.baselineDir, baselineFile)
-    const actualFile = path.join(CONFIG.actualDir, relativePath)
-    
+    const relativePath = path.relative(CONFIG.baselineDir, baselineFile);
+    const actualFile = path.join(CONFIG.actualDir, relativePath);
+
     if (!fs.existsSync(actualFile)) {
-      log(`Screenshot manquant: ${relativePath}`, 'red')
+      log(`Screenshot manquant: ${relativePath}`, 'red');
       results.push({
         name: relativePath,
         passed: false,
         error: 'Screenshot manquant',
         baselinePath: path.relative(CONFIG.diffDir, baselineFile),
         actualPath: null,
-      })
-      hasFailures = true
+      });
+      hasFailures = true;
     }
   }
-  
+
   // Générer le rapport
   if (shouldReport || hasFailures) {
-    generateReport(results)
+    generateReport(results);
   }
-  
+
   // Résumé
-  log('\n' + '='.repeat(50), 'cyan')
-  const passed = results.filter(r => r.passed).length
-  const failed = results.filter(r => !r.passed).length
-  log(`Total: ${results.length} | Réussis: ${passed} | Échoués: ${failed}`, 'cyan')
-  
+  log('\n' + '='.repeat(50), 'cyan');
+  const passed = results.filter(r => r.passed).length;
+  const failed = results.filter(r => !r.passed).length;
+  log(`Total: ${results.length} | Réussis: ${passed} | Échoués: ${failed}`, 'cyan');
+
   if (hasFailures) {
-    log('\nDes différences visuelles ont été détectées!', 'red')
-    log('Pour mettre à jour les baselines: npm run test:visual:update', 'yellow')
-    process.exit(1)
+    log('\nDes différences visuelles ont été détectées!', 'red');
+    log('Pour mettre à jour les baselines: npm run test:visual:update', 'yellow');
+    process.exit(1);
   } else {
-    log('\n✓ Tous les tests visuels ont réussi!', 'green')
-    process.exit(0)
+    log('\n✓ Tous les tests visuels ont réussi!', 'green');
+    process.exit(0);
   }
-}
+};
 
 // Gestion des erreurs
-process.on('unhandledRejection', (error) => {
-  log(`Erreur non gérée: ${error}`, 'red')
-  process.exit(1)
-})
-
-// Exécuter
-(async () => {
-  try {
-    await main()
-  } catch (error) {
-    log(`Erreur: ${error.message}`, 'red')
-    process.exit(1)
+process.on('unhandledRejection', error => {
+  log(`Erreur non gérée: ${error}`, 'red');
+  process.exit(1);
+})(
+  // Exécuter
+  async () => {
+    try {
+      await main();
+    } catch (error) {
+      log(`Erreur: ${error.message}`, 'red');
+      process.exit(1);
+    }
   }
-})()
+)();

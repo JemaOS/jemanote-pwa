@@ -13,10 +13,10 @@ import { describe, it, expect, beforeAll } from 'vitest';
 const CONFIG = {
   sourceDir: path.resolve(__dirname, '../../src'),
   thresholds: {
-    maxDependencies: 10,    // Max imports per file
-    maxDependents: 10,      // Max files importing a module
-    maxExternalDeps: 15,    // Max external dependencies per file
-    instabilityThreshold: 0.7 // Max instability (I = Ce / (Ca + Ce))
+    maxDependencies: 10, // Max imports per file
+    maxDependents: 10, // Max files importing a module
+    maxExternalDeps: 15, // Max external dependencies per file
+    instabilityThreshold: 0.7, // Max instability (I = Ce / (Ca + Ce))
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -26,8 +26,8 @@ const CONFIG = {
     '**/__mocks__/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // Types
@@ -41,8 +41,8 @@ interface DependencyGraph {
 
 interface CouplingMetrics {
   path: string;
-  ca: number;  // Afferent coupling (incoming)
-  ce: number;  // Efferent coupling (outgoing)
+  ca: number; // Afferent coupling (incoming)
+  ce: number; // Efferent coupling (outgoing)
   instability: number;
 }
 
@@ -63,15 +63,15 @@ describe('Module Coupling Analysis', () => {
 
       for (const [file, data] of Object.entries(dependencyGraph)) {
         if (data.dependencies.length > CONFIG.thresholds.maxDependencies) {
-          violations.push(
-            `${file} - dependencies: ${data.dependencies.length}`
-          );
+          violations.push(`${file} - dependencies: ${data.dependencies.length}`);
         }
       }
 
       if (violations.length > 0) {
         console.warn('High dependency violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -82,15 +82,15 @@ describe('Module Coupling Analysis', () => {
 
       for (const [file, data] of Object.entries(dependencyGraph)) {
         if (data.externalDeps.length > CONFIG.thresholds.maxExternalDeps) {
-          violations.push(
-            `${file} - external deps: ${data.externalDeps.length}`
-          );
+          violations.push(`${file} - external deps: ${data.externalDeps.length}`);
         }
       }
 
       if (violations.length > 0) {
         console.warn('High external dependency violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -103,29 +103,25 @@ describe('Module Coupling Analysis', () => {
 
       for (const metric of couplingMetrics) {
         if (metric.instability > CONFIG.thresholds.instabilityThreshold) {
-          violations.push(
-            `${metric.path} - instability: ${metric.instability.toFixed(2)}`
-          );
+          violations.push(`${metric.path} - instability: ${metric.instability.toFixed(2)}`);
         }
       }
 
       if (violations.length > 0) {
         console.warn('High instability violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
     });
 
     it('should have average instability < 0.5', () => {
-      const totalInstability = couplingMetrics.reduce(
-        (sum, m) => sum + m.instability,
-        0
-      );
+      const totalInstability = couplingMetrics.reduce((sum, m) => sum + m.instability, 0);
 
-      const averageInstability = couplingMetrics.length > 0
-        ? totalInstability / couplingMetrics.length
-        : 0;
+      const averageInstability =
+        couplingMetrics.length > 0 ? totalInstability / couplingMetrics.length : 0;
 
       expect(averageInstability).toBeLessThan(0.5);
     });
@@ -137,15 +133,15 @@ describe('Module Coupling Analysis', () => {
 
       for (const metric of couplingMetrics) {
         if (metric.ca > CONFIG.thresholds.maxDependents) {
-          violations.push(
-            `${metric.path} - dependents: ${metric.ca}`
-          );
+          violations.push(`${metric.path} - dependents: ${metric.ca}`);
         }
       }
 
       if (violations.length > 0) {
         console.warn('God module violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -183,7 +179,9 @@ describe('Module Coupling Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Layer violation (services → components):');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -204,7 +202,9 @@ describe('Module Coupling Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Layer violation (utils → components/services):');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -220,7 +220,7 @@ function getSourceFiles(): string[] {
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
@@ -263,7 +263,7 @@ function buildDependencyGraph(files: string[]): DependencyGraph {
     graph[relativePath] = {
       dependencies: [],
       dependents: [],
-      externalDeps: []
+      externalDeps: [],
     };
   }
 
@@ -309,7 +309,7 @@ function calculateCouplingMetrics(graph: DependencyGraph): CouplingMetrics[] {
       path,
       ca,
       ce,
-      instability: Math.round(instability * 100) / 100
+      instability: Math.round(instability * 100) / 100,
     });
   }
 

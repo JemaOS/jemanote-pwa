@@ -1,12 +1,12 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import { Note, Folder } from '@/types'
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { Note, Folder } from '@/types';
 
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'Layout/Sidebar',
@@ -18,7 +18,7 @@ const meta: Meta<typeof Sidebar> = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <div className="h-screen w-80">
         <ThemeProvider>
           <Story />
@@ -27,10 +27,10 @@ const meta: Meta<typeof Sidebar> = {
     ),
   ],
   tags: ['autodocs'],
-}
+};
 
-export default meta
-type Story = StoryObj<typeof Sidebar>
+export default meta;
+type Story = StoryObj<typeof Sidebar>;
 
 const mockNotes: Note[] = [
   {
@@ -63,7 +63,7 @@ const mockNotes: Note[] = [
     created_at: '2025-01-10T10:00:00Z',
     updated_at: '2025-01-10T10:00:00Z',
   },
-]
+];
 
 const mockFolders: Folder[] = [
   {
@@ -82,7 +82,7 @@ const mockFolders: Folder[] = [
     created_at: '2025-01-02T10:00:00Z',
     updated_at: '2025-01-02T10:00:00Z',
   },
-]
+];
 
 const defaultProps = {
   side: 'left' as const,
@@ -102,25 +102,25 @@ const defaultProps = {
   restoreFolder: async () => {},
   permanentlyDeleteFolder: async () => {},
   reloadFolders: async () => {},
-}
+};
 
 export const Default: Story = {
   args: defaultProps,
-}
+};
 
 export const WithActiveNote: Story = {
   args: {
     ...defaultProps,
     activeNoteId: 'note-1',
   },
-}
+};
 
 export const RightSide: Story = {
   args: {
     ...defaultProps,
     side: 'right',
   },
-}
+};
 
 export const Empty: Story = {
   args: {
@@ -128,7 +128,7 @@ export const Empty: Story = {
     notes: [],
     folders: [],
   },
-}
+};
 
 export const WithTrash: Story = {
   args: {
@@ -147,7 +147,7 @@ export const WithTrash: Story = {
       },
     ],
   },
-}
+};
 
 export const ManyNotes: Story = {
   args: {
@@ -163,4 +163,4 @@ export const ManyNotes: Story = {
       updated_at: '2025-01-15T10:00:00Z',
     })),
   },
-}
+};

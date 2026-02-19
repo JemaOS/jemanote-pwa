@@ -16,45 +16,45 @@ Ce dossier contient tous les tests de performance pour l'application Jemanote PW
 
 Les tests de performance sont organisés en plusieurs catégories :
 
-| Fichier | Description |
-|---------|-------------|
-| [`lighthouse.spec.ts`](./lighthouse.spec.ts) | Audits Lighthouse automatisés |
-| [`bundle.spec.ts`](./bundle.spec.ts) | Tests de taille des bundles |
-| [`memory.spec.ts`](./memory.spec.ts) | Tests de consommation mémoire |
-| [`rendering.spec.ts`](./rendering.spec.ts) | Tests de temps de rendu |
+| Fichier                                        | Description                     |
+| ---------------------------------------------- | ------------------------------- |
+| [`lighthouse.spec.ts`](./lighthouse.spec.ts)   | Audits Lighthouse automatisés   |
+| [`bundle.spec.ts`](./bundle.spec.ts)           | Tests de taille des bundles     |
+| [`memory.spec.ts`](./memory.spec.ts)           | Tests de consommation mémoire   |
+| [`rendering.spec.ts`](./rendering.spec.ts)     | Tests de temps de rendu         |
 | [`interaction.spec.ts`](./interaction.spec.ts) | Tests d'interactions (INP, FID) |
 
 ## Budgets de performance
 
 ### Core Web Vitals
 
-| Métrique | Budget | Description |
-|----------|--------|-------------|
-| **FCP** (First Contentful Paint) | < 1.8s | Premier contenu visible |
-| **LCP** (Largest Contentful Paint) | < 2.5s | Plus grand contenu visible |
-| **TTI** (Time to Interactive) | < 3.8s | Temps d'interactivité |
-| **CLS** (Cumulative Layout Shift) | < 0.1 | Stabilité visuelle |
-| **TBT** (Total Blocking Time) | < 200ms | Temps de blocage |
-| **FID** (First Input Delay) | < 100ms | Délai première interaction |
-| **INP** (Interaction to Next Paint) | < 200ms | Réactivité interactions |
-| **TTFB** (Time to First Byte) | < 600ms | Temps de réponse serveur |
+| Métrique                            | Budget  | Description                |
+| ----------------------------------- | ------- | -------------------------- |
+| **FCP** (First Contentful Paint)    | < 1.8s  | Premier contenu visible    |
+| **LCP** (Largest Contentful Paint)  | < 2.5s  | Plus grand contenu visible |
+| **TTI** (Time to Interactive)       | < 3.8s  | Temps d'interactivité      |
+| **CLS** (Cumulative Layout Shift)   | < 0.1   | Stabilité visuelle         |
+| **TBT** (Total Blocking Time)       | < 200ms | Temps de blocage           |
+| **FID** (First Input Delay)         | < 100ms | Délai première interaction |
+| **INP** (Interaction to Next Paint) | < 200ms | Réactivité interactions    |
+| **TTFB** (Time to First Byte)       | < 600ms | Temps de réponse serveur   |
 
 ### Budgets de bundle
 
-| Type | Budget (gzipped) | Description |
-|------|------------------|-------------|
-| **JavaScript total** | < 300 KB | Tous les fichiers JS |
-| **CSS total** | < 50 KB | Tous les fichiers CSS |
-| **Bundle total** | < 500 KB | Tous les assets |
-| **HTML** | < 50 KB | Fichier index.html |
+| Type                 | Budget (gzipped) | Description           |
+| -------------------- | ---------------- | --------------------- |
+| **JavaScript total** | < 300 KB         | Tous les fichiers JS  |
+| **CSS total**        | < 50 KB          | Tous les fichiers CSS |
+| **Bundle total**     | < 500 KB         | Tous les assets       |
+| **HTML**             | < 50 KB          | Fichier index.html    |
 
 ### Budgets mémoire
 
-| Métrique | Budget | Description |
-|----------|--------|-------------|
-| **Heap initial** | < 50 MB | Mémoire après chargement |
-| **Heap de pic** | < 150 MB | Mémoire maximale |
-| **Croissance** | < 30 MB | Augmentation entre navigations |
+| Métrique         | Budget   | Description                    |
+| ---------------- | -------- | ------------------------------ |
+| **Heap initial** | < 50 MB  | Mémoire après chargement       |
+| **Heap de pic**  | < 150 MB | Mémoire maximale               |
+| **Croissance**   | < 30 MB  | Augmentation entre navigations |
 
 ## Métriques Web Vitals
 
@@ -178,11 +178,11 @@ node scripts/benchmark.js --verbose
 
 Le rapport Lighthouse génère des scores de 0 à 100 :
 
-| Score | Interprétation |
-|-------|----------------|
-| 90-100 | 🟢 Excellent |
-| 50-89 | 🟡 À améliorer |
-| 0-49 | 🔴 Médiocre |
+| Score  | Interprétation |
+| ------ | -------------- |
+| 90-100 | 🟢 Excellent   |
+| 50-89  | 🟡 À améliorer |
+| 0-49   | 🔴 Médiocre    |
 
 ### Métriques de bundle
 
@@ -195,6 +195,7 @@ Le rapport Lighthouse génère des scores de 0 à 100 :
 ### Tests mémoire
 
 Un test mémoire réussi signifie :
+
 - Pas de fuites mémoire détectées
 - Croissance mémoire < 30MB entre navigations
 - Nombre de nœuds DOM stable
@@ -214,6 +215,7 @@ Objectif : maintenir 60fps (16.67ms par frame)
 ### Si FCP/LCP est trop élevé
 
 1. **Optimiser les images**
+
    ```bash
    # Utiliser des formats modernes (WebP, AVIF)
    # Compresser les images
@@ -221,9 +223,10 @@ Objectif : maintenir 60fps (16.67ms par frame)
    ```
 
 2. **Précharger les ressources critiques**
+
    ```html
-   <link rel="preload" href="critical.css" as="style">
-   <link rel="preload" href="font.woff2" as="font" crossorigin>
+   <link rel="preload" href="critical.css" as="style" />
+   <link rel="preload" href="font.woff2" as="font" crossorigin />
    ```
 
 3. **Réduire le CSS critique**
@@ -233,11 +236,13 @@ Objectif : maintenir 60fps (16.67ms par frame)
 ### Si CLS est trop élevé
 
 1. **Définir les dimensions des images**
+
    ```html
-   <img src="photo.jpg" width="800" height="600" alt="Description">
+   <img src="photo.jpg" width="800" height="600" alt="Description" />
    ```
 
 2. **Réserver l'espace pour les éléments dynamiques**
+
    ```css
    .dynamic-content {
      min-height: 200px;
@@ -249,6 +254,7 @@ Objectif : maintenir 60fps (16.67ms par frame)
 ### Si le bundle est trop gros
 
 1. **Code splitting**
+
    ```typescript
    // Utiliser React.lazy pour le chargement différé
    const GraphView = React.lazy(() => import('./GraphView'));
@@ -272,10 +278,11 @@ Objectif : maintenir 60fps (16.67ms par frame)
    - Utiliser `requestIdleCallback`
 
 2. **Découper les longues tâches**
+
    ```typescript
    // Mauvais : blocage long
    heavyComputation();
-   
+
    // Bon : découpé
    await scheduler.yield();
    heavyComputationPart1();
@@ -292,11 +299,14 @@ Objectif : maintenir 60fps (16.67ms par frame)
 ### Si la mémoire fuit
 
 1. **Nettoyer les event listeners**
+
    ```typescript
    useEffect(() => {
-     const handler = () => { /* ... */ };
+     const handler = () => {
+       /* ... */
+     };
      window.addEventListener('scroll', handler);
-     
+
      return () => {
        window.removeEventListener('scroll', handler);
      };
@@ -304,11 +314,12 @@ Objectif : maintenir 60fps (16.67ms par frame)
    ```
 
 2. **Annuler les requêtes en cours**
+
    ```typescript
    useEffect(() => {
      const controller = new AbortController();
      fetch('/api/data', { signal: controller.signal });
-     
+
      return () => controller.abort();
    }, []);
    ```
@@ -334,6 +345,7 @@ Les tests de performance sont exécutés automatiquement via GitHub Actions :
 ### Seuils d'échec
 
 Un job échoue si :
+
 - Lighthouse score < 85
 - Bundle size > 500KB
 - Tests Playwright échouent
@@ -342,6 +354,7 @@ Un job échoue si :
 ### Artefacts
 
 Tous les rapports sont conservés comme artefacts :
+
 - Rapports Lighthouse
 - Analyses de bundle
 - Résultats des tests Playwright
@@ -357,6 +370,7 @@ Tous les rapports sont conservés comme artefacts :
 ## Support
 
 Pour toute question concernant les tests de performance :
+
 1. Consulter les logs d'erreur détaillés
 2. Vérifier les artefacts de la CI
 3. Exécuter les tests localement avec `--debug`

@@ -63,25 +63,28 @@ const DANGEROUS_VALUES = new Set([
  */
 function parseCSP(cspString) {
   const directives = {};
-  
+
   if (!cspString) return directives;
-  
+
   const parts = cspString.split(';');
-  
+
   for (const part of parts) {
     const trimmed = part.trim();
     if (!trimmed) continue;
-    
+
     const spaceIndex = trimmed.indexOf(' ');
     if (spaceIndex === -1) {
       directives[trimmed] = [];
     } else {
       const directive = trimmed.slice(0, spaceIndex);
-      const values = trimmed.slice(spaceIndex + 1).trim().split(/\s+/);
+      const values = trimmed
+        .slice(spaceIndex + 1)
+        .trim()
+        .split(/\s+/);
       directives[directive] = values;
     }
   }
-  
+
   return directives;
 }
 
@@ -107,9 +110,10 @@ function isDangerousValueAllowed(directive, value) {
 }
 
 function checkRequiredDirectives(directives) {
-  return REQUIRED_DIRECTIVES
-    .filter(required => !directives[required])
-    .map(required => ({ type: 'error', message: `Missing required directive: ${required}` }));
+  return REQUIRED_DIRECTIVES.filter(required => !directives[required]).map(required => ({
+    type: 'error',
+    message: `Missing required directive: ${required}`,
+  }));
 }
 
 function checkDangerousValues(directives) {
@@ -126,36 +130,48 @@ function checkDangerousValues(directives) {
 
 function checkCSPWarnings(directives) {
   const warnings = [];
-  
+
   if (directives['script-src']?.includes("'unsafe-inline'")) {
     const hasNonce = directives['script-src'].some(v => v.includes('nonce-'));
-    const hasHash = directives['script-src'].some(v => v.startsWith("'sha256-") || v.startsWith("'sha384-") || v.startsWith("'sha512-"));
+    const hasHash = directives['script-src'].some(
+      v => v.startsWith("'sha256-") || v.startsWith("'sha384-") || v.startsWith("'sha512-")
+    );
     if (!hasNonce && !hasHash) {
-      warnings.push({ type: 'warning', message: "script-src uses 'unsafe-inline' without nonce or hash - consider using strict-dynamic" });
+      warnings.push({
+        type: 'warning',
+        message:
+          "script-src uses 'unsafe-inline' without nonce or hash - consider using strict-dynamic",
+      });
     }
   }
-  
+
   if (!directives['frame-ancestors']) {
-    warnings.push({ type: 'warning', message: "frame-ancestors not set - application may be vulnerable to clickjacking" });
+    warnings.push({
+      type: 'warning',
+      message: 'frame-ancestors not set - application may be vulnerable to clickjacking',
+    });
   }
   if (!directives['upgrade-insecure-requests']) {
-    warnings.push({ type: 'warning', message: "Consider adding 'upgrade-insecure-requests' for HTTPS enforcement" });
+    warnings.push({
+      type: 'warning',
+      message: "Consider adding 'upgrade-insecure-requests' for HTTPS enforcement",
+    });
   }
   return warnings;
 }
 
 function validateCSP(directives, source = 'custom') {
-  const issues = [
-    ...checkRequiredDirectives(directives),
-    ...checkDangerousValues(directives),
-  ];
-  
+  const issues = [...checkRequiredDirectives(directives), ...checkDangerousValues(directives)];
+
   if (directives['object-src'] && !directives['object-src'].includes("'none'")) {
-    issues.push({ type: 'error', message: "object-src should be set to 'none' to prevent plugin-based attacks" });
+    issues.push({
+      type: 'error',
+      message: "object-src should be set to 'none' to prevent plugin-based attacks",
+    });
   }
-  
+
   const warnings = checkCSPWarnings(directives);
-  
+
   return { issues, warnings, isValid: issues.length === 0 };
 }
 
@@ -164,7 +180,7 @@ function validateCSP(directives, source = 'custom') {
  */
 function checkIndexHtml() {
   const indexPath = path.join(process.cwd(), 'index.html');
-  
+
   if (!fs.existsSync(indexPath)) {
     return {
       found: false,
@@ -172,10 +188,12 @@ function checkIndexHtml() {
       issues: [{ type: 'error', message: 'index.html not found' }],
     };
   }
-  
+
   const content = fs.readFileSync(indexPath, 'utf-8');
-  const cspMatch = content.match(/<meta[^>]*http-equiv="Content-Security-Policy"[^>]*content="([^"]*)"[^>]*>/i);
-  
+  const cspMatch = content.match(
+    /<meta[^>]*http-equiv="Content-Security-Policy"[^>]*content="([^"]*)"[^>]*>/i
+  );
+
   if (!cspMatch) {
     return {
       found: false,
@@ -183,11 +201,11 @@ function checkIndexHtml() {
       issues: [{ type: 'warning', message: 'No CSP meta tag found in index.html' }],
     };
   }
-  
+
   const cspString = cspMatch[1];
   const directives = parseCSP(cspString);
   const validation = validateCSP(directives, 'meta-tag');
-  
+
   return {
     found: true,
     csp: cspString,
@@ -201,26 +219,27 @@ function checkIndexHtml() {
  */
 function checkViteConfig() {
   const viteConfigPath = path.join(process.cwd(), 'vite.config.ts');
-  
+
   if (!fs.existsSync(viteConfigPath)) {
     return {
       found: false,
       issues: [{ type: 'warning', message: 'vite.config.ts not found' }],
     };
   }
-  
+
   const content = fs.readFileSync(viteConfigPath, 'utf-8');
-  
+
   // Check for headers configuration
-  const hasHeaders = content.includes('headers') || content.includes('server') || content.includes('preview');
-  
+  const hasHeaders =
+    content.includes('headers') || content.includes('server') || content.includes('preview');
+
   if (!hasHeaders) {
     return {
       found: false,
       issues: [{ type: 'warning', message: 'No CSP headers configured in Vite config' }],
     };
   }
-  
+
   return {
     found: true,
     issues: [],
@@ -240,13 +259,13 @@ function generateRecommendedCSP() {
 function printResults(results) {
   console.log('🛡️  Content Security Policy Check\n');
   console.log('=================================\n');
-  
+
   // Meta tag check
   console.log('📄 index.html Meta Tag:');
   if (results.metaTag.found) {
     console.log('  ✅ CSP meta tag found');
     console.log(`  CSP: ${results.metaTag.csp?.substring(0, 80)}...\n`);
-    
+
     if (results.metaTag.issues.length > 0) {
       console.log('  Issues:');
       results.metaTag.issues.forEach(issue => {
@@ -254,7 +273,7 @@ function printResults(results) {
         console.log(`    ${icon} ${issue.message}`);
       });
     }
-    
+
     if (results.metaTag.warnings?.length > 0) {
       console.log('  Warnings:');
       results.metaTag.warnings.forEach(warning => {
@@ -267,9 +286,9 @@ function printResults(results) {
       console.log(`  ${issue.type === 'error' ? '❌' : '⚠️'} ${issue.message}`);
     });
   }
-  
+
   console.log('\n');
-  
+
   // Vite config check
   console.log('⚙️  Vite Configuration:');
   if (results.viteConfig.found) {
@@ -280,13 +299,13 @@ function printResults(results) {
       console.log(`  ${issue.type === 'error' ? '❌' : '⚠️'} ${issue.message}`);
     });
   }
-  
+
   console.log('\n');
-  
+
   // Recommendations
   console.log('💡 Recommendations:');
   console.log('-------------------\n');
-  
+
   if (!results.metaTag.found || results.metaTag.issues.length > 0) {
     console.log('Add the following CSP meta tag to your index.html <head>:');
     console.log('');
@@ -295,9 +314,9 @@ function printResults(results) {
   } else {
     console.log('✅ CSP configuration looks good!');
   }
-  
+
   console.log('\n');
-  
+
   // For production deployment
   console.log('🚀 Production Deployment:');
   console.log('-------------------------\n');
@@ -307,8 +326,12 @@ function printResults(results) {
   console.log('  add_header Content-Security-Policy "' + generateRecommendedCSP() + '" always;');
   console.log('');
   console.log('Vercel (vercel.json):');
-  console.log('  {"headers": [{"source": "/(.*)", "headers": [{"key": "Content-Security-Policy", "value": "' + generateRecommendedCSP() + '"}]}]}');
-  
+  console.log(
+    '  {"headers": [{"source": "/(.*)", "headers": [{"key": "Content-Security-Policy", "value": "' +
+      generateRecommendedCSP() +
+      '"}]}]}'
+  );
+
   console.log('\n');
 }
 
@@ -318,33 +341,36 @@ function printResults(results) {
 async function main() {
   const args = process.argv.slice(2);
   const generateOnly = args.includes('--generate');
-  
+
   if (generateOnly) {
     console.log('🛡️  Recommended CSP Configuration\n');
     console.log('==================================\n');
     console.log(generateRecommendedCSP());
     console.log('\n');
     console.log('As HTML meta tag:');
-    console.log(`<meta http-equiv="Content-Security-Policy" content="${generateRecommendedCSP()}">`);
+    console.log(
+      `<meta http-equiv="Content-Security-Policy" content="${generateRecommendedCSP()}">`
+    );
     return;
   }
-  
+
   const results = {
     metaTag: checkIndexHtml(),
     viteConfig: checkViteConfig(),
   };
-  
+
   printResults(results);
-  
+
   // Exit with error code if there are critical issues
-  const hasErrors = results.metaTag.issues?.some(i => i.type === 'error') ||
-                    results.viteConfig.issues?.some(i => i.type === 'error');
-  
+  const hasErrors =
+    results.metaTag.issues?.some(i => i.type === 'error') ||
+    results.viteConfig.issues?.some(i => i.type === 'error');
+
   if (hasErrors) {
     console.log('❌ CSP check failed with errors\n');
     process.exit(1);
   }
-  
+
   console.log('✅ CSP check completed\n');
 }
 

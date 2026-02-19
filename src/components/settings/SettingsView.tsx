@@ -1,38 +1,47 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Palette, Type, Cloud, Moon, Sun } from 'lucide-react'
-import React from 'react'
+import { Palette, Type, Cloud, Moon, Sun } from 'lucide-react';
+import React from 'react';
 
-import AISettingsSection from '@/components/ai/AISettingsSection'
-import { useTheme } from '@/contexts/ThemeContext'
+import AISettingsSection from '@/components/ai/AISettingsSection';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SettingsViewProps {
-  readonly userId?: string | null
+  readonly userId?: string | null;
 }
 
 export default function SettingsView({ userId }: SettingsViewProps) {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="h-full bg-surface-bg dark:bg-neutral-900 overflow-auto">
       <div className="max-w-4xl mx-auto p-8">
-        <h2 className="text-title font-bold text-neutral-900 dark:text-neutral-100 mb-8">Paramètres</h2>
+        <h2 className="text-title font-bold text-neutral-900 dark:text-neutral-100 mb-8">
+          Paramètres
+        </h2>
 
         <div className="space-y-6">
           <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
               <Palette className="h-6 w-6 text-primary-500" />
-              <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">Apparence</h3>
+              <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">
+                Apparence
+              </h3>
             </div>
             <div className="space-y-4">
               <div>
-                <label htmlFor="theme-label" className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-3">
+                <label
+                  htmlFor="theme-label"
+                  className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-3"
+                >
                   Thème
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => { setTheme('light'); }}
+                    onClick={() => {
+                      setTheme('light');
+                    }}
                     className={`flex items-center gap-2 p-4 border-2 rounded-lg transition-all ${
                       theme === 'light'
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
@@ -43,7 +52,9 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                     <span className="font-medium">Clair</span>
                   </button>
                   <button
-                    onClick={() => { setTheme('dark'); }}
+                    onClick={() => {
+                      setTheme('dark');
+                    }}
                     className={`flex items-center gap-2 p-4 border-2 rounded-lg transition-all ${
                       theme === 'dark'
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
@@ -61,11 +72,18 @@ export default function SettingsView({ userId }: SettingsViewProps) {
           <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
               <Type className="h-6 w-6 text-primary-500" />
-              <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">Éditeur</h3>
+              <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">
+                Éditeur
+              </h3>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <label htmlFor="lineNumbers" className="text-body text-neutral-700 dark:text-neutral-300">Numéros de ligne</label>
+                <label
+                  htmlFor="lineNumbers"
+                  className="text-body text-neutral-700 dark:text-neutral-300"
+                >
+                  Numéros de ligne
+                </label>
                 <input
                   id="lineNumbers"
                   type="checkbox"
@@ -74,7 +92,12 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label htmlFor="autoSave" className="text-body text-neutral-700 dark:text-neutral-300">Sauvegarde automatique</label>
+                <label
+                  htmlFor="autoSave"
+                  className="text-body text-neutral-700 dark:text-neutral-300"
+                >
+                  Sauvegarde automatique
+                </label>
                 <input
                   id="autoSave"
                   type="checkbox"
@@ -83,7 +106,12 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label htmlFor="vimMode" className="text-body text-neutral-700 dark:text-neutral-300">Mode Vim</label>
+                <label
+                  htmlFor="vimMode"
+                  className="text-body text-neutral-700 dark:text-neutral-300"
+                >
+                  Mode Vim
+                </label>
                 <input
                   id="vimMode"
                   type="checkbox"
@@ -100,11 +128,18 @@ export default function SettingsView({ userId }: SettingsViewProps) {
             <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Cloud className="h-6 w-6 text-primary-500" />
-                <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">Synchronisation Cloud</h3>
+                <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">
+                  Synchronisation Cloud
+                </h3>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="syncEnabled" className="text-body text-neutral-700 dark:text-neutral-300">Synchronisation activée</label>
+                  <label
+                    htmlFor="syncEnabled"
+                    className="text-body text-neutral-700 dark:text-neutral-300"
+                  >
+                    Synchronisation activée
+                  </label>
                   <input
                     id="syncEnabled"
                     type="checkbox"
@@ -113,7 +148,10 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="syncInterval" className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                  <label
+                    htmlFor="syncInterval"
+                    className="block text-body font-medium text-neutral-700 dark:text-neutral-300 mb-2"
+                  >
                     Intervalle de synchronisation (secondes)
                   </label>
                   <input
@@ -130,5 +168,5 @@ export default function SettingsView({ userId }: SettingsViewProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

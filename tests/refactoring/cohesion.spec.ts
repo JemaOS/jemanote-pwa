@@ -18,7 +18,7 @@ const CONFIG = {
     maxPublicMethods: 10,
     maxProperties: 15,
     minCohesionRatio: 0.5, // LCOM (Lack of Cohesion of Methods) inverse
-    maxFileResponsibilities: 3
+    maxFileResponsibilities: 3,
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -28,8 +28,8 @@ const CONFIG = {
     '**/__mocks__/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // Types
@@ -71,7 +71,9 @@ describe('Module Cohesion Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Single responsibility violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -92,15 +94,15 @@ describe('Module Cohesion Analysis', () => {
           analysis.exports.types.length;
 
         if (totalExports > 10) {
-          violations.push(
-            `${analysis.path} - exports: ${totalExports}`
-          );
+          violations.push(`${analysis.path} - exports: ${totalExports}`);
         }
       }
 
       if (violations.length > 0) {
         console.warn('Excessive export violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -115,7 +117,7 @@ describe('Module Cohesion Analysis', () => {
         // Check for components with too many props (indicated by complex interfaces)
         if (analysis.exports.components.length > 0) {
           const content = fs.readFileSync(
-            `${path.join(CONFIG.sourceDir, analysis.path)  }.tsx`,
+            `${path.join(CONFIG.sourceDir, analysis.path)}.tsx`,
             'utf-8'
           );
 
@@ -126,9 +128,7 @@ describe('Module Cohesion Analysis', () => {
             const propCount = (propsContent.match(/\w+\??\s*:/g) || []).length;
 
             if (propCount > 10) {
-              violations.push(
-                `${analysis.path} - component props: ${propCount}`
-              );
+              violations.push(`${analysis.path} - component props: ${propCount}`);
             }
           }
         }
@@ -136,7 +136,9 @@ describe('Module Cohesion Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Component cohesion violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -150,19 +152,18 @@ describe('Module Cohesion Analysis', () => {
       const checkHookComplexity = (analysis: any, content: string) => {
         // SECURITY FIX: Limit content size to prevent ReDoS
         const MAX_CONTENT_LENGTH = 1000000; // 1MB max
-        const safeContent = content.length > MAX_CONTENT_LENGTH
-          ? content.substring(0, MAX_CONTENT_LENGTH)
-          : content;
+        const safeContent =
+          content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
         const hookMatches = safeContent.match(/export\s+function\s+use[a-zA-Z_]\w{0,99}/g) || [];
         for (const hook of hookMatches) {
           const hookName = hook.replace('export function ', '');
-          
+
           // SECURITY FIX: Validate hook name to prevent ReDoS in dynamic regex
           if (!/^\w+$/.test(hookName)) {
             continue; // Skip invalid hook names
           }
-          
+
           // SECURITY FIX: Use safer regex with length limits
           const hookRegex = new RegExp(
             String.raw`export\s+function\s+${hookName}\s*\([^)]{0,500}\)\s*\{[\s\S]{0,50000}\}`,
@@ -170,11 +171,13 @@ describe('Module Cohesion Analysis', () => {
           );
           const hookMatch = safeContent.match(hookRegex);
           if (!hookMatch) continue;
-          
+
           const useEffectCount = (hookMatch[0].match(/useEffect/g) || []).length;
           const useStateCount = (hookMatch[0].match(/useState/g) || []).length;
           if (useEffectCount > 3 || useStateCount > 5) {
-            violations.push(`${analysis.path}:${hookName} - effects: ${useEffectCount}, states: ${useStateCount}`);
+            violations.push(
+              `${analysis.path}:${hookName} - effects: ${useEffectCount}, states: ${useStateCount}`
+            );
           }
         }
       };
@@ -182,7 +185,7 @@ describe('Module Cohesion Analysis', () => {
       for (const analysis of fileAnalyses) {
         if (analysis.exports.hooks.length === 0) continue;
         const content = fs.readFileSync(
-          `${path.join(CONFIG.sourceDir, analysis.path)  }.ts`,
+          `${path.join(CONFIG.sourceDir, analysis.path)}.ts`,
           'utf-8'
         );
         checkHookComplexity(analysis, content);
@@ -190,7 +193,9 @@ describe('Module Cohesion Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Hook cohesion violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -207,23 +212,21 @@ describe('Module Cohesion Analysis', () => {
 
           // Services should have a reasonable number of functions
           if (functionCount > CONFIG.thresholds.maxMethodsPerClass) {
-            violations.push(
-              `${analysis.path} - functions: ${functionCount}`
-            );
+            violations.push(`${analysis.path} - functions: ${functionCount}`);
           }
 
           // Services should export functions, not just a class
           if (functionCount === 0 && analysis.exports.classes.length === 0) {
-            violations.push(
-              `${analysis.path} - no exported functions or classes`
-            );
+            violations.push(`${analysis.path} - no exported functions or classes`);
           }
         }
       }
 
       if (violations.length > 0) {
         console.warn('Service cohesion violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -241,9 +244,7 @@ describe('Module Cohesion Analysis', () => {
           // Utility files should have multiple related functions
           if (functionCount === 1) {
             // Single function utilities might be better placed elsewhere
-            violations.push(
-              `${analysis.path} - only 1 function, consider merging or relocating`
-            );
+            violations.push(`${analysis.path} - only 1 function, consider merging or relocating`);
           }
 
           // But not too many
@@ -257,7 +258,9 @@ describe('Module Cohesion Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Utility cohesion violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -283,7 +286,9 @@ describe('Module Cohesion Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Naming consistency violations:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -299,7 +304,7 @@ function getSourceFiles(): string[] {
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
@@ -318,7 +323,7 @@ function analyzeFile(filePath: string): FileAnalysis {
     components: extractComponentExports(content),
     hooks: extractHookExports(content),
     constants: extractConstantExports(content),
-    types: extractTypeExports(content)
+    types: extractTypeExports(content),
   };
 
   // Determine responsibilities
@@ -331,7 +336,7 @@ function analyzeFile(filePath: string): FileAnalysis {
     path: relativePath,
     exports,
     responsibilities,
-    cohesion
+    cohesion,
   };
 }
 
@@ -361,7 +366,8 @@ function extractClassExports(content: string): string[] {
 
 function extractComponentExports(content: string): string[] {
   const components: string[] = [];
-  const regex = /export\s+(?:default\s+)?(?:function|const)\s+(\w+):?\s*.*?React\.FC|export\s+(?:default\s+)?(?:function|const)\s+(\w+)\s*[=\(].*?=>/g;
+  const regex =
+    /export\s+(?:default\s+)?(?:function|const)\s+(\w+):?\s*.*?React\.FC|export\s+(?:default\s+)?(?:function|const)\s+(\w+)\s*[=\(].*?=>/g;
   let match;
 
   while ((match = regex.exec(content)) !== null) {
@@ -437,21 +443,25 @@ function determineResponsibilities(exports: FileAnalysis['exports'], content: st
     responsibilities.push('State Management');
   }
 
-  if (exports.functions.some(f =>
-    f.includes('fetch') || f.includes('get') || f.includes('post') || f.includes('api')
-  )) {
+  if (
+    exports.functions.some(
+      f => f.includes('fetch') || f.includes('get') || f.includes('post') || f.includes('api')
+    )
+  ) {
     responsibilities.push('Data Fetching');
   }
 
-  if (exports.functions.some(f =>
-    f.includes('validate') || f.includes('parse') || f.includes('format')
-  )) {
+  if (
+    exports.functions.some(
+      f => f.includes('validate') || f.includes('parse') || f.includes('format')
+    )
+  ) {
     responsibilities.push('Data Transformation');
   }
 
-  if (exports.functions.some(f =>
-    f.includes('handle') || f.includes('on') || f.includes('click')
-  )) {
+  if (
+    exports.functions.some(f => f.includes('handle') || f.includes('on') || f.includes('click'))
+  ) {
     responsibilities.push('Event Handling');
   }
 
@@ -470,11 +480,7 @@ function calculateCohesion(exports: FileAnalysis['exports'], content: string): n
   // Simplified LCOM (Lack of Cohesion of Methods) calculation
   // Higher is better (1 = perfect cohesion)
 
-  const allExports = [
-    ...exports.functions,
-    ...exports.hooks,
-    ...exports.components
-  ];
+  const allExports = [...exports.functions, ...exports.hooks, ...exports.components];
 
   if (allExports.length <= 1) {
     return 1; // Single export is perfectly cohesive
@@ -488,8 +494,8 @@ function calculateCohesion(exports: FileAnalysis['exports'], content: string): n
     const regex = new RegExp(String.raw`${exp}.*?\{([^}]*)\}`, 's');
     const match = content.match(regex);
     if (match) {
-      const deps = (match[1].match(/\b\w+\b/g) || []).filter(w =>
-        allExports.includes(w) && w !== exp
+      const deps = (match[1].match(/\b\w+\b/g) || []).filter(
+        w => allExports.includes(w) && w !== exp
       );
       exportDependencies.push(deps);
     }
@@ -498,9 +504,7 @@ function calculateCohesion(exports: FileAnalysis['exports'], content: string): n
   // Calculate cohesion based on shared dependencies
   for (let i = 0; i < exportDependencies.length; i++) {
     for (let j = i + 1; j < exportDependencies.length; j++) {
-      const shared = exportDependencies[i].filter(d =>
-        exportDependencies[j].includes(d)
-      );
+      const shared = exportDependencies[i].filter(d => exportDependencies[j].includes(d));
       if (shared.length > 0) {
         sharedDependencies++;
       }

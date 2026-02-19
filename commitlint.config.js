@@ -13,17 +13,17 @@ export default {
       2,
       'always',
       [
-        'feat',     // A new feature
-        'fix',      // A bug fix
-        'docs',     // Documentation only changes
-        'style',    // Changes that do not affect the meaning of the code
+        'feat', // A new feature
+        'fix', // A bug fix
+        'docs', // Documentation only changes
+        'style', // Changes that do not affect the meaning of the code
         'refactor', // A code change that neither fixes a bug nor adds a feature
-        'perf',     // A code change that improves performance
-        'test',     // Adding missing tests or correcting existing tests
-        'build',    // Changes that affect the build system or external dependencies
-        'ci',       // Changes to CI configuration files and scripts
-        'chore',    // Other changes that don't modify src or test files
-        'revert',   // Reverts a previous commit
+        'perf', // A code change that improves performance
+        'test', // Adding missing tests or correcting existing tests
+        'build', // Changes that affect the build system or external dependencies
+        'ci', // Changes to CI configuration files and scripts
+        'chore', // Other changes that don't modify src or test files
+        'revert', // Reverts a previous commit
       ],
     ],
     // Type must be in lowercase
@@ -35,25 +35,25 @@ export default {
       1,
       'always',
       [
-        'auth',       // Authentication related
-        'notes',      // Notes functionality
-        'graph',      // Graph visualization
-        'editor',     // Markdown editor
-        'ai',         // AI features
-        'search',     // Search functionality
-        'sync',       // Synchronization
-        'ui',         // UI components
-        'pwa',        // PWA features
-        'test',       // Tests
-        'deps',       // Dependencies
-        'config',     // Configuration
-        'ci',         // CI/CD
-        'docs',       // Documentation
-        'api',        // API related
-        'storage',    // Storage layer
-        'perf',       // Performance
-        'security',   // Security
-        'i18n',       // Internationalization
+        'auth', // Authentication related
+        'notes', // Notes functionality
+        'graph', // Graph visualization
+        'editor', // Markdown editor
+        'ai', // AI features
+        'search', // Search functionality
+        'sync', // Synchronization
+        'ui', // UI components
+        'pwa', // PWA features
+        'test', // Tests
+        'deps', // Dependencies
+        'config', // Configuration
+        'ci', // CI/CD
+        'docs', // Documentation
+        'api', // API related
+        'storage', // Storage layer
+        'perf', // Performance
+        'security', // Security
+        'i18n', // Internationalization
       ],
     ],
     // Scope must be in lowercase
@@ -82,7 +82,17 @@ export default {
     parserOpts: {
       headerPattern: /^(\w+)(?:\(([^)]+)\))?: (.+)$/,
       headerCorrespondence: ['type', 'scope', 'subject'],
-      referenceActions: ['close', 'closes', 'closed', 'fix', 'fixes', 'fixed', 'resolve', 'resolves', 'resolved'],
+      referenceActions: [
+        'close',
+        'closes',
+        'closed',
+        'fix',
+        'fixes',
+        'fixed',
+        'resolve',
+        'resolves',
+        'resolved',
+      ],
       issuePrefixes: ['#', 'JEMA-'],
     },
   },

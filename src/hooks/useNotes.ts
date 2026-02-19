@@ -1,79 +1,79 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import localforage from 'localforage'
-import { useState, useEffect } from 'react'
+import localforage from 'localforage';
+import { useState, useEffect } from 'react';
 
-import { supabase } from '@/lib/supabase'
-import { Note } from '@/types'
+import { supabase } from '@/lib/supabase';
+import { Note } from '@/types';
 
-const NOTES_STORAGE_KEY = 'obsidian_pwa_notes'
+const NOTES_STORAGE_KEY = 'obsidian_pwa_notes';
 
 function handleNoteRealtimePayload(
   payload: { eventType: string; new: any; old: any },
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>
 ) {
   if (payload.eventType === 'INSERT') {
-    setNotes((prev) => [payload.new as Note, ...prev])
+    setNotes(prev => [payload.new as Note, ...prev]);
   } else if (payload.eventType === 'UPDATE') {
-    setNotes((prev) =>
-      prev.map((note) => (note.id === payload.new.id ? (payload.new as Note) : note))
-    )
+    setNotes(prev => prev.map(note => (note.id === payload.new.id ? (payload.new as Note) : note)));
   } else if (payload.eventType === 'DELETE') {
-    setNotes((prev) => prev.filter((note) => note.id !== payload.old.id))
+    setNotes(prev => prev.filter(note => note.id !== payload.old.id));
   }
 }
 
 export function useNotes(userId?: string) {
-  const [notes, setNotes] = useState<Note[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   // Load notes from local storage first (offline support)
   useEffect(() => {
     const loadLocalNotes = async () => {
       try {
-        const cachedNotes = await localforage.getItem<Note[]>(NOTES_STORAGE_KEY)
+        const cachedNotes = await localforage.getItem<Note[]>(NOTES_STORAGE_KEY);
         if (cachedNotes) {
-          setNotes(cachedNotes)
+          setNotes(cachedNotes);
         }
       } catch (err) {
-        console.error('Error loading cached notes:', err)
+        console.error('Error loading cached notes:', err);
       }
-    }
-    loadLocalNotes()
-  }, [])
+    };
+    loadLocalNotes();
+  }, []);
 
   // Fetch notes from Supabase
   useEffect(() => {
     if (!userId) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
     const fetchNotes = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const { data, error } = await supabase
           .from('notes')
           .select('*')
           .eq('user_id', userId)
-          .order('updated_at', { ascending: false })
+          .order('updated_at', { ascending: false });
 
-        if (error) {throw error}
+        if (error) {
+          throw error;
+        }
 
-        setNotes(data || [])
+        setNotes(data || []);
         // Cache to local storage
-        await localforage.setItem(NOTES_STORAGE_KEY, data || [])
+        await localforage.setItem(NOTES_STORAGE_KEY, data || []);
       } catch (err) {
-        setError(err as Error)
-        console.error('Error fetching notes:', err)
+        setError(err as Error);
+        console.error('Error fetching notes:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchNotes()
+    fetchNotes();
 
     // Subscribe to realtime changes
     const channel = supabase
@@ -86,17 +86,21 @@ export function useNotes(userId?: string) {
           table: 'notes',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => { handleNoteRealtimePayload(payload, setNotes) }
+        payload => {
+          handleNoteRealtimePayload(payload, setNotes);
+        }
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      channel.unsubscribe()
-    }
-  }, [userId])
+      channel.unsubscribe();
+    };
+  }, [userId]);
 
   const createNote = async (title: string, content: string = '', folderId?: string) => {
-    if (!userId) {return { data: null, error: new Error('User not authenticated') }}
+    if (!userId) {
+      return { data: null, error: new Error('User not authenticated') };
+    }
 
     try {
       const { data, error } = await supabase
@@ -108,14 +112,16 @@ export function useNotes(userId?: string) {
           folder_id: folderId,
         })
         .select()
-        .single()
+        .single();
 
-      if (error) {throw error}
-      return { data, error: null }
+      if (error) {
+        throw error;
+      }
+      return { data, error: null };
     } catch (err) {
-      return { data: null, error: err as Error }
+      return { data: null, error: err as Error };
     }
-  }
+  };
 
   const updateNote = async (noteId: string, updates: Partial<Note>) => {
     try {
@@ -124,25 +130,29 @@ export function useNotes(userId?: string) {
         .update(updates)
         .eq('id', noteId)
         .select()
-        .single()
+        .single();
 
-      if (error) {throw error}
-      return { data, error: null }
+      if (error) {
+        throw error;
+      }
+      return { data, error: null };
     } catch (err) {
-      return { data: null, error: err as Error }
+      return { data: null, error: err as Error };
     }
-  }
+  };
 
   const deleteNote = async (noteId: string) => {
     try {
-      const { error } = await supabase.from('notes').delete().eq('id', noteId)
+      const { error } = await supabase.from('notes').delete().eq('id', noteId);
 
-      if (error) {throw error}
-      return { error: null }
+      if (error) {
+        throw error;
+      }
+      return { error: null };
     } catch (err) {
-      return { error: err as Error }
+      return { error: err as Error };
     }
-  }
+  };
 
   return {
     notes,
@@ -151,5 +161,5 @@ export function useNotes(userId?: string) {
     createNote,
     updateNote,
     deleteNote,
-  }
+  };
 }

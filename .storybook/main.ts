@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import type { StorybookConfig } from '@storybook/react-vite'
+import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -22,13 +22,13 @@ const config: StorybookConfig = {
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: {
       shouldExtractLiteralValuesFromEnum: true,
-      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
+      propFilter: prop => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
     },
   },
-  viteFinal: async (config) => {
+  viteFinal: async config => {
     // Merge with project's vite config
-    const { mergeConfig } = await import('vite')
-    const path = await import('path')
+    const { mergeConfig } = await import('vite');
+    const path = await import('path');
 
     return mergeConfig(config, {
       resolve: {
@@ -39,9 +39,9 @@ const config: StorybookConfig = {
       css: {
         postcss: './postcss.config.js',
       },
-    })
+    });
   },
   staticDirs: ['../public'],
-}
+};
 
-export default config
+export default config;

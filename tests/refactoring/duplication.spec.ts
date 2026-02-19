@@ -16,7 +16,7 @@ const CONFIG = {
     maxDuplicationPercent: 3,
     minDuplicateLines: 5,
     minDuplicateTokens: 50,
-    maxSimilarFunctions: 2
+    maxSimilarFunctions: 2,
   },
   excludePatterns: [
     '**/*.test.ts',
@@ -26,8 +26,8 @@ const CONFIG = {
     '**/__mocks__/**',
     '**/*.stories.tsx',
     '**/*.stories.ts',
-    '**/*.d.ts'
-  ]
+    '**/*.d.ts',
+  ],
 };
 
 // Types
@@ -54,7 +54,7 @@ let duplicationReport: DuplicationReport = {
   totalLines: 0,
   duplicatedLines: 0,
   duplicationPercent: 0,
-  duplicates: []
+  duplicates: [],
 };
 
 describe('Code Duplication Analysis', () => {
@@ -84,7 +84,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('High file duplication:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -108,7 +110,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Large duplicate blocks:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -119,7 +123,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Identical functions found:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -133,7 +139,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Similar function patterns:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -145,7 +153,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Duplicated error handling:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -159,7 +169,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Duplicated type definitions:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -183,7 +195,9 @@ describe('Code Duplication Analysis', () => {
 
       if (violations.length > 0) {
         console.warn('Unused imports:');
-        violations.forEach(v => { console.warn(`  - ${v}`); });
+        violations.forEach(v => {
+          console.warn(`  - ${v}`);
+        });
       }
 
       expect(violations).toHaveLength(0);
@@ -199,7 +213,7 @@ function getSourceFiles(): string[] {
   for (const ext of extensions) {
     const pattern = path.join(CONFIG.sourceDir, '**', ext);
     const matches = glob.sync(pattern, {
-      ignore: CONFIG.excludePatterns
+      ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
   }
@@ -207,7 +221,10 @@ function getSourceFiles(): string[] {
   return files.filter(file => !file.includes('node_modules'));
 }
 
-function readFileContents(files: string[]): { fileContents: { [key: string]: string[] }; totalLines: number } {
+function readFileContents(files: string[]): {
+  fileContents: { [key: string]: string[] };
+  totalLines: number;
+} {
   const fileContents: { [key: string]: string[] } = {};
   let totalLines = 0;
   for (const file of files) {
@@ -221,22 +238,32 @@ function readFileContents(files: string[]): { fileContents: { [key: string]: str
 
 function findDuplicateWindow(
   // eslint-disable-next-line max-params
-  window1: string, file1: string, i: number,
-  file2: string, lines2: string[], windowSize: number,
-  processed: Set<string>, duplicates: DuplicateBlock[]
+  window1: string,
+  file1: string,
+  i: number,
+  file2: string,
+  lines2: string[],
+  windowSize: number,
+  processed: Set<string>,
+  duplicates: DuplicateBlock[]
 ) {
   for (let j = 0; j <= lines2.length - windowSize; j++) {
-    const window2 = lines2.slice(j, j + windowSize).join('\n').trim();
+    const window2 = lines2
+      .slice(j, j + windowSize)
+      .join('\n')
+      .trim();
     if (window1 !== window2 || window1.length <= CONFIG.thresholds.minDuplicateTokens) continue;
-    
+
     const similarity = calculateSimilarity(window1, window2);
     if (similarity <= 0.9) continue;
-    
+
     duplicates.push({
-      file1, file2,
+      file1,
+      file2,
       lines1: { start: i + 1, end: i + windowSize },
       lines2: { start: j + 1, end: j + windowSize },
-      content: window1.substring(0, 100), similarity
+      content: window1.substring(0, 100),
+      similarity,
     });
     for (let k = 0; k < windowSize; k++) {
       processed.add(`${file1}:${i + k}`);
@@ -254,7 +281,10 @@ function analyzeDuplication(files: string[]): DuplicationReport {
   for (const [file1, lines1] of Object.entries(fileContents)) {
     for (let i = 0; i <= lines1.length - windowSize; i++) {
       if (processed.has(`${file1}:${i}`)) continue;
-      const window1 = lines1.slice(i, i + windowSize).join('\n').trim();
+      const window1 = lines1
+        .slice(i, i + windowSize)
+        .join('\n')
+        .trim();
 
       for (const [file2, lines2] of Object.entries(fileContents)) {
         if (file1 === file2) continue;
@@ -269,17 +299,21 @@ function analyzeDuplication(files: string[]): DuplicationReport {
     totalLines,
     duplicatedLines,
     duplicationPercent: totalLines > 0 ? (duplicatedLines / totalLines) * 100 : 0,
-    duplicates
+    duplicates,
   };
 }
 
 function calculateSimilarity(str1: string, str2: string): number {
-  if (str1 === str2) {return 1;}
+  if (str1 === str2) {
+    return 1;
+  }
 
   const longer = str1.length > str2.length ? str1 : str2;
   const shorter = str1.length > str2.length ? str2 : str1;
 
-  if (longer.length === 0) {return 1;}
+  if (longer.length === 0) {
+    return 1;
+  }
 
   const distance = levenshteinDistance(longer, shorter);
   return (longer.length - distance) / longer.length;
@@ -347,9 +381,7 @@ function findIdenticalFunctions(report: DuplicationReport): string[] {
   for (const dup of report.duplicates) {
     // Check if the duplicate looks like a function
     if (dup.content.includes('function') || dup.content.includes('=>')) {
-      violations.push(
-        `${dup.file1}:${dup.lines1.start} ↔ ${dup.file2}:${dup.lines2.start}`
-      );
+      violations.push(`${dup.file1}:${dup.lines1.start} ↔ ${dup.file2}:${dup.lines2.start}`);
     }
   }
 
@@ -366,12 +398,12 @@ function findSimilarFunctions(files: string[]): string[] {
 
     // SECURITY FIX: Added content length limit and safer regex to prevent ReDoS
     const MAX_CONTENT_LENGTH = 1000000; // 1MB max per file
-    const safeContent = content.length > MAX_CONTENT_LENGTH
-      ? content.substring(0, MAX_CONTENT_LENGTH)
-      : content;
+    const safeContent =
+      content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
     // Extract function bodies (simplified) with safer regex patterns
-    const functionRegex = /(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z_]\w{0,99})\s*\([^)]{0,500}\)\s*\{([^}]*)\}/g;
+    const functionRegex =
+      /(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z_]\w{0,99})\s*\([^)]{0,500}\)\s*\{([^}]*)\}/g;
     let match;
 
     while ((match = functionRegex.exec(safeContent)) !== null) {
@@ -406,9 +438,8 @@ function findDuplicatedErrorHandling(files: string[]): string[] {
 
     // SECURITY FIX: Limit content size for regex processing
     const MAX_CONTENT_LENGTH = 1000000; // 1MB max per file
-    const safeContent = content.length > MAX_CONTENT_LENGTH
-      ? content.substring(0, MAX_CONTENT_LENGTH)
-      : content;
+    const safeContent =
+      content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
     // Find try-catch blocks with safer regex
     const tryCatchRegex = /try\s*\{[\s\S]{0,10000}\}\s*catch\s*\([^)]{0,200}\)\s*\{([^}]*)\}/g;
@@ -482,7 +513,7 @@ function findUnusedImports(content: string): string[] {
       if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(imp)) {
         continue; // Skip invalid import names
       }
-      
+
       // Check if import is used (excluding the import statement itself)
       const usageRegex = new RegExp(String.raw`\b${imp}\b`, 'g');
       const usages = content.match(usageRegex) || [];

@@ -1,10 +1,10 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Sparkles, Check, Server, Loader2, AlertTriangle } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Sparkles, Check, Server, Loader2, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-import { aiService } from '@/services/ai/mistralService'
+import { aiService } from '@/services/ai/mistralService';
 
 export default function AISettingsSection() {
   const [cacheStats, setCacheStats] = useState({
@@ -13,72 +13,74 @@ export default function AISettingsSection() {
     historySize: 0,
     maxHistorySize: 50,
     cacheDuration: 0,
-  })
-  const [clearing, setClearing] = useState(false)
-  const [apiStatus, setApiStatus] = useState<'checking' | 'available' | 'unavailable'>('checking')
-  const [apiError, setApiError] = useState<string>('')
+  });
+  const [clearing, setClearing] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const [apiError, setApiError] = useState<string>('');
 
   // Charger les statistiques
   useEffect(() => {
-    loadStats()
-    checkApiStatus()
-  }, [])
+    loadStats();
+    checkApiStatus();
+  }, []);
 
   const loadStats = async () => {
-    const stats = await aiService.getCacheStats()
-    setCacheStats(stats)
-  }
+    const stats = await aiService.getCacheStats();
+    setCacheStats(stats);
+  };
 
   const checkApiStatus = async () => {
     try {
       // Tester avec un petit prompt
-      await aiService.summarize('Test de connectivité API', 'short')
-      setApiStatus('available')
-      setApiError('')
+      await aiService.summarize('Test de connectivité API', 'short');
+      setApiStatus('available');
+      setApiError('');
     } catch (error) {
-      setApiStatus('unavailable')
+      setApiStatus('unavailable');
       if (error instanceof Error) {
         if (error.message.includes('401')) {
-          setApiError('La clé API Mistral est invalide ou expirée. Le service IA est temporairement indisponible.')
+          setApiError(
+            'La clé API Mistral est invalide ou expirée. Le service IA est temporairement indisponible.'
+          );
         } else if (error.message.includes('Network')) {
-          setApiError('Impossible de contacter l\'API Mistral. Vérifiez votre connexion internet.')
+          setApiError("Impossible de contacter l'API Mistral. Vérifiez votre connexion internet.");
         } else {
-          setApiError(`Service IA indisponible : ${error.message}`)
+          setApiError(`Service IA indisponible : ${error.message}`);
         }
       } else {
-        setApiError('Le service IA rencontre un problème de configuration.')
+        setApiError('Le service IA rencontre un problème de configuration.');
       }
     }
-  }
+  };
 
   const handleClearCache = async () => {
-    setClearing(true)
+    setClearing(true);
     try {
-      await aiService.clearCache()
-      await loadStats()
+      await aiService.clearCache();
+      await loadStats();
     } catch (error) {
-      console.error('Erreur lors du vidage du cache:', error)
+      console.error('Erreur lors du vidage du cache:', error);
     } finally {
-      setClearing(false)
+      setClearing(false);
     }
-  }
+  };
 
   const handleClearHistory = async () => {
-    setClearing(true)
+    setClearing(true);
     try {
-      await aiService.clearHistory()
-      await loadStats()
+      await aiService.clearHistory();
+      await loadStats();
     } catch (error) {
-      console.error('Erreur lors du vidage de l\'historique:', error)
+      console.error("Erreur lors du vidage de l'historique:", error);
     } finally {
-      setClearing(false)
+      setClearing(false);
     }
-  }
+  };
 
   const handleRetryConnection = () => {
-    setApiStatus('checking')
-    checkApiStatus()
-  }
+    setApiStatus('checking');
+    checkApiStatus();
+  };
 
   return (
     <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 sm:p-6">
@@ -116,7 +118,8 @@ export default function AISettingsSection() {
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-green-600 dark:text-green-400">
-                  L'assistant IA est configuré et connecté. Toutes les fonctionnalités sont disponibles.
+                  L'assistant IA est configuré et connecté. Toutes les fonctionnalités sont
+                  disponibles.
                 </p>
               </div>
             </div>
@@ -150,17 +153,13 @@ export default function AISettingsSection() {
         {/* Cache */}
         <div className="p-3 bg-neutral-100 dark:bg-neutral-900 rounded-md space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-700 dark:text-neutral-300">
-              Réponses en cache
-            </span>
+            <span className="text-neutral-700 dark:text-neutral-300">Réponses en cache</span>
             <span className="font-medium text-neutral-900 dark:text-neutral-100">
               {cacheStats.cacheSize} / {cacheStats.maxCacheSize}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-700 dark:text-neutral-300">
-              Historique des résumés
-            </span>
+            <span className="text-neutral-700 dark:text-neutral-300">Historique des résumés</span>
             <span className="font-medium text-neutral-900 dark:text-neutral-100">
               {cacheStats.historySize} / {cacheStats.maxHistorySize}
             </span>
@@ -224,11 +223,12 @@ export default function AISettingsSection() {
         {/* Note de confidentialité */}
         <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
           <p className="text-xs text-blue-700 dark:text-blue-300">
-            <strong>Confidentialité:</strong> Vos notes sont envoyées à Mistral AI uniquement lors de l'utilisation des fonctionnalités IA. 
-            Elles ne sont pas stockées par Mistral et sont traitées de manière confidentielle.
+            <strong>Confidentialité:</strong> Vos notes sont envoyées à Mistral AI uniquement lors
+            de l'utilisation des fonctionnalités IA. Elles ne sont pas stockées par Mistral et sont
+            traitées de manière confidentielle.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

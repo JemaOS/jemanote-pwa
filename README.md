@@ -25,6 +25,7 @@ JemaNote est une application de prise de notes Progressive Web App (PWA) dévelo
 ## ✨ Fonctionnalités
 
 ### Éditeur Markdown
+
 - 📝 Éditeur Markdown complet avec prévisualisation en temps réel
 - 🎨 Coloration syntaxique avec CodeMirror
 - 📐 Support des formules mathématiques (KaTeX)
@@ -32,26 +33,31 @@ JemaNote est une application de prise de notes Progressive Web App (PWA) dévelo
 - 🔗 WikiLinks pour lier vos notes entre elles
 
 ### Organisation
+
 - 📁 Système de dossiers pour organiser vos notes
 - 🔍 Recherche rapide et puissante (Fuse.js)
 - 🗑️ Corbeille avec restauration
 - 📅 Vue timeline pour naviguer par date
 
 ### Visualisation
+
 - 🕸️ Vue graphe pour visualiser les liens entre notes (Cytoscape)
 - 🖼️ Vue canvas pour une organisation spatiale (PixiJS)
 
 ### Intelligence Artificielle
+
 - 🤖 Intégration IA avec Mistral AI
 - 📋 Résumés automatiques
 - ✍️ Assistance à la rédaction
 
 ### Synchronisation & Stockage
+
 - 💾 Stockage local (LocalForage)
 - ☁️ Synchronisation cloud optionnelle (Supabase)
 - 📱 Mode hors-ligne complet (PWA)
 
 ### Interface
+
 - 🌙 Thème clair/sombre
 - 📱 Design responsive (mobile, tablette, desktop)
 - ⌨️ Palette de commandes (Cmd/Ctrl + K)
@@ -60,7 +66,8 @@ JemaNote est une application de prise de notes Progressive Web App (PWA) dévelo
 ## 🚀 Installation
 
 ### Prérequis
-- Node.js 18+ 
+
+- Node.js 18+
 - npm ou yarn
 
 ### Installation locale
@@ -97,18 +104,18 @@ VITE_MISTRAL_API_KEY=your_mistral_api_key
 
 ### Raccourcis clavier
 
-| Raccourci | Action |
-|-----------|--------|
+| Raccourci      | Action                         |
+| -------------- | ------------------------------ |
 | `Ctrl/Cmd + K` | Ouvrir la palette de commandes |
-| `Ctrl/Cmd + N` | Nouvelle note |
-| `Ctrl/Cmd + S` | Sauvegarder |
-| `Ctrl/Cmd + B` | Texte en gras |
-| `Ctrl/Cmd + I` | Texte en italique |
+| `Ctrl/Cmd + N` | Nouvelle note                  |
+| `Ctrl/Cmd + S` | Sauvegarder                    |
+| `Ctrl/Cmd + B` | Texte en gras                  |
+| `Ctrl/Cmd + I` | Texte en italique              |
 
 ### Syntaxe Markdown supportée
 
 - Titres (`# H1`, `## H2`, etc.)
-- **Gras** et *italique*
+- **Gras** et _italique_
 - Listes à puces et numérotées
 - Blocs de code avec coloration syntaxique
 - Tableaux
@@ -132,6 +139,7 @@ VITE_MISTRAL_API_KEY=your_mistral_api_key
 ## 📦 Scripts disponibles
 
 ### Développement
+
 ```bash
 npm run dev              # Serveur de développement
 npm run build            # Build de production
@@ -140,6 +148,7 @@ npm run preview          # Prévisualiser le build
 ```
 
 ### Tests
+
 ```bash
 npm run test             # Tests unitaires (Vitest)
 npm run test:watch       # Tests en mode watch
@@ -158,16 +167,16 @@ JemaNote dispose d'une infrastructure de tests complète et professionnelle :
 
 ### Types de tests
 
-| Type | Outil | Description |
-|------|-------|-------------|
-| **Unitaires** | [Vitest](https://vitest.dev/) | Tests rapides pour fonctions, hooks et utilitaires |
-| **Intégration** | [Vitest](https://vitest.dev/) + [MSW](https://mswjs.io/) | Tests des interactions entre modules et API |
-| **Composants** | [React Testing Library](https://testing-library.com/) | Tests des composants React avec interactions |
-| **E2E** | [Playwright](https://playwright.dev/) | Tests de bout en bout sur vrais navigateurs |
-| **Sécurité** | [Playwright](https://playwright.dev/) | Tests XSS, CSP, injection, headers |
-| **Performance** | [Lighthouse](https://developer.chrome.com/docs/lighthouse) + Playwright | Audits Lighthouse, taille bundle, mémoire |
-| **Visuels** | [Playwright](https://playwright.dev/) | Tests de régression visuelle |
-| **Refactoring** | Scripts custom | Analyse de complexité, duplication, couplage |
+| Type            | Outil                                                                   | Description                                        |
+| --------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
+| **Unitaires**   | [Vitest](https://vitest.dev/)                                           | Tests rapides pour fonctions, hooks et utilitaires |
+| **Intégration** | [Vitest](https://vitest.dev/) + [MSW](https://mswjs.io/)                | Tests des interactions entre modules et API        |
+| **Composants**  | [React Testing Library](https://testing-library.com/)                   | Tests des composants React avec interactions       |
+| **E2E**         | [Playwright](https://playwright.dev/)                                   | Tests de bout en bout sur vrais navigateurs        |
+| **Sécurité**    | [Playwright](https://playwright.dev/)                                   | Tests XSS, CSP, injection, headers                 |
+| **Performance** | [Lighthouse](https://developer.chrome.com/docs/lighthouse) + Playwright | Audits Lighthouse, taille bundle, mémoire          |
+| **Visuels**     | [Playwright](https://playwright.dev/)                                   | Tests de régression visuelle                       |
+| **Refactoring** | Scripts custom                                                          | Analyse de complexité, duplication, couplage       |
 
 ### Documentation des tests
 
@@ -181,6 +190,7 @@ JemaNote dispose d'une infrastructure de tests complète et professionnelle :
 ![Coverage](https://img.shields.io/badge/coverage-70%25-brightgreen)
 
 Les seuils de couverture actuels :
+
 - Statements: 70%
 - Branches: 60%
 - Functions: 70%
@@ -190,21 +200,22 @@ Voir le rapport de couverture détaillé avec `npm run test:coverage`.
 
 ### Commandes de test
 
-| Commande | Description |
-|----------|-------------|
-| `npm run test` | Tests unitaires |
-| `npm run test:watch` | Tests en mode watch |
-| `npm run test:coverage` | Tests avec couverture |
-| `npm run test:e2e` | Tests E2E |
-| `npm run test:e2e:ui` | Tests E2E avec interface |
-| `npm run test:visual` | Tests de régression visuelle |
-| `npm run test:performance` | Tests de performance |
-| `npm run test:security` | Tests de sécurité |
-| `npm run test:refactoring` | Analyse de qualité du code |
-| `npm run test:all` | Tous les tests qualité |
-| `node scripts/run-tests.js` | Lanceur interactif |
+| Commande                    | Description                  |
+| --------------------------- | ---------------------------- |
+| `npm run test`              | Tests unitaires              |
+| `npm run test:watch`        | Tests en mode watch          |
+| `npm run test:coverage`     | Tests avec couverture        |
+| `npm run test:e2e`          | Tests E2E                    |
+| `npm run test:e2e:ui`       | Tests E2E avec interface     |
+| `npm run test:visual`       | Tests de régression visuelle |
+| `npm run test:performance`  | Tests de performance         |
+| `npm run test:security`     | Tests de sécurité            |
+| `npm run test:refactoring`  | Analyse de qualité du code   |
+| `npm run test:all`          | Tous les tests qualité       |
+| `node scripts/run-tests.js` | Lanceur interactif           |
 
 ### Qualité du code
+
 ```bash
 npm run lint             # ESLint
 npm run lint:fix         # ESLint avec auto-fix
@@ -216,6 +227,7 @@ npm run quality:fix      # Suite qualité avec auto-fix
 ```
 
 ### Analyse du code
+
 ```bash
 npm run depcheck         # Détecter dépendances inutilisées
 npm run knip             # Détecter code mort
@@ -224,13 +236,17 @@ npm run knip             # Détecter code mort
 ## 🔒 Qualité et Standards
 
 ### Pre-commit Hooks
+
 Ce projet utilise Husky et lint-staged pour exécuter automatiquement :
+
 - ESLint avec auto-fix
 - Prettier formatage
 - Tests liés aux fichiers modifiés
 
 ### Conventional Commits
+
 Les messages de commit doivent suivre la convention [Conventional Commits](https://www.conventionalcommits.org/) :
+
 ```
 <type>(<scope>): <subject>
 
@@ -242,6 +258,7 @@ Les messages de commit doivent suivre la convention [Conventional Commits](https
 Types disponibles : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
 Exemples :
+
 ```bash
 git commit -m "feat(notes): add search by tags"
 git commit -m "fix(auth): resolve login redirect issue"
@@ -249,7 +266,9 @@ git commit -m "docs(readme): update installation instructions"
 ```
 
 ### CI/CD
+
 Le workflow GitHub Actions exécute automatiquement :
+
 - Lint et vérification des types
 - Tests unitaires avec couverture
 - Tests E2E
@@ -259,17 +278,19 @@ Le workflow GitHub Actions exécute automatiquement :
 
 ### Configuration des outils
 
-| Outil | Configuration | Description |
-|-------|--------------|-------------|
-| ESLint | [`eslint.config.js`](eslint.config.js) | Linting avec règles React, TypeScript strict, imports, a11y |
-| Prettier | [`.prettierrc`](.prettierrc) | Formatage cohérent du code |
-| TypeScript | [`tsconfig.app.json`](tsconfig.app.json) | Mode strict activé |
-| Commitlint | [`commitlint.config.js`](commitlint.config.js) | Validation des messages de commit |
-| Knip | [`knip.json`](knip.json) | Détection de code mort |
-| Husky | [`.husky/pre-commit`](.husky/pre-commit) | Hooks pre-commit |
+| Outil      | Configuration                                  | Description                                                 |
+| ---------- | ---------------------------------------------- | ----------------------------------------------------------- |
+| ESLint     | [`eslint.config.js`](eslint.config.js)         | Linting avec règles React, TypeScript strict, imports, a11y |
+| Prettier   | [`.prettierrc`](.prettierrc)                   | Formatage cohérent du code                                  |
+| TypeScript | [`tsconfig.app.json`](tsconfig.app.json)       | Mode strict activé                                          |
+| Commitlint | [`commitlint.config.js`](commitlint.config.js) | Validation des messages de commit                           |
+| Knip       | [`knip.json`](knip.json)                       | Détection de code mort                                      |
+| Husky      | [`.husky/pre-commit`](.husky/pre-commit)       | Hooks pre-commit                                            |
 
 ### TypeScript Strict Mode
+
 Le projet utilise TypeScript en mode strict avec les options suivantes activées :
+
 - `strict: true` - Toutes les vérifications strictes
 - `noImplicitAny: true` - Interdit les types implicites `any`
 - `strictNullChecks: true` - Vérification stricte des null/undefined
@@ -296,6 +317,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 ## 👨‍💻 Auteur
 
 **Jema Technology**
+
 - Site web : [https://www.jematechnology.fr/](https://www.jematechnology.fr/)
 
 ---

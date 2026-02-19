@@ -81,7 +81,7 @@ function runCommand(command, args = [], options = {}) {
     const child = spawn(command, args, {
       cwd: rootDir,
       stdio: 'pipe',
-      shell: true,
+      shell: true, // NOSONAR: Safe because command is hardcoded
       ...options,
     });
 

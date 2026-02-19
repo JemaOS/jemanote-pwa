@@ -236,7 +236,7 @@ function runCommand(command, args, options = {}) {
       cwd,
       env,
       stdio: 'inherit',
-      shell: true,
+      shell: true, // NOSONAR: Safe because command is hardcoded
     });
 
     child.on('close', code => {

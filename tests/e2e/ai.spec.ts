@@ -27,7 +27,7 @@ async function loginUser(page: Page) {
   const password = 'TestPassword123!';
 
   // Open auth modal
-  await page.getByRole('button', { name: /connexion|login/i }).click();
+  await page.getByRole('button', { name: /se connecter|login/i }).click();
   await page.waitForTimeout(500);
 
   // Switch to register tab
@@ -36,11 +36,17 @@ async function loginUser(page: Page) {
 
   // Fill form using placeholders (matching auth.spec.ts)
   await page.getByPlaceholder(/email/i).fill(email);
-  await page.getByPlaceholder(/mot de passe|password/i).fill(password);
+  await page.getByLabel(/mot de passe|password/i).fill(password);
 
   // Submit
   await page.getByRole('button', { name: /s'inscrire|sign up|register/i }).click();
-  await page.waitForTimeout(3000);
+  
+  // Wait for modal to close after registration
+  await page.waitForSelector('dialog:not([open])', { timeout: 10000 }).catch(() => {
+    // If modal still open, try clicking outside or pressing escape
+    return page.keyboard.press('Escape').catch(() => {});
+  });
+  await page.waitForTimeout(2000);
 }
 
 // Helper to create a note with content

@@ -685,7 +685,7 @@ export default function VoiceRecorder({
                 left: `${audioDuration > 0 ? (audioCurrentTime / audioDuration) * 100 : 0}%`,
               }}
             />
-          </div>
+          </button>
 
           {/* Contrôles de lecture */}
           <div className="flex flex-col items-center gap-4 pt-2">

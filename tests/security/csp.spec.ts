@@ -29,8 +29,8 @@ const EXPECTED_CSP_DIRECTIVES = {
 const FORBIDDEN_CSP_VALUES = [
   "'*'", // Wildcard allows anything
   "'unsafe-eval'", // Allows eval() - high XSS risk
-  'http:', // Insecure HTTP
-  'http://*', // Insecure wildcard
+  'http:', // Insecure HTTP // NOSONAR - test data for security check
+  'http://*', // Insecure wildcard // NOSONAR - test data for security check
 ];
 
 /**
@@ -187,7 +187,7 @@ test.describe('Content Security Policy', () => {
       if (directives['script-src']) {
         expect(directives['script-src']).not.toContain("'*'");
         expect(directives['script-src']).not.toContain('https://*');
-        expect(directives['script-src']).not.toContain('http://*');
+        expect(directives['script-src']).not.toContain('http://*'); // NOSONAR - test assertion
       }
     }
   });

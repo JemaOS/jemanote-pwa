@@ -196,11 +196,11 @@ describe('useAuth', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      const response = await result.current.signUp('test@example.com', 'password123');
+      const response = await result.current.signUp('test@example.com', 'password123'); // NOSONAR
 
       expect(supabase.auth.signUp).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123',
+        password: 'password123', // NOSONAR
       });
       expect(response.data?.user).toEqual(mockUser);
       expect(response.error).toBeNull();
@@ -219,7 +219,7 @@ describe('useAuth', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      const response = await result.current.signUp('test@example.com', 'password123');
+      const response = await result.current.signUp('test@example.com', 'password123'); // NOSONAR
 
       expect(response.error).toEqual(mockError);
     });
@@ -238,11 +238,11 @@ describe('useAuth', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      const response = await result.current.signIn('test@example.com', 'password123');
+      const response = await result.current.signIn('test@example.com', 'password123'); // NOSONAR
 
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123',
+        password: 'password123', // NOSONAR
       });
       expect(response.data?.user).toEqual(mockUser);
       expect(response.error).toBeNull();
@@ -261,7 +261,7 @@ describe('useAuth', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      const response = await result.current.signIn('test@example.com', 'wrongpassword');
+      const response = await result.current.signIn('test@example.com', 'wrongpassword'); // NOSONAR
 
       expect(response.error).toEqual(mockError);
     });

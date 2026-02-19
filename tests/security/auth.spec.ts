@@ -7,26 +7,26 @@ import { test, expect } from '@playwright/test';
  * Weak passwords that should be rejected
  */
 const WEAK_PASSWORDS = [
-  '123456',
-  'password',
-  'qwerty',
-  'abc123',
-  'letmein',
-  'welcome',
-  'monkey',
-  '1234567890',
-  'password123',
-  'admin',
-  'root',
-  'toor',
-  '1234',
-  '111111',
-  'master',
-  'sunshine',
-  'princess',
-  'football',
-  'baseball',
-  'iloveyou',
+  '123456', // NOSONAR
+  'password', // NOSONAR
+  'qwerty', // NOSONAR
+  'abc123', // NOSONAR
+  'letmein', // NOSONAR
+  'welcome', // NOSONAR
+  'monkey', // NOSONAR
+  '1234567890', // NOSONAR
+  'password123', // NOSONAR
+  'admin', // NOSONAR
+  'root', // NOSONAR
+  'toor', // NOSONAR
+  '1234', // NOSONAR
+  '111111', // NOSONAR
+  'master', // NOSONAR
+  'sunshine', // NOSONAR
+  'princess', // NOSONAR
+  'football', // NOSONAR
+  'baseball', // NOSONAR
+  'iloveyou', // NOSONAR
 ];
 
 /**
@@ -44,12 +44,12 @@ const STRONG_PASSWORDS = [
  * Common authentication bypass attempts
  */
 const AUTH_BYPASS_PAYLOADS = [
-  { email: "admin' OR '1'='1", password: 'anything' },
-  { email: 'admin@example.com', password: "' OR '1'='1" },
-  { email: "admin'--", password: 'anything' },
-  { email: "admin'/*", password: 'anything' },
-  { email: 'admin@example.com', password: 'password', otp: '000000' },
-  { email: 'admin@example.com', password: 'password', otp: '123456' },
+  { email: "admin' OR '1'='1", password: 'anything' }, // NOSONAR
+  { email: 'admin@example.com', password: "' OR '1'='1" }, // NOSONAR
+  { email: "admin'--", password: 'anything' }, // NOSONAR
+  { email: "admin'/*", password: 'anything' }, // NOSONAR
+  { email: 'admin@example.com', password: 'password', otp: '000000' }, // NOSONAR
+  { email: 'admin@example.com', password: 'password', otp: '123456' }, // NOSONAR
 ];
 
 test.describe('Authentication Security', () => {
@@ -371,8 +371,8 @@ test.describe('Authentication Security', () => {
       'https://evil.com',
       '//evil.com',
       String.raw`/\evil.com`,
-      'javascript:alert(1)',
-      'data:text/html,<script>alert(1)</script>',
+      'javascript:alert(1)', // NOSONAR
+      'data:text/html,<script>alert(1)</script>', // NOSONAR
     ];
 
     const allowedDomains = ['jemanote.app', 'app.jemanote.com', 'localhost'];

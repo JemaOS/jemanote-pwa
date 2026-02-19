@@ -218,7 +218,7 @@ export const supabaseAuthHandlers = [
   // Sign up
   http.post('https://yadtnmgyrmigqbndnmho.supabase.co/auth/v1/signup', async ({ request }) => {
     await delay(100);
-    const body = (await request.json()) as { email: string; password: string };
+    const body = (await request.json()) as { email: string; password: string }; // NOSONAR
 
     const user: AuthUser = {
       id: generateId(),
@@ -245,7 +245,7 @@ export const supabaseAuthHandlers = [
     const grantType = url.searchParams.get('grant_type');
 
     if (grantType === 'password') {
-      const body = (await request.json()) as { email: string; password: string };
+      const body = (await request.json()) as { email: string; password: string }; // NOSONAR
 
       // Find user by email (mock validation)
       const user = Array.from(mockUsers.values()).find(u => u.email === body.email);

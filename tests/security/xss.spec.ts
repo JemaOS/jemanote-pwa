@@ -21,37 +21,37 @@ const XSS_PAYLOADS = [
   '<iframe onload=alert("XSS")>',
 
   // JavaScript protocol
-  '<a href="javascript:alert(\'XSS\')">Click me</a>',
-  '<a href=javascript:alert("XSS")>Click me</a>',
+  '<a href="javascript:alert(\'XSS\')">Click me</a>', // NOSONAR
+  '<a href=javascript:alert("XSS")>Click me</a>', // NOSONAR
 
   // Data URI
-  '<iframe src="data:text/html,<script>alert(\'XSS\')</script>">',
+  '<iframe src="data:text/html,<script>alert(\'XSS\')</script>">', // NOSONAR
 
   // Encoded payloads
-  '<script>alert("XSS")</script>',
-  '<scr<script>ipt>alert("XSS")</scr</script>ipt>',
+  '<script>alert("XSS")</script>', // NOSONAR
+  '<scr<script>ipt>alert("XSS")</scr</script>ipt>', // NOSONAR
 
   // Template injection
-  '{{constructor.constructor("alert(\'XSS\')")()}}',
-  '${alert("XSS")}',
+  '{{constructor.constructor("alert(\'XSS\')")()}}', // NOSONAR
+  '${alert("XSS")}', // NOSONAR
 
   // SVG-based
-  '<svg><script>alert("XSS")</script></svg>',
-  '<svg><animate onbegin=alert("XSS")>',
+  '<svg><script>alert("XSS")</script></svg>', // NOSONAR
+  '<svg><animate onbegin=alert("XSS")>', // NOSONAR
 
   // Style injection
-  '<style>@import url("javascript:alert(\'XSS\')")</style>',
-  '<style>body{background:url("javascript:alert(\'XSS\')")}</style>',
+  '<style>@import url("javascript:alert(\'XSS\')")</style>', // NOSONAR
+  '<style>body{background:url("javascript:alert(\'XSS\')")}</style>', // NOSONAR
 
   // Meta refresh
-  '<meta http-equiv="refresh" content="0;url=javascript:alert(\'XSS\')">',
+  '<meta http-equiv="refresh" content="0;url=javascript:alert(\'XSS\')">', // NOSONAR
 
   // Form action
-  '<form action="javascript:alert(\'XSS\')"><input type="submit"></form>',
+  '<form action="javascript:alert(\'XSS\')"><input type="submit"></form>', // NOSONAR
 
   // Object/Embed
-  '<object data="javascript:alert(\'XSS\')">',
-  '<embed src="javascript:alert(\'XSS\')">',
+  '<object data="javascript:alert(\'XSS\')">', // NOSONAR
+  '<embed src="javascript:alert(\'XSS\')">', // NOSONAR
 ];
 
 /**
@@ -374,7 +374,7 @@ test.describe('XSS Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-xss-${Math.random()}`,
+            id: `test-xss-${Math.random()}`, // NOSONAR
             title: 'Template Injection Test',
             content,
             created_at: new Date().toISOString(),
@@ -445,7 +445,7 @@ test.describe('XSS Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-xss-${Math.random()}`,
+            id: `test-xss-${Math.random()}`, // NOSONAR
             title: 'InnerHTML Test',
             content,
             created_at: new Date().toISOString(),

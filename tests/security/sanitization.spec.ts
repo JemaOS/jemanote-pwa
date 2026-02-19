@@ -18,9 +18,9 @@ const HTML_SANITIZATION_CASES = [
     shouldNotContain: ['<script>'],
   },
   {
-    input: '<a href="javascript:alert(1)">Click</a>',
+    input: '<a href="javascript:alert(1)">Click</a>', // NOSONAR
     shouldContain: ['<a', '>Click</a>'],
-    shouldNotContain: ['javascript:'],
+    shouldNotContain: ['javascript:'], // NOSONAR
   },
   {
     input: '<img src=x onerror="alert(1)">',
@@ -58,12 +58,12 @@ const HTML_SANITIZATION_CASES = [
  * URL sanitization test cases
  */
 const URL_SANITIZATION_CASES = [
-  { input: 'javascript:alert(1)', expected: '' },
-  { input: 'javascript://alert(1)', expected: '' },
-  { input: 'data:text/html,<script>alert(1)</script>', expected: '' },
-  { input: 'vbscript:msgbox(1)', expected: '' },
+  { input: 'javascript:alert(1)', expected: '' }, // NOSONAR
+  { input: 'javascript://alert(1)', expected: '' }, // NOSONAR
+  { input: 'data:text/html,<script>alert(1)</script>', expected: '' }, // NOSONAR
+  { input: 'vbscript:msgbox(1)', expected: '' }, // NOSONAR
   { input: 'https://example.com', expected: 'https://example.com' },
-  { input: 'http://example.com', expected: 'http://example.com' },
+  { input: 'http://example.com', expected: 'http://example.com' }, // NOSONAR
   { input: '/relative/path', expected: '/relative/path' },
   { input: '#anchor', expected: '#anchor' },
   { input: 'mailto:test@example.com', expected: 'mailto:test@example.com' },
@@ -85,9 +85,9 @@ const FILENAME_SANITIZATION_CASES = [
  */
 const CSS_SANITIZATION_CASES = [
   { input: 'color: red; behavior: url(#default#VML)', shouldNotContain: ['behavior'] },
-  { input: 'background: url(javascript:alert(1))', shouldNotContain: ['javascript:'] },
+  { input: 'background: url(javascript:alert(1))', shouldNotContain: ['javascript:'] }, // NOSONAR
   { input: 'color: red; -moz-binding: url(xss.xml)', shouldNotContain: ['-moz-binding'] },
-  { input: 'color: red; expression(alert(1))', shouldNotContain: ['expression'] },
+  { input: 'color: red; expression(alert(1))', shouldNotContain: ['expression'] }, // NOSONAR
   { input: 'color: red;', shouldContain: ['color: red'] },
 ];
 
@@ -102,7 +102,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-sanitize-${Math.random()}`,
+            id: `test-sanitize-${Math.random()}`, // NOSONAR
             title: 'Sanitization Test',
             content,
             created_at: new Date().toISOString(),
@@ -132,7 +132,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-url-${Math.random()}`,
+            id: `test-url-${Math.random()}`, // NOSONAR
             title: 'URL Test',
             content: noteContent,
             created_at: new Date().toISOString(),
@@ -161,7 +161,7 @@ test.describe('Input Sanitization', () => {
         const attachments = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-file-${Math.random()}`,
+            id: `test-file-${Math.random()}`, // NOSONAR
             name: fileName,
             note_id: 'test-note-1',
             created_at: new Date().toISOString(),
@@ -190,7 +190,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-css-${Math.random()}`,
+            id: `test-css-${Math.random()}`, // NOSONAR
             title: 'CSS Test',
             content: noteContent,
             created_at: new Date().toISOString(),
@@ -228,7 +228,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-entity-${Math.random()}`,
+            id: `test-entity-${Math.random()}`, // NOSONAR
             title: 'Entity Test',
             content: noteContent,
             created_at: new Date().toISOString(),
@@ -261,7 +261,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-svg-${Math.random()}`,
+            id: `test-svg-${Math.random()}`, // NOSONAR
             title: 'SVG Test',
             content,
             created_at: new Date().toISOString(),
@@ -295,7 +295,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-form-${Math.random()}`,
+            id: `test-form-${Math.random()}`, // NOSONAR
             title: 'Form Test',
             content,
             created_at: new Date().toISOString(),
@@ -324,7 +324,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-data-${Math.random()}`,
+            id: `test-data-${Math.random()}`, // NOSONAR
             title: 'Data Attribute Test',
             content,
             created_at: new Date().toISOString(),
@@ -355,7 +355,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-md-${Math.random()}`,
+            id: `test-md-${Math.random()}`, // NOSONAR
             title: 'Markdown Test',
             content,
             created_at: new Date().toISOString(),
@@ -419,7 +419,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-unicode-${Math.random()}`,
+            id: `test-unicode-${Math.random()}`, // NOSONAR
             title: 'Unicode Test',
             content,
             created_at: new Date().toISOString(),
@@ -454,7 +454,7 @@ test.describe('Input Sanitization', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-id-${Math.random()}`,
+            id: `test-id-${Math.random()}`, // NOSONAR
             title: 'ID Test',
             content: noteContent,
             created_at: new Date().toISOString(),

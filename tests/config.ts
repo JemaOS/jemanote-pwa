@@ -62,12 +62,12 @@ export const TEST_URLS = {
   /** URL de base pour l'application */
   // SECURITY NOTE: Using HTTP for localhost development is acceptable
   // These are local development server URLs, not production endpoints
-  BASE: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+  BASE: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173', // NOSONAR
 
   /** URL de base pour l'API */
   // SECURITY NOTE: Using HTTP for localhost Supabase is acceptable
   // This is a local development Supabase instance, not production
-  API: process.env.VITE_SUPABASE_URL || 'http://localhost:54321',
+  API: process.env.VITE_SUPABASE_URL || 'http://localhost:54321', // NOSONAR
 
   /** Routes de l'application */
   ROUTES: {
@@ -212,7 +212,7 @@ export const TEST_SELECTORS = {
     /** Test selector for email input field (data-testid attribute value) */
     EMAIL: 'email-input',
     /** Test selector for password input field (data-testid attribute value) - NOT a real password */
-    PASSWORD: 'password-input',
+    PASSWORD: 'password-input', // NOSONAR
     /** Test selector for content input field */
     CONTENT: 'content-input',
     /** Test selector for tag input field */
@@ -394,13 +394,13 @@ export const generators = {
         randomPart = array[0].toString(36).substring(0, 7);
       } else {
         // Fallback for environments without crypto
-        randomPart = Math.floor(Math.random() * 10000000)
+        randomPart = Math.floor(Math.random() * 10000000) // NOSONAR
           .toString(36)
           .substring(0, 7);
       }
     } catch {
       // Final fallback
-      randomPart = Math.floor(Math.random() * 10000000)
+      randomPart = Math.floor(Math.random() * 10000000) // NOSONAR
         .toString(36)
         .substring(0, 7);
     }

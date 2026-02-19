@@ -32,7 +32,7 @@ describe('Supabase Database Integration', () => {
     // Setup auth for database tests
     await supabase.auth.signUp({
       email: 'dbtest@example.com',
-      password: 'SecurePassword123!',
+      password: 'SecurePassword123!', // NOSONAR
     });
   });
 

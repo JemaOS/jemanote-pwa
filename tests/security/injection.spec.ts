@@ -16,8 +16,8 @@ const SQL_INJECTION_PAYLOADS = [
   "' OR 1=1; DROP TABLE users --",
 
   // Union-based
-  "' UNION SELECT * FROM users --",
-  "' UNION SELECT null, username, password FROM users --",
+  "' UNION SELECT * FROM users --", // NOSONAR
+  "' UNION SELECT null, username, password FROM users --", // NOSONAR
 
   // Time-based blind
   "' OR SLEEP(5) --",
@@ -135,7 +135,7 @@ test.describe('Injection Attack Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-sql-${Math.random()}`,
+            id: `test-sql-${Math.random()}`, // NOSONAR
             title,
             content: 'Test content',
             created_at: new Date().toISOString(),
@@ -174,7 +174,7 @@ test.describe('Injection Attack Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-nosql-${Math.random()}`,
+            id: `test-nosql-${Math.random()}`, // NOSONAR
             title: 'NoSQL Injection Test',
             content,
             created_at: new Date().toISOString(),
@@ -204,7 +204,7 @@ test.describe('Injection Attack Prevention', () => {
         const attachments = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-cmd-${Math.random()}`,
+            id: `test-cmd-${Math.random()}`, // NOSONAR
             name: fileName,
             note_id: 'test-note-1',
             created_at: new Date().toISOString(),
@@ -253,7 +253,7 @@ test.describe('Injection Attack Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-xpath-${Math.random()}`,
+            id: `test-xpath-${Math.random()}`, // NOSONAR
             title: 'XPath Injection Test',
             content,
             created_at: new Date().toISOString(),
@@ -296,7 +296,7 @@ test.describe('Injection Attack Prevention', () => {
         const notes = [
           {
             // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-            id: `test-special-${Math.random()}`,
+            id: `test-special-${Math.random()}`, // NOSONAR
             title: 'Special Character Test',
             content,
             created_at: new Date().toISOString(),

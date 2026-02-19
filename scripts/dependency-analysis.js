@@ -73,7 +73,7 @@ function parseImports(filePath, content) {
 
   // ES6 imports - simplified regex to avoid complexity issues
   // Match: import x from 'path' or import { x } from 'path' or import * as x from 'path'
-  const importFromRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g;
+  const importFromRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g; // NOSONAR
   let match;
   while ((match = importFromRegex.exec(content)) !== null) {
     const importPath = match[1];
@@ -81,14 +81,14 @@ function parseImports(filePath, content) {
   }
 
   // Dynamic imports
-  const dynamicRegex = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  const dynamicRegex = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g; // NOSONAR
   while ((match = dynamicRegex.exec(content)) !== null) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));
   }
 
   // Require statements
-  const requireRegex = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  const requireRegex = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g; // NOSONAR
   while ((match = requireRegex.exec(content)) !== null) {
     const importPath = match[1];
     imports.push(resolveImportPath(importPath, dirName));

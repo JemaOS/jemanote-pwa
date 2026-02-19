@@ -18,7 +18,7 @@ test.describe('Local Storage Security', () => {
   test('should not store sensitive data in plain text', async ({ page }) => {
     // Simulate storing sensitive data
     const sensitiveData = {
-      password: 'secret123',
+      password: 'secret123', // NOSONAR
       apiKey: 'sk-1234567890abcdef',
       secretKey: 'super-secret-value',
     };
@@ -36,7 +36,7 @@ test.describe('Local Storage Security', () => {
     // For now, document that plain text storage is detected
     if (storedData) {
       const parsed = JSON.parse(storedData);
-      expect(parsed.password).toBe('secret123');
+      expect(parsed.password).toBe('secret123'); // NOSONAR
     }
   });
 
@@ -382,7 +382,7 @@ test.describe('Local Storage Security', () => {
     const maliciousData = {
       id: 'test',
       title: '<script>alert(1)</script>',
-      content: 'javascript:alert(1)',
+      content: 'javascript:alert(1)', // NOSONAR
     };
 
     await page.evaluate(data => {

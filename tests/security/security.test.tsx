@@ -16,7 +16,7 @@ describe('Security Tests', () => {
       // Using a simpler, safer regex pattern with length limits
       // eslint-disable-next-line prefer-string-replace-all
       const sanitized = safeContent.replace(
-        /<script\b[^<]{0,1000}(?:(?!<\/script>)<[^<]{0,1000}){0,100}<\/script>/gi,
+        /<script\b[^<]{0,1000}(?:(?!<\/script>)<[^<]{0,1000}){0,100}<\/script>/gi, // NOSONAR
         ''
       );
       expect(sanitized).not.toContain('<script>');
@@ -30,7 +30,7 @@ describe('Security Tests', () => {
     });
 
     it('should sanitize javascript: URLs', () => {
-      const maliciousContent = '<a href="javascript:alert(\'XSS\')">Click me</a>';
+      const maliciousContent = '<a href="javascript:alert(\'XSS\')">Click me</a>'; // NOSONAR
       // eslint-disable-next-line prefer-string-replace-all
       const sanitized = maliciousContent.replace(/javascript:/gi, 'blocked:');
       expect(sanitized).not.toContain('javascript:');
@@ -97,7 +97,7 @@ describe('Security Tests', () => {
 
   describe('Authentication Security', () => {
     it('should enforce password minimum length', () => {
-      const passwords = ['12345', '123456', 'short', 'longenoughpassword'];
+      const passwords = ['12345', '123456', 'short', 'longenoughpassword']; // NOSONAR
       const minLength = 6;
 
       passwords.forEach(password => {
@@ -176,7 +176,7 @@ describe('Security Tests', () => {
 
     it('should encrypt sensitive data in localStorage', () => {
       // Sensitive data should not be stored in plain text
-      const sensitiveData = { password: 'secret123' };
+      const sensitiveData = { password: 'secret123' }; // NOSONAR
 
       // In real implementation, this would be encrypted
       const encrypted = btoa(JSON.stringify(sensitiveData)); // Simple base64 for demo
@@ -196,7 +196,7 @@ describe('Security Tests', () => {
 
     it('should validate data before loading from localStorage', () => {
       // Simulate tampered data
-      localStorage.setItem('notes', '{"malicious": true, "data": "<script>alert(1)</script>"}');
+      localStorage.setItem('notes', '{"malicious": true, "data": "<script>alert(1)</script>"}'); // NOSONAR
 
       const raw = localStorage.getItem('notes');
       let parsed;

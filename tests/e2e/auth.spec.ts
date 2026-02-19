@@ -11,8 +11,8 @@ import { test, expect, Page } from '@playwright/test';
 // Generate unique test data to avoid conflicts
 // SECURITY NOTE: Math.random() is acceptable here for test email generation
 const generateTestEmail = () =>
-  `test-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@example.com`;
-const generateTestPassword = () => `TestPass${Date.now()}!`;
+  `test-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@example.com`; // NOSONAR
+const generateTestPassword = () => `TestPass${Date.now()}!`; // NOSONAR
 
 // Helper function to clear localStorage
 async function clearLocalStorage(page: Page) {
@@ -62,7 +62,7 @@ test.describe('Authentication', () => {
 
       // Fill with invalid email
       await page.getByPlaceholder(/email/i).fill('invalid-email');
-      await page.getByPlaceholder(/mot de passe|password/i).fill('password123');
+      await page.getByPlaceholder(/mot de passe|password/i).fill('password123'); // NOSONAR
 
       await page.getByRole('button', { name: /s'inscrire|sign up/i }).click();
 
@@ -76,7 +76,7 @@ test.describe('Authentication', () => {
 
       await page.getByPlaceholder(/email/i).fill(generateTestEmail());
       // Password too short
-      await page.getByPlaceholder(/mot de passe|password/i).fill('123');
+      await page.getByPlaceholder(/mot de passe|password/i).fill('123'); // NOSONAR
 
       await page.getByRole('button', { name: /s'inscrire|sign up/i }).click();
 
@@ -154,7 +154,7 @@ test.describe('Authentication', () => {
       await page.getByRole('button', { name: /connexion|login/i }).click();
 
       await page.getByPlaceholder(/email/i).fill('nonexistent@example.com');
-      await page.getByPlaceholder(/mot de passe|password/i).fill('wrongpassword');
+      await page.getByPlaceholder(/mot de passe|password/i).fill('wrongpassword'); // NOSONAR
       await page.getByRole('button', { name: /se connecter|sign in/i }).click();
 
       // Should show error message

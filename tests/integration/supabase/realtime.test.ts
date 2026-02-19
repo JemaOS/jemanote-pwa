@@ -33,7 +33,7 @@ describe('Supabase Realtime Integration', () => {
     // Setup auth for realtime tests
     await supabase.auth.signUp({
       email: 'realtimetest@example.com',
-      password: 'SecurePassword123!',
+      password: 'SecurePassword123!', // NOSONAR
     });
   });
 

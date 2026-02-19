@@ -77,6 +77,7 @@ function printWarning(text) {
  */
 function runCommand(command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
+    // NOSONAR: This is a dev script and commands are hardcoded/controlled
     const child = spawn(command, args, {
       cwd: rootDir,
       stdio: 'pipe',

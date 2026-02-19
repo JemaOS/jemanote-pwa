@@ -231,6 +231,7 @@ function runCommand(command, args, options = {}) {
 
     console.log(color('dim', `\n> ${command} ${args.join(' ')}\n`));
 
+    // NOSONAR: This is a dev script and commands are hardcoded/controlled
     const child = spawn(command, args, {
       cwd,
       env,

@@ -30,7 +30,7 @@ describe('Supabase Auth Integration', () => {
   describe('Sign Up', () => {
     it('should sign up with email and password successfully', async () => {
       const email = 'newuser@example.com';
-      const password = 'SecurePassword123!';
+      const password = 'SecurePassword123!'; // NOSONAR
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -46,7 +46,7 @@ describe('Supabase Auth Integration', () => {
     it('should handle duplicate email error', async () => {
       // First signup
       const email = 'duplicate@example.com';
-      const password = 'SecurePassword123!';
+      const password = 'SecurePassword123!'; // NOSONAR
 
       await supabase.auth.signUp({ email, password });
 
@@ -82,7 +82,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signUp({
         email: 'test@example.com',
-        password: '123',
+        password: '123', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -101,7 +101,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signUp({
         email: 'invalid-email',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -113,7 +113,7 @@ describe('Supabase Auth Integration', () => {
     it('should sign in with valid credentials', async () => {
       // First create a user
       const email = 'loginuser@example.com';
-      const password = 'SecurePassword123!';
+      const password = 'SecurePassword123!'; // NOSONAR
 
       await supabase.auth.signUp({ email, password });
       await supabase.auth.signOut();
@@ -143,7 +143,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: 'wrong@example.com',
-        password: 'WrongPassword123!',
+        password: 'WrongPassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -153,7 +153,7 @@ describe('Supabase Auth Integration', () => {
     it('should handle non-existent user', async () => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: 'nonexistent@example.com',
-        password: 'AnyPassword123!',
+        password: 'AnyPassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -166,7 +166,7 @@ describe('Supabase Auth Integration', () => {
       // First sign in
       const { data: signUpData } = await supabase.auth.signUp({
         email: 'logoutuser@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(signUpData.session).toBeDefined();
@@ -195,7 +195,7 @@ describe('Supabase Auth Integration', () => {
       const email = 'recovery@example.com';
       await supabase.auth.signUp({
         email,
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
       await supabase.auth.signOut();
 
@@ -234,7 +234,7 @@ describe('Supabase Auth Integration', () => {
       // Create user
       await supabase.auth.signUp({
         email,
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       const { data, error } = await supabase.auth.verifyOtp({
@@ -293,7 +293,7 @@ describe('Supabase Auth Integration', () => {
       // Sign up to get initial tokens
       const { data: signUpData } = await supabase.auth.signUp({
         email: 'refresh@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(signUpData.session).toBeDefined();
@@ -328,7 +328,7 @@ describe('Supabase Auth Integration', () => {
       // Sign up first
       await supabase.auth.signUp({
         email: 'getuser@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       const { data, error } = await supabase.auth.getUser();
@@ -354,7 +354,7 @@ describe('Supabase Auth Integration', () => {
       // Sign up first
       await supabase.auth.signUp({
         email: 'getsession@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       const { data, error } = await supabase.auth.getSession();
@@ -389,7 +389,7 @@ describe('Supabase Auth Integration', () => {
       // Sign in
       await supabase.auth.signUp({
         email: 'statechange@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       // Wait for callback
@@ -404,7 +404,7 @@ describe('Supabase Auth Integration', () => {
       // Sign in first
       await supabase.auth.signUp({
         email: 'signoutstate@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       const callback = vi.fn();
@@ -432,7 +432,7 @@ describe('Supabase Auth Integration', () => {
       // Sign up first
       await supabase.auth.signUp({
         email: 'updateuser@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       const { data: _data, error } = await supabase.auth.updateUser({
@@ -455,7 +455,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signUp({
         email: 'network@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -471,7 +471,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signUp({
         email: 'servererror@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();
@@ -490,7 +490,7 @@ describe('Supabase Auth Integration', () => {
 
       const { data, error } = await supabase.auth.signUp({
         email: 'ratelimit@example.com',
-        password: 'SecurePassword123!',
+        password: 'SecurePassword123!', // NOSONAR
       });
 
       expect(error).toBeDefined();

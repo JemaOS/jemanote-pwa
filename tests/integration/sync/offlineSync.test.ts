@@ -38,7 +38,7 @@ describe('Offline/Online Sync Integration', () => {
     // Setup auth
     await supabase.auth.signUp({
       email: 'synctest@example.com',
-      password: 'SecurePassword123!',
+      password: 'SecurePassword123!', // NOSONAR
     });
 
     // Reset online status

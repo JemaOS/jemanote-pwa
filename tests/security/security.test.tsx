@@ -33,9 +33,8 @@ describe('Security Tests', () => {
       const maliciousContent = '<a href="javascript:alert(\'XSS\')">Click me</a>'; // NOSONAR
       // eslint-disable-next-line prefer-string-replace-all
       const sanitized = maliciousContent.replace(/javascript:/gi, 'blocked:');
-      expect(sanitized).not.toContain('javascript:');
+      expect(sanitized).not.toContain('javascript:'); // NOSONAR
     });
-
     it('should handle data: URLs safely', () => {
       const content = '<img src="data:image/png;base64,abc123">';
       // Data URLs for images should be allowed but validated

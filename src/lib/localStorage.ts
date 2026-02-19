@@ -21,6 +21,8 @@ const STORES = {
   SETTINGS: 'settings',
   ATTACHMENTS: 'attachments',
   ATTACHMENT_FILES: 'attachment_files', // Store actual blobs here
+  DELETED_NOTES: 'deleted_notes',
+  DELETED_FOLDERS: 'deleted_folders',
 };
 
 // Synchronous localStorage keys for instant persistence
@@ -170,6 +172,39 @@ export class LocalStorage {
     }
   }
 
+  // Deleted Notes operations (Tombstones)
+  static async getDeletedNotes(): Promise<string[]> {
+    try {
+      const deletedIds = await localforage.getItem<string[]>(STORES.DELETED_NOTES);
+      return deletedIds || [];
+    } catch (error) {
+      console.error('Error getting deleted notes:', error);
+      return [];
+    }
+  }
+
+  static async addDeletedNote(id: string): Promise<void> {
+    try {
+      const deletedIds = await this.getDeletedNotes();
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        await localforage.setItem(STORES.DELETED_NOTES, deletedIds);
+      }
+    } catch (error) {
+      console.error('Error adding deleted note:', error);
+    }
+  }
+
+  static async removeDeletedNote(id: string): Promise<void> {
+    try {
+      const deletedIds = await this.getDeletedNotes();
+      const filtered = deletedIds.filter(deletedId => deletedId !== id);
+      await localforage.setItem(STORES.DELETED_NOTES, filtered);
+    } catch (error) {
+      console.error('Error removing deleted note:', error);
+    }
+  }
+
   // Folders operations
   static async getFolders(): Promise<Folder[]> {
     try {
@@ -207,6 +242,39 @@ export class LocalStorage {
     } catch (error) {
       console.error('Error deleting folder:', error);
       throw error;
+    }
+  }
+
+  // Deleted Folders operations (Tombstones)
+  static async getDeletedFolders(): Promise<string[]> {
+    try {
+      const deletedIds = await localforage.getItem<string[]>(STORES.DELETED_FOLDERS);
+      return deletedIds || [];
+    } catch (error) {
+      console.error('Error getting deleted folders:', error);
+      return [];
+    }
+  }
+
+  static async addDeletedFolder(id: string): Promise<void> {
+    try {
+      const deletedIds = await this.getDeletedFolders();
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        await localforage.setItem(STORES.DELETED_FOLDERS, deletedIds);
+      }
+    } catch (error) {
+      console.error('Error adding deleted folder:', error);
+    }
+  }
+
+  static async removeDeletedFolder(id: string): Promise<void> {
+    try {
+      const deletedIds = await this.getDeletedFolders();
+      const filtered = deletedIds.filter(deletedId => deletedId !== id);
+      await localforage.setItem(STORES.DELETED_FOLDERS, filtered);
+    } catch (error) {
+      console.error('Error removing deleted folder:', error);
     }
   }
 

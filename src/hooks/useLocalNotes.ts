@@ -163,7 +163,8 @@ export function useLocalNotes(userId?: string | null) {
 
         // Merge local and cloud notes (cloud takes precedence for conflicts)
         const localNotes = await LocalStorage.getNotes();
-        const mergedNotes = mergeNotes(localNotes, cloudNotes || [], userId);
+        const deletedNoteIds = await LocalStorage.getDeletedNotes();
+        const mergedNotes = mergeNotes(localNotes, cloudNotes || [], userId, deletedNoteIds);
 
         setNotes(mergedNotes);
 
@@ -182,7 +183,8 @@ export function useLocalNotes(userId?: string | null) {
 
         // Merge local and cloud folders (cloud takes precedence for conflicts)
         const localFolders = await LocalStorage.getFolders();
-        const mergedFolders = mergeFolders(localFolders, cloudFolders || [], userId);
+        const deletedFolderIds = await LocalStorage.getDeletedFolders();
+        const mergedFolders = mergeFolders(localFolders, cloudFolders || [], userId, deletedFolderIds);
 
         setFolders(mergedFolders);
 
@@ -379,6 +381,7 @@ export function useLocalNotes(userId?: string | null) {
     try {
       // Delete from local storage
       await LocalStorage.deleteNote(noteId);
+      await LocalStorage.addDeletedNote(noteId); // Add tombstone
       setNotes(prev => prev.filter(note => note.id !== noteId));
 
       // Sync to cloud if user is logged in
@@ -482,6 +485,7 @@ export function useLocalNotes(userId?: string | null) {
       const notesInFolder = notes.filter(n => n.folder_id === folderId);
       for (const note of notesInFolder) {
         await LocalStorage.deleteNote(note.id);
+        await LocalStorage.addDeletedNote(note.id); // Add tombstone
 
         // Sync note deletion to cloud if user is logged in
         if (userId && syncEnabled) {
@@ -492,6 +496,7 @@ export function useLocalNotes(userId?: string | null) {
 
       // Delete the folder
       await LocalStorage.deleteFolder(folderId);
+      await LocalStorage.addDeletedFolder(folderId); // Add tombstone
       setFolders(prev => prev.filter(f => f.id !== folderId));
 
       // Sync folder deletion to cloud if user is logged in
@@ -546,16 +551,30 @@ export function useLocalNotes(userId?: string | null) {
 }
 
 // Helper function to merge local and cloud notes
-function mergeNotes(localNotes: Note[], cloudNotes: Note[], userId: string): Note[] {
+function mergeNotes(
+  localNotes: Note[],
+  cloudNotes: Note[],
+  userId: string,
+  deletedNoteIds: string[] = []
+): Note[] {
   const merged = new Map<string, Note>();
 
   // Add all cloud notes to the map
   for (const cloudNote of cloudNotes) {
+    // If note is marked as deleted locally, don't add it from cloud
+    if (deletedNoteIds.includes(cloudNote.id)) {
+      continue;
+    }
     merged.set(cloudNote.id, { ...cloudNote, user_id: userId });
   }
 
   // Merge with local notes, respecting timestamps and deletions
   for (const localNote of localNotes) {
+    // If note is marked as deleted locally, skip it
+    if (deletedNoteIds.includes(localNote.id)) {
+      continue;
+    }
+
     const cloudNote = merged.get(localNote.id);
     const localTime = new Date(localNote.updated_at).getTime();
     const cloudTime = cloudNote ? new Date(cloudNote.updated_at).getTime() : 0;
@@ -577,16 +596,30 @@ function mergeNotes(localNotes: Note[], cloudNotes: Note[], userId: string): Not
 }
 
 // Helper function to merge local and cloud folders
-function mergeFolders(localFolders: Folder[], cloudFolders: Folder[], userId: string): Folder[] {
+function mergeFolders(
+  localFolders: Folder[],
+  cloudFolders: Folder[],
+  userId: string,
+  deletedFolderIds: string[] = []
+): Folder[] {
   const merged = new Map<string, Folder>();
 
   // Add all cloud folders to the map
   for (const cloudFolder of cloudFolders) {
+    // If folder is marked as deleted locally, don't add it from cloud
+    if (deletedFolderIds.includes(cloudFolder.id)) {
+      continue;
+    }
     merged.set(cloudFolder.id, { ...cloudFolder, user_id: userId });
   }
 
   // Merge with local folders, respecting timestamps and deletions
   for (const localFolder of localFolders) {
+    // If folder is marked as deleted locally, skip it
+    if (deletedFolderIds.includes(localFolder.id)) {
+      continue;
+    }
+
     const cloudFolder = merged.get(localFolder.id);
     const localTime = new Date(localFolder.updated_at).getTime();
     const cloudTime = cloudFolder ? new Date(cloudFolder.updated_at).getTime() : 0;

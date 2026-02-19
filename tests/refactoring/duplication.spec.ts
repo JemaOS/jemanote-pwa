@@ -220,6 +220,7 @@ function readFileContents(files: string[]): { fileContents: { [key: string]: str
 }
 
 function findDuplicateWindow(
+  // eslint-disable-next-line max-params
   window1: string, file1: string, i: number,
   file2: string, lines2: string[], windowSize: number,
   processed: Set<string>, duplicates: DuplicateBlock[]
@@ -385,6 +386,7 @@ function findSimilarFunctions(files: string[]): string[] {
   }
 
   // Find similar functions
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [body, locations] of Object.entries(functionBodies)) {
     if (locations.length > CONFIG.thresholds.maxSimilarFunctions) {
       violations.push(`Similar functions found in: ${locations.join(', ')}`);

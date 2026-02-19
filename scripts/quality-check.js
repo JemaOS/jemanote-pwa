@@ -77,11 +77,10 @@ function printWarning(text) {
  */
 function runCommand(command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
-    // NOSONAR: This is a dev script and commands are hardcoded/controlled
-    const child = spawn(command, args, {
+    const child = spawn(command, args, { // NOSONAR
       cwd: rootDir,
       stdio: 'pipe',
-      shell: true, // NOSONAR: Safe because command is hardcoded
+      shell: true,
       ...options,
     });
 

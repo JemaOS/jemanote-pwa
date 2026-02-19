@@ -231,12 +231,11 @@ function runCommand(command, args, options = {}) {
 
     console.log(color('dim', `\n> ${command} ${args.join(' ')}\n`));
 
-    // NOSONAR: This is a dev script and commands are hardcoded/controlled
-    const child = spawn(command, args, {
+    const child = spawn(command, args, { // NOSONAR
       cwd,
       env,
       stdio: 'inherit',
-      shell: true, // NOSONAR: Safe because command is hardcoded
+      shell: true,
     });
 
     child.on('close', code => {

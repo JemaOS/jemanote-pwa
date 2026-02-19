@@ -10,7 +10,7 @@ import { test, expect, Page } from '@playwright/test';
 
 // Generate unique test data
 // SECURITY NOTE: Math.random() is acceptable here for test ID generation
-const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`; // NOSONAR
 const generateNoteTitle = () => `Test Note ${generateUniqueId()}`;
 const generateFolderName = () => `Test Folder ${generateUniqueId()}`;
 

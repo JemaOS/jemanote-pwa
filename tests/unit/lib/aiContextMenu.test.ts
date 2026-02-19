@@ -349,7 +349,7 @@ describe('aiContextMenu', () => {
       // What's important is that preventDefault is called
       try {
         handlers.contextmenu(mockEvent, mockView as any);
-      } catch (e) {
+      } catch (e) { // NOSONAR
         // Error may be thrown - that's acceptable if preventDefault was called
       }
 

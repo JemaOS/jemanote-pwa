@@ -3,7 +3,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { graphIndexer, GraphNode, GraphEdge, GraphData } from '@/services/graphIndexer';
+import { graphIndexer, GraphNode, GraphEdge } from '@/services/graphIndexer';
 import type { Note } from '@/types';
 
 describe('graphIndexer', () => {

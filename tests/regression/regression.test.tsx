@@ -189,7 +189,7 @@ describe('Regression Tests', () => {
       searchQueries.forEach(query => {
         // Should not throw when creating RegExp
         expect(() => {
-          const escaped = query.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const escaped = query.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
           const regex = new RegExp(escaped, 'i');
           expect(regex).toBeInstanceOf(RegExp);
         }).not.toThrow();

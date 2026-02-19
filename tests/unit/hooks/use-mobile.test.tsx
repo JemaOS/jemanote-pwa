@@ -28,13 +28,13 @@ describe('useIsMobile', () => {
       dispatchEvent: vi.fn(),
     }));
 
-    Object.defineProperty(window, 'matchMedia', {
+    Object.defineProperty(globalThis, 'matchMedia', {
       writable: true,
       value: matchMediaMock,
     });
 
     // Default window width
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(globalThis, 'innerWidth', {
       writable: true,
       value: 1024,
     });
@@ -46,7 +46,7 @@ describe('useIsMobile', () => {
 
   describe('initial state', () => {
     it('should return false for desktop viewport (width >= 768)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 1024,
       });
@@ -57,7 +57,7 @@ describe('useIsMobile', () => {
     });
 
     it('should return true for mobile viewport (width < 768)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 375,
       });
@@ -68,7 +68,7 @@ describe('useIsMobile', () => {
     });
 
     it('should return false for tablet viewport (width = 768)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 768,
       });
@@ -79,7 +79,7 @@ describe('useIsMobile', () => {
     });
 
     it('should return true for small tablet (width = 767)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 767,
       });
@@ -109,7 +109,7 @@ describe('useIsMobile', () => {
     it('should update state when viewport changes to mobile', () => {
       // This test verifies the hook correctly responds to viewport changes
       // The actual implementation uses matchMedia which is mocked in setup
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 1024,
       });
@@ -125,7 +125,7 @@ describe('useIsMobile', () => {
 
     it('should update state when viewport changes to desktop', () => {
       // Test that hook initializes correctly with mobile viewport
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 375,
       });
@@ -141,7 +141,7 @@ describe('useIsMobile', () => {
 
     it('should handle multiple viewport changes', () => {
       // Test that hook initializes correctly with different viewport sizes
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 1024,
       });
@@ -150,11 +150,11 @@ describe('useIsMobile', () => {
       expect(desktopResult.current).toBe(false);
 
       // For different viewport sizes, the hook should reflect the initial state
-      Object.defineProperty(window, 'innerWidth', { writable: true, value: 375 });
+      Object.defineProperty(globalThis, 'innerWidth', { writable: true, value: 375 });
       const { result: mobileResult } = renderHook(() => useIsMobile());
       expect(mobileResult.current).toBe(true);
 
-      Object.defineProperty(window, 'innerWidth', { writable: true, value: 768 });
+      Object.defineProperty(globalThis, 'innerWidth', { writable: true, value: 768 });
       const { result: tabletResult } = renderHook(() => useIsMobile());
       expect(tabletResult.current).toBe(false);
     });
@@ -166,7 +166,7 @@ describe('useIsMobile', () => {
       const originalMatchMedia = globalThis.matchMedia;
 
       // Mock matchMedia as undefined to test error handling
-      Object.defineProperty(window, 'matchMedia', {
+      Object.defineProperty(globalThis, 'matchMedia', {
         writable: true,
         value: undefined,
       });
@@ -181,14 +181,14 @@ describe('useIsMobile', () => {
       }
 
       // Restore original matchMedia
-      Object.defineProperty(window, 'matchMedia', {
+      Object.defineProperty(globalThis, 'matchMedia', {
         writable: true,
         value: originalMatchMedia,
       });
     });
 
     it('should handle very small viewport', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 320,
       });
@@ -199,7 +199,7 @@ describe('useIsMobile', () => {
     });
 
     it('should handle very large viewport', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 3840,
       });
@@ -210,7 +210,7 @@ describe('useIsMobile', () => {
     });
 
     it('should handle boundary value (767px)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 767,
       });
@@ -221,7 +221,7 @@ describe('useIsMobile', () => {
     });
 
     it('should handle boundary value (768px)', () => {
-      Object.defineProperty(window, 'innerWidth', {
+      Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
         value: 768,
       });

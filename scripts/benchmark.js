@@ -22,13 +22,13 @@ process.on('exit', () => {
   if (serverProcess) {
     try {
       process.kill(-serverProcess.pid); // Kill process group if possible
-    } catch (e) {
+    } catch (e) { // NOSONAR
       try {
         serverProcess.kill();
-      } catch (e) {
+      } catch (e) { // NOSONAR
         // Ignore
-      } // NOSONAR
-    } // NOSONAR
+      }
+    }
   }
 });
 

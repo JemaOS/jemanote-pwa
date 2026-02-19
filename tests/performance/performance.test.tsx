@@ -231,10 +231,10 @@ const code = "example";
 
       // Process the note
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({
+      const _ = {
         ...largeNote,
         preview: largeNote.content.slice(0, 200),
-      });
+      };
 
       const endMemory = (performance as any).memory?.usedJSHeapSize || 0;
       const memoryIncrease = endMemory - startMemory;

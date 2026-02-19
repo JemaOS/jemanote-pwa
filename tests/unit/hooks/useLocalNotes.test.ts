@@ -37,7 +37,7 @@ vi.mock('@/lib/wikiLinks', () => ({
 }));
 
 // Mock crypto.randomUUID
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(globalThis, 'crypto', {
   value: {
     randomUUID: vi.fn().mockReturnValue('mock-uuid-123'),
   },

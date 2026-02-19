@@ -572,11 +572,10 @@ export default function VoiceRecorder({
           </div>
 
           {/* Waveform interactive style Apple avec drag */}
-          <div
-            ref={waveformContainerRef}
-            className="relative py-2 cursor-pointer select-none"
-            role="button" // NOSONAR
-            tabIndex={0}
+          <button
+            type="button"
+            ref={waveformContainerRef as any}
+            className="relative py-2 cursor-pointer select-none w-full bg-transparent border-none p-0 text-left"
             aria-label="Waveform player"
             onKeyDown={e => {
               if (e.key === 'ArrowLeft') {

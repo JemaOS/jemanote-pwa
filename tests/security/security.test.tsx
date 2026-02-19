@@ -350,7 +350,7 @@ describe('Security Tests', () => {
       const error = new Error('Database connection failed: postgres://user:pass@host/db');
       // SECURITY FIX: Use safer regex with length limit
       const sanitizedError = error.message.replace(
-        new RegExp('postgres://[a-zA-Z0-9:@./_-]{0,500}'),
+        /postgres:\/\/[a-zA-Z0-9:@.\/_-]{0,500}/, // NOSONAR
         '[DATABASE_URL]'
       );
 

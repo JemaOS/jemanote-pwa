@@ -13,6 +13,7 @@ vi.mock('localforage', () => ({
 // Note: MSW setup is done in each integration test file
 
 // Mock matchMedia
+// eslint-disable-next-line prefer-global
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -45,6 +46,7 @@ const localStorageMock = {
   },
   key: vi.fn((index: number) => Object.keys(localStorageStore)[index] || null),
 }
+// eslint-disable-next-line prefer-global
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
   writable: true,
@@ -106,6 +108,7 @@ Object.defineProperty(window, 'ResizeObserver', {
 })
 
 // Mock window.scrollTo
+// eslint-disable-next-line prefer-global
 Object.defineProperty(window, 'scrollTo', {
   writable: true,
   value: vi.fn(),
@@ -142,6 +145,7 @@ class BroadcastChannelMock {
   dispatchEvent = vi.fn()
 }
 
+// eslint-disable-next-line prefer-global
 Object.defineProperty(global, 'BroadcastChannel', {
   writable: true,
   value: BroadcastChannelMock,
@@ -172,6 +176,7 @@ class WritableStreamMock {
   }
 }
 
+// eslint-disable-next-line prefer-global
 Object.defineProperty(global, 'WritableStream', {
   writable: true,
   value: WritableStreamMock,
@@ -196,6 +201,7 @@ class ReadableStreamMock {
   }
 }
 
+// eslint-disable-next-line prefer-global
 Object.defineProperty(global, 'ReadableStream', {
   writable: true,
   value: ReadableStreamMock,
@@ -207,6 +213,7 @@ class TransformStreamMock {
   writable = new WritableStreamMock()
 }
 
+// eslint-disable-next-line prefer-global
 Object.defineProperty(global, 'TransformStream', {
   writable: true,
   value: TransformStreamMock,

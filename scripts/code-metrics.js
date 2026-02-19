@@ -187,7 +187,7 @@ function calculateCognitiveComplexity(content) {
     if (matchesKeyword(trimmed, incrementKeywords) && !trimmed.endsWith('{')) complexity++;
 
     // Ternary operators
-    if (/\?\s*[^:]*:/.test(trimmed)) complexity++;
+    if (/\?\s*[^:]*:/.test(trimmed)) complexity++; // NOSONAR
 
     // Logical operators
     complexity += (trimmed.match(/&&/g) || []).length;

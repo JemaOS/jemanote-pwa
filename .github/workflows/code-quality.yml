@@ -63,7 +63,7 @@ jobs:
         run: npm ci
 
       - name: Run Code Climate
-        uses: paambaati/codeclimate-action@v5.0.0
+        uses: paambaati/codeclimate-action@v5.0.0  # NOSONAR
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:

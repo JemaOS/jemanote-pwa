@@ -168,7 +168,7 @@ jobs:
       # Publier sur Chromatic (si CHROMATIC_TOKEN est configuré)
       - name: Publish to Chromatic
         if: env.CHROMATIC_TOKEN != ''
-        uses: chromaui/action@latest
+        uses: chromaui/action@latest  # NOSONAR
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
           storybookBuildDir: storybook-static

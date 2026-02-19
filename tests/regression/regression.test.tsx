@@ -163,7 +163,7 @@ describe('Regression Tests', () => {
       // Using possessive-like behavior with length limits
       const codeBlockPattern = /```[\s\S]{0,50000}```/g;
 
-      const textWithoutCode = safeContent.replace(codeBlockPattern, '');
+      const textWithoutCode = safeContent.replaceAll(codeBlockPattern, '');
       // SECURITY FIX: Limit wiki link content length
       const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g; // NOSONAR
       const wikiLinks = [...textWithoutCode.matchAll(wikiLinkPattern)];
@@ -189,7 +189,7 @@ describe('Regression Tests', () => {
       searchQueries.forEach(query => {
         // Should not throw when creating RegExp
         expect(() => {
-          const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const escaped = query.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
           const regex = new RegExp(escaped, 'i');
           expect(regex).toBeInstanceOf(RegExp);
         }).not.toThrow();
@@ -200,7 +200,7 @@ describe('Regression Tests', () => {
       const notes: Note[] = [];
       const searchQuery = 'test';
 
-      const results = notes.filter(note =>
+      const results = notes.filter(note => // NOSONAR
         note.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
 

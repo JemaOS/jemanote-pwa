@@ -108,13 +108,11 @@ const code = "example";
           : complexContent;
 
       // Simple processing simulation with safer regex patterns
-      // eslint-disable-next-line prefer-string-replace-all, @typescript-eslint/no-unused-vars
+      // @typescript-eslint/no-unused-vars
       const processed = safeContent
-        .replace(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
-        // eslint-disable-next-line prefer-string-replace-all
-        .replace(/\*\*([^*]{1,500}?)\*\*/g, '<strong>$1</strong>')
-        // eslint-disable-next-line prefer-string-replace-all
-        .replace(/\*([^*]{1,500}?)\*/g, '<em>$1</em>');
+        .replaceAll(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
+        .replaceAll(/\*\*([^*]{1,500}?)\*\*/g, '<strong>$1</strong>')
+        .replaceAll(/\*([^*]{1,500}?)\*/g, '<em>$1</em>');
 
       const end = performance.now();
       expect(end - start).toBeLessThan(200);

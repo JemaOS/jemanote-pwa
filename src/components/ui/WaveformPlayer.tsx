@@ -162,6 +162,21 @@ export default function WaveformPlayer({
 
       <div
         className="flex-1 h-8 cursor-pointer relative"
+        role="slider"
+        tabIndex={0}
+        aria-label="Seek audio"
+        aria-valuenow={currentTime}
+        aria-valuemin={0}
+        aria-valuemax={duration}
+        onKeyDown={e => {
+          if (waveformData.length === 0 || duration === 0) return;
+          const currentIndex = Math.floor((currentTime / duration) * waveformData.length);
+          if (e.key === 'ArrowLeft') {
+            handleSeek(Math.max(0, currentIndex - 1));
+          } else if (e.key === 'ArrowRight') {
+            handleSeek(Math.min(waveformData.length - 1, currentIndex + 1));
+          }
+        }}
         onClick={e => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left;

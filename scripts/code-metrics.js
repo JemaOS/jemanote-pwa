@@ -134,7 +134,7 @@ function calculateCyclomaticComplexity(content) {
     /\b&&\b/g,
     /\|\|/g,
     /\?\s*:/g, // ternary
-    /\breturn\s+.*\?/g, // conditional return
+    /\breturn\s+[^?]*\?/g, // conditional return
   ];
 
   let complexity = 1; // Base complexity

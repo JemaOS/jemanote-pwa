@@ -263,7 +263,7 @@ test.describe('Authentication Security', () => {
       'user name@example.com',
     ];
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // NOSONAR
 
     for (const email of validEmails) {
       expect(emailRegex.test(email)).toBe(true);

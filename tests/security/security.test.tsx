@@ -59,7 +59,7 @@ describe('Security Tests', () => {
       const validEmails = ['user@example.com', 'test.user@domain.co.uk', 'user+tag@example.com'];
       const invalidEmails = ['invalid', '@example.com', 'user@', 'user@.com'];
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // NOSONAR
 
       validEmails.forEach(email => {
         expect(emailRegex.test(email)).toBe(true);

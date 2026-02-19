@@ -7,10 +7,30 @@
  * Usage: node scripts/benchmark.js [--compare] [--verbose]
  */
 
-const { execSync, execFileSync } = require('node:child_process');
-const fs = require('node:fs');
-const path = require('node:path');
-const http = require('node:http');
+import { execSync, execFileSync, spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import http from 'node:http';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let serverProcess = null;
+
+process.on('exit', () => {
+  if (serverProcess) {
+    try {
+      process.kill(-serverProcess.pid); // Kill process group if possible
+    } catch (e) {
+      try {
+        serverProcess.kill();
+      } catch (e) {
+        // Ignore
+      }
+    }
+  }
+});
 
 // Configuration
 const CONFIG = {
@@ -44,9 +64,16 @@ function measureCommand(command, options = {}) {
   const start = Date.now();
 
   try {
-    // Split command into command and arguments to avoid shell interpretation
-    const [cmd, ...args] = command.split(' ');
-    execFileSync(cmd, args, {
+    // Use execSync for compatibility
+    let cmdToRun = command;
+    if (command.startsWith('npm ')) {
+      const npm = process.env.npm_execpath;
+      if (npm && npm.endsWith('.js')) {
+        cmdToRun = command.replace('npm', `"${process.execPath}" "${npm}"`);
+      }
+    }
+
+    execSync(cmdToRun, {
       stdio: options.verbose ? 'inherit' : 'pipe',
       cwd: process.cwd(),
       ...options,
@@ -175,9 +202,10 @@ async function benchmarkStartup() {
     const startTime = Date.now();
 
     // Démarrer le serveur preview
-    execSync('npm run preview', {
+    const npm = process.env.npm_execpath || (process.platform === 'win32' ? 'npm.cmd' : 'npm');
+    serverProcess = spawn(npm, ['run', 'preview'], {
       cwd: process.cwd(),
-      timeout: CONFIG.serverStartupTimeout,
+      stdio: 'ignore',
     });
 
     // Attendre que le serveur soit prêt
@@ -395,8 +423,8 @@ async function main() {
 }
 
 // Exécuter si appelé directement
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   await main();
 }
 
-module.exports = { benchmarkBuild, analyzeBuildSize, generateReport };
+export { benchmarkBuild, analyzeBuildSize, generateReport };

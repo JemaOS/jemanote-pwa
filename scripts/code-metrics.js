@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import glob from 'glob';
+import { globSync } from 'glob';
 import escomplex from 'typhonjs-escomplex';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,8 +67,8 @@ function getSourceFiles() {
   const extensions = ['*.ts', '*.tsx'];
 
   for (const ext of extensions) {
-    const pattern = path.join(CONFIG.sourceDir, '**', ext);
-    const matches = glob.sync(pattern, {
+    const pattern = path.join(CONFIG.sourceDir, '**', ext).replace(/\\/g, '/');
+    const matches = globSync(pattern, {
       ignore: CONFIG.excludePatterns,
     });
     files.push(...matches);
@@ -133,7 +133,7 @@ function calculateCyclomaticComplexity(content) {
     /\b&&\b/g,
     /\|\|/g,
     /\?\s*:/g, // NOSONAR - safe pattern
-    /\breturn\s+[^?]*\?/g, // NOSONAR - safe pattern with negated char class
+    /\breturn\b[^?]*\?/g, // NOSONAR - safe pattern with negated char class
   ];
 
   let complexity = 1; // Base complexity
@@ -187,7 +187,7 @@ function calculateCognitiveComplexity(content) {
     if (matchesKeyword(trimmed, incrementKeywords) && !trimmed.endsWith('{')) complexity++;
 
     // Ternary operators
-    if (/\?\s*[^:]*:/.test(trimmed)) complexity++; // NOSONAR
+    if (/\?[^:]*:/.test(trimmed)) complexity++; // NOSONAR
 
     // Logical operators
     complexity += (trimmed.match(/&&/g) || []).length;

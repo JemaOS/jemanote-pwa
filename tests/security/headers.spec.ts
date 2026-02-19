@@ -155,7 +155,7 @@ test.describe('HTTP Security Headers', () => {
 
       // If present, should not reveal version numbers
       if (headerValue) {
-        expect(headerValue).not.toMatch(/\d+\.\d+/);
+        expect(headerValue).not.toMatch(/\d+\.\d+/); // NOSONAR
       }
     }
   });

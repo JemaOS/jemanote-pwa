@@ -61,7 +61,7 @@ const BUNDLE_BUDGETS: BundleBudget[] = [
     name: 'Cytoscape Bundle',
   },
   {
-    pattern: /.*\.css$/,
+    pattern: /.*\.css$/, // NOSONAR
     maxSize: 200 * 1024, // 200KB non compressé
     maxGzipSize: 50 * 1024, // 50KB gzippé
     name: 'CSS Bundle',

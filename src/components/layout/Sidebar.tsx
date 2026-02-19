@@ -608,7 +608,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
 
         {/* Notes sans dossier */}
         <div className="mb-1.5 xs:mb-2">
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role,jsx-a11y/prefer-tag-over-role */}
           <div
             role="group"
             aria-label="Notes sans dossier"
@@ -1295,7 +1295,7 @@ export default function Sidebar({
 
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/prefer-tag-over-role
     <div
       role="button"
       aria-label={`Note: ${note.title || 'Sans titre'}`}
@@ -1320,7 +1320,7 @@ export default function Sidebar({
     >
       {editingNoteId === note.id ? (
         // Edit mode
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/prefer-tag-over-role
         <div
           role="button"
           tabIndex={0}

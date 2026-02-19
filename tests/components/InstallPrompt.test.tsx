@@ -343,7 +343,7 @@ describe('InstallPrompt', () => {
       vi.useFakeTimers();
       let appInstalledHandler: (() => void) | null = null;
 
-      vi.spyOn(window, 'addEventListener').mockImplementation((event, handler) => {
+      vi.spyOn(globalThis, 'addEventListener').mockImplementation((event, handler) => {
         if (event === 'beforeinstallprompt') {
           beforeInstallPromptHandler = handler as (e: Event) => void;
         }

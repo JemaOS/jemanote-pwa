@@ -159,9 +159,9 @@ export default function WaveformPlayer({
         )}
       </button>
 
-      <div
+      <div // NOSONAR
         className="flex-1 h-8 cursor-pointer relative"
-        role="slider" // NOSONAR
+        role="slider"
         tabIndex={0}
         aria-label="Seek audio"
         aria-valuenow={currentTime}

@@ -276,7 +276,7 @@ describe('Sidebar', () => {
   describe('Note Deletion', () => {
     it('should show confirmation before deleting note', async () => {
       const user = userEvent.setup();
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
 
       render(<Sidebar {...defaultProps} />);
 
@@ -292,7 +292,7 @@ describe('Sidebar', () => {
 
     it('should delete note after confirmation', async () => {
       const user = userEvent.setup();
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
 
       render(<Sidebar {...defaultProps} />);
 

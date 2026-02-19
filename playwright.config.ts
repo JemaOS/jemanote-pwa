@@ -91,10 +91,10 @@ export default defineConfig({
     },
   ],
 
-  /* Run local dev server before starting the tests */
-  webServer: {
+  /* Run local dev server before starting the tests (disabled when using remote URL) */
+  webServer: process.env.PLAYWRIGHT_BASE_URL?.startsWith('http') && !process.env.PLAYWRIGHT_BASE_URL.includes('localhost') ? undefined : {
     command: 'npm run dev',
-    url: 'http://localhost:5173', // NOSONAR
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173', // NOSONAR
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

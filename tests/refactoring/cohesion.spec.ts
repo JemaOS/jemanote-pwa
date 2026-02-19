@@ -125,7 +125,7 @@ describe('Module Cohesion Analysis', () => {
           const propsInterfaceMatch = content.match(/interface\s+\w*Props\s*{([^}]*)}/s); // NOSONAR
           if (propsInterfaceMatch) {
             const propsContent = propsInterfaceMatch[1];
-            const propCount = (propsContent.match(/\w+\??\s*:/g) || []).length;
+            const propCount = (propsContent.match(/\w+\??\s*:/g) || []).length; // NOSONAR
 
             if (propCount > 10) {
               violations.push(`${analysis.path} - component props: ${propCount}`);

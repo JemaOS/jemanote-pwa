@@ -145,7 +145,7 @@ describe('Regression Tests', () => {
 
       contents.forEach(content => {
         // Should not throw
-        const wikiLinkPattern = /\[\[([^\]]+)\]\]/g;
+        const wikiLinkPattern = /\[\[([^\]]+)\]\]/g; // NOSONAR
         const matches = [...content.matchAll(wikiLinkPattern)];
         expect(matches).toBeDefined();
       });
@@ -165,7 +165,7 @@ describe('Regression Tests', () => {
 
       const textWithoutCode = safeContent.replace(codeBlockPattern, '');
       // SECURITY FIX: Limit wiki link content length
-      const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g;
+      const wikiLinkPattern = /\[\[([^\]]{1,200})\]\]/g; // NOSONAR
       const wikiLinks = [...textWithoutCode.matchAll(wikiLinkPattern)];
 
       expect(wikiLinks.length).toBe(1);

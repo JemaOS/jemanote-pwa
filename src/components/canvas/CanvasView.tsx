@@ -584,7 +584,6 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
         aria-label="Zone de dessin"
         className="canvas-background h-full w-full cursor-grab active:cursor-grabbing block text-left"
         tabIndex={0}
-        onClick={() => {}}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -643,10 +642,9 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
             const isInMultiSelection = selectedNodes.has(node.id) && selectedNodes.size > 1
             
             return (
-            <div
+            <button
+              type="button"
               key={node.id}
-              role="button"
-              tabIndex={0}
               aria-label={`Nœud ${node.title || 'sans titre'}`}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -747,7 +745,7 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
                   )}
                 </div>
               )}
-            </div>
+            </button>
           )})}
         </div>
       </div>

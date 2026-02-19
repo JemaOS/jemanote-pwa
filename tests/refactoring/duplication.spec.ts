@@ -375,7 +375,7 @@ function findSimilarFunctions(files: string[]): string[] {
 
     while ((match = functionRegex.exec(safeContent)) !== null) {
       const funcName = match[1];
-      const funcBody = match[2].replace(/\s+/g, ' ').trim();
+      const funcBody = match[2].replaceAll(/\s+/g, ' ').trim();
 
       if (!functionBodies[funcBody]) {
         functionBodies[funcBody] = [];
@@ -413,7 +413,7 @@ function findDuplicatedErrorHandling(files: string[]): string[] {
     let match;
 
     while ((match = tryCatchRegex.exec(safeContent)) !== null) {
-      const catchBody = match[1].replace(/\s+/g, ' ').trim();
+      const catchBody = match[1].replaceAll(/\s+/g, ' ').trim();
 
       if (!errorPatterns[catchBody]) {
         errorPatterns[catchBody] = [];
@@ -445,7 +445,7 @@ function findDuplicatedTypes(files: string[]): string[] {
     let match;
 
     while ((match = interfaceRegex.exec(content)) !== null) {
-      const interfaceBody = match[2].replace(/\s+/g, ' ').trim();
+      const interfaceBody = match[2].replaceAll(/\s+/g, ' ').trim();
 
       if (!typeDefinitions[interfaceBody]) {
         typeDefinitions[interfaceBody] = [];

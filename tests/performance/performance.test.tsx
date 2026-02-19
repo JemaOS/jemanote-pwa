@@ -1,11 +1,9 @@
 // Copyright (c) 2025 Jema Technology.
 // Performance Tests
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 import type { Note, Folder } from '@/types'
-
-import { render } from '@/tests/utils/test-utils'
 
 describe('Performance Tests', () => {
   describe('Note List Rendering', () => {
@@ -111,8 +109,8 @@ const code = "example";
       // Simple processing simulation with safer regex patterns
       const processed = safeContent
         .replace(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
-        .replace(/\*\*([^\*]{1,500}?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*([^\*]{1,500}?)\*/g, '<em>$1</em>')
+        .replace(/\*\*([^*]{1,500}?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]{1,500}?)\*/g, '<em>$1</em>')
       
       const end = performance.now()
       expect(end - start).toBeLessThan(200)

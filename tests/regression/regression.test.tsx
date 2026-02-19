@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 import type { Note, Folder } from '@/types'
 
-import { render, waitFor } from '@/tests/utils/test-utils'
+import { waitFor } from '@/tests/utils/test-utils'
 
 describe('Regression Tests', () => {
   describe('Note Synchronization', () => {
@@ -74,17 +74,6 @@ describe('Regression Tests', () => {
 
   describe('Folder Operations', () => {
     it('should handle folder deletion with notes (BUG-003)', () => {
-      const folders: Folder[] = [
-        {
-          id: 'folder-1',
-          name: 'Test Folder',
-          path: '/Test Folder',
-          user_id: 'user-1',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]
-
       const notes: Note[] = [
         {
           id: 'note-1',
@@ -175,7 +164,6 @@ describe('Regression Tests', () => {
       // Code blocks should not process wiki links
       // Using possessive-like behavior with length limits
       const codeBlockPattern = /```[\s\S]{0,50000}```/g
-      const codeBlocks = safeContent.match(codeBlockPattern) || []
       
       const textWithoutCode = safeContent.replace(codeBlockPattern, '')
       // SECURITY FIX: Limit wiki link content length
@@ -204,7 +192,8 @@ describe('Regression Tests', () => {
         // Should not throw when creating RegExp
         expect(() => {
           const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-          new RegExp(escaped, 'i')
+          const regex = new RegExp(escaped, 'i')
+          expect(regex).toBeInstanceOf(RegExp)
         }).not.toThrow()
       })
     })
@@ -309,12 +298,6 @@ describe('Regression Tests', () => {
   describe('AI Features', () => {
     it('should handle AI service timeout (BUG-014)', async () => {
       const timeout = 30000
-      const start = Date.now()
-
-      // Simulate slow API call
-      const slowCall = new Promise((_, reject) => {
-        setTimeout(() => { reject(new Error('Timeout')); }, timeout + 1000)
-      })
 
       // Should timeout before completion
       const quickCall = new Promise((_, reject) => {
@@ -494,16 +477,6 @@ describe('Regression Tests', () => {
     it('should cancel pending requests on unmount (BUG-025)', () => {
       let aborted = false
       const controller = new AbortController()
-
-      const fetchData = async () => {
-        try {
-          await fetch('/api/data', { signal: controller.signal })
-        } catch (e) {
-          if (e instanceof Error && e.name === 'AbortError') {
-            aborted = true
-          }
-        }
-      }
 
       // Simulate unmount
       controller.abort()

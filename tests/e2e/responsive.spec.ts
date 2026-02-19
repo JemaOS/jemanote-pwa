@@ -66,8 +66,6 @@ test.describe('Responsive Design', () => {
     })
 
     test('should show hamburger menu on mobile', async ({ page }) => {
-      const hamburgerButton = page.getByRole('button', { name: /menu|hamburger/i }).first()
-      
       // May be visible or have different name
       const menuButton = page.locator('button').filter({ has: page.locator('svg') }).first()
       
@@ -414,7 +412,7 @@ test.describe('Responsive Design', () => {
       })
       
       // Should be at least 16px for readability
-      const sizeInPx = parseInt(fontSize)
+      const sizeInPx = Number.parseInt(fontSize)
       expect(sizeInPx).toBeGreaterThanOrEqual(14)
     })
   })

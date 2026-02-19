@@ -347,7 +347,7 @@ describe('Supabase Auth Integration', () => {
   describe('Get User', () => {
     it('should get current user when authenticated', async () => {
       // Sign up first
-      const { data: signUpData } = await supabase.auth.signUp({
+      await supabase.auth.signUp({
         email: 'getuser@example.com',
         password: 'SecurePassword123!',
       })
@@ -363,7 +363,7 @@ describe('Supabase Auth Integration', () => {
       // Ensure signed out
       await supabase.auth.signOut()
 
-      const { data, error } = await supabase.auth.getUser()
+      const { data } = await supabase.auth.getUser()
 
       // Should not error, just return null user
       expect(data.user).toBeNull()

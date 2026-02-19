@@ -88,7 +88,7 @@ test.describe('HTTP Security Headers', () => {
         // max-age should be at least 1 year (31536000 seconds) for production
         const maxAgeMatch = hsts.match(/max-age=(\d+)/)
         if (maxAgeMatch) {
-          const maxAge = parseInt(maxAgeMatch[1], 10)
+          const maxAge = Number.parseInt(maxAgeMatch[1], 10)
           expect(maxAge).toBeGreaterThanOrEqual(31536000)
         }
         

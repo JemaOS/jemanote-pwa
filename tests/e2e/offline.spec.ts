@@ -362,9 +362,7 @@ test.describe('Offline Mode', () => {
     test('should detect offline status', async ({ page, context }) => {
       await context.setOffline(true)
       
-      const isOnline = await page.evaluate(() => navigator.onLine)
       // navigator.onLine may not update immediately in all browsers
-      
       await context.setOffline(false)
     })
 

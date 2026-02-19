@@ -287,7 +287,6 @@ test.describe('Command Palette', () => {
       await page.waitForTimeout(200)
       
       // Should highlight first item
-      const firstItem = page.locator('[cmdk-item][aria-selected="true"], .command-item.selected').first()
       // Selection state may vary by implementation
     })
 

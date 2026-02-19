@@ -475,6 +475,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
                 role="treeitem"
                 aria-label={`Dossier ${folder.name}`}
                 aria-expanded={isExpanded}
+                aria-selected={selectedFolderIds.has(folder.id)}
                 tabIndex={0}
                 onDragOver={handleDragOver}
                 onDrop={(e) => { handleDrop(folder.id, e); }}
@@ -608,6 +609,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
         {/* Notes sans dossier */}
         <div className="mb-1.5 xs:mb-2">
           <div
+            role="group"
             aria-label="Notes sans dossier"
             onDragOver={handleDragOver}
             onDrop={(e) => { handleDrop(undefined, e); }}
@@ -1292,7 +1294,7 @@ export default function Sidebar({
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
     <div
-      role="listitem"
+      role="button"
       aria-label={`Note: ${note.title || 'Sans titre'}`}
       tabIndex={0}
       key={note.id}
@@ -1315,7 +1317,13 @@ export default function Sidebar({
     >
       {editingNoteId === note.id ? (
         // Edit mode
-        <div className="flex items-center gap-1 xs:gap-1.5 w-full px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1.5 xs:py-2 sm:py-2 laptop:py-2.5 min-h-[44px]" onClick={(e) => { e.stopPropagation(); }}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="flex items-center gap-1 xs:gap-1.5 w-full px-1.5 xs:px-2 sm:px-2 laptop:px-3 py-1.5 xs:py-2 sm:py-2 laptop:py-2.5 min-h-[44px]"
+          onClick={(e) => { e.stopPropagation(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); } }}
+        >
           <File className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 laptop:h-4.5 laptop:w-4.5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
           <input
             type="text"

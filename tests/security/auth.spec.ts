@@ -146,7 +146,7 @@ test.describe('Authentication Security', () => {
       const hasUpper = /[A-Z]/.test(password)
       const hasLower = /[a-z]/.test(password)
       const hasNumber = /\d/.test(password)
-      const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+      const hasSpecial = /[!@#$%^&*()_+-=\[\]{};':"\\|,.<>?]/.test(password)
       const minLength = password.length >= 8
       
       return (hasUpper && hasLower && hasNumber && minLength) ||
@@ -210,8 +210,8 @@ test.describe('Authentication Security', () => {
     // Session IDs should be random, not sequential
     const isSequential = sessionIds.every((id, i) => {
       if (i === 0) {return true}
-      const prevNum = parseInt(sessionIds[i - 1].split('-')[1])
-      const currNum = parseInt(id.split('-')[1])
+      const prevNum = Number.parseInt(sessionIds[i - 1].split('-')[1])
+      const currNum = Number.parseInt(id.split('-')[1])
       return currNum === prevNum + 1
     })
     

@@ -7,7 +7,7 @@ import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate } from '@
 // Parse wiki links in the document and add decorations
 function parseWikiLinks(view: EditorView) {
   const builder = new RangeSetBuilder<Decoration>();
-  const regex = /\[\[([^\]]+)\]\]/g;
+  const regex = /\[\[([^\]]+)\]\]/g; // NOSONAR - safe pattern, negated char class
 
   for (const { from, to } of view.visibleRanges) {
     const text = view.state.doc.sliceString(from, to);
@@ -56,7 +56,7 @@ export const wikiLinksPlugin = ViewPlugin.fromClass(
 
 // Utility to extract wiki links from markdown content
 export function extractWikiLinks(content: string): string[] {
-  const regex = /\[\[([^\]]+)\]\]/g;
+  const regex = /\[\[([^\]]+)\]\]/g; // NOSONAR - safe pattern, negated char class
   const links: string[] = [];
   let match: RegExpExecArray | null;
 
@@ -79,8 +79,8 @@ export function renderWikiLinksToHTML(
   const safeContent =
     content.length > MAX_CONTENT_LENGTH ? content.substring(0, MAX_CONTENT_LENGTH) : content;
 
-  return safeContent.replace(/\[\[([^\]]{1,200})\]\]/g, (match, linkText) => {
-    const escapedText = linkText.replaceAll('"', '&quot;');
+  return safeContent.replace(/\[\[([^\]]{1,200})\]\]/g, (match, linkText) => { // NOSONAR - safe pattern, negated char class with length limit
+    const escapedText = linkText.replaceAll('"', '"');
     return `<a href="#" class="wiki-link" data-note-title="${escapedText}" style="color: #5a63e9; text-decoration: underline; font-weight: 500;">${linkText}</a>`;
   });
 }

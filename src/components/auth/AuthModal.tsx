@@ -52,12 +52,16 @@ export default function AuthModal({ onClose }: AuthModalProps) {
       if (authError) {
         setError(authError.message);
       } else {
+        // Success - close the modal
+        dialogRef.current?.close();
         onClose();
       }
     } catch (err) {
       // Handle error - log for debugging but show user-friendly message
       console.error('Auth error:', err);
       setError('Une erreur est survenue');
+      // Even on error, try to close the modal
+      dialogRef.current?.close();
     } finally {
       setLoading(false);
     }

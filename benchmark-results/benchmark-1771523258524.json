@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-19T17:47:38.524Z",
+  "summary": {
+    "buildTime": {
+      "avg": 0,
+      "min": 0,
+      "max": 0
+    },
+    "buildSize": {},
+    "startupTime": 0,
+    "pageLoadTimes": {}
+  },
+  "raw": {
+    "buildTime": [],
+    "buildSize": {},
+    "startupTime": 0,
+    "pageLoadTimes": {}
+  }
+}

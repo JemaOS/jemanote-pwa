@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-02-19T16:59:34.350Z",
+  "summary": {
+    "buildTime": {
+      "avg": 22115.333333333332,
+      "min": 21946,
+      "max": 22316
+    },
+    "buildSize": {
+      "totalSize": 25448068,
+      "jsSize": 5330510,
+      "cssSize": 88445,
+      "otherSize": 20029113,
+      "fileCount": 192
+    },
+    "startupTime": 0,
+    "pageLoadTimes": {}
+  },
+  "raw": {
+    "buildTime": [
+      22316,
+      21946,
+      22084
+    ],
+    "buildSize": {
+      "totalSize": 25448068,
+      "jsSize": 5330510,
+      "cssSize": 88445,
+      "otherSize": 20029113,
+      "fileCount": 192
+    },
+    "startupTime": 0,
+    "pageLoadTimes": {}
+  }
+}

@@ -1,0 +1,635 @@
+{
+  "metrics": [
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\utils\\performance.ts",
+      "lines": {
+        "total": 453,
+        "code": 298,
+        "comments": 82,
+        "blank": 73,
+        "commentRatio": 18.101545253863137
+      },
+      "cyclomatic": 56,
+      "cognitive": 57,
+      "halstead": {},
+      "maintainability": 24.49134535173939,
+      "technicalDebt": 23
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\types\\index.ts",
+      "lines": {
+        "total": 129,
+        "code": 114,
+        "comments": 2,
+        "blank": 13,
+        "commentRatio": 1.550387596899225
+      },
+      "cyclomatic": 17,
+      "cognitive": 16,
+      "halstead": {},
+      "maintainability": 38.84017553735151,
+      "technicalDebt": 7.724806201550388
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\services\\linkDetectionService.ts",
+      "lines": {
+        "total": 252,
+        "code": 180,
+        "comments": 38,
+        "blank": 34,
+        "commentRatio": 15.079365079365079
+      },
+      "cyclomatic": 19,
+      "cognitive": 28,
+      "halstead": {},
+      "maintainability": 34.24398482364941,
+      "technicalDebt": 4.5
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\services\\graphIndexer.ts",
+      "lines": {
+        "total": 296,
+        "code": 190,
+        "comments": 57,
+        "blank": 49,
+        "commentRatio": 19.256756756756758
+      },
+      "cyclomatic": 34,
+      "cognitive": 56,
+      "halstead": {},
+      "maintainability": 31.714225183545054,
+      "technicalDebt": 12
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\services\\ai\\mistralService.ts",
+      "lines": {
+        "total": 587,
+        "code": 421,
+        "comments": 85,
+        "blank": 81,
+        "commentRatio": 14.480408858603067
+      },
+      "cyclomatic": 63,
+      "cognitive": 73,
+      "halstead": {},
+      "maintainability": 20.276294226437038,
+      "technicalDebt": 26.5
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\wikiLinks.ts",
+      "lines": {
+        "total": 87,
+        "code": 62,
+        "comments": 10,
+        "blank": 15,
+        "commentRatio": 11.494252873563218
+      },
+      "cyclomatic": 10,
+      "cognitive": 10,
+      "halstead": {},
+      "maintainability": 45.55177660534,
+      "technicalDebt": 0
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\utils.ts",
+      "lines": {
+        "total": 10,
+        "code": 5,
+        "comments": 2,
+        "blank": 3,
+        "commentRatio": 20
+      },
+      "cyclomatic": 1,
+      "cognitive": 1,
+      "halstead": {},
+      "maintainability": 70.61416424060205,
+      "technicalDebt": 0
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\supabase.ts",
+      "lines": {
+        "total": 35,
+        "code": 27,
+        "comments": 3,
+        "blank": 5,
+        "commentRatio": 8.571428571428571
+      },
+      "cyclomatic": 3,
+      "cognitive": 2,
+      "halstead": {},
+      "maintainability": 54.36874725356245,
+      "technicalDebt": 0.7142857142857144
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\localStorage.ts",
+      "lines": {
+        "total": 496,
+        "code": 392,
+        "comments": 43,
+        "blank": 61,
+        "commentRatio": 8.669354838709678
+      },
+      "cyclomatic": 75,
+      "cognitive": 75,
+      "halstead": {},
+      "maintainability": 19.338405396641186,
+      "technicalDebt": 33.16532258064516
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\audioWidgetExtension.ts",
+      "lines": {
+        "total": 118,
+        "code": 96,
+        "comments": 4,
+        "blank": 18,
+        "commentRatio": 3.389830508474576
+      },
+      "cyclomatic": 9,
+      "cognitive": 9,
+      "halstead": {},
+      "maintainability": 41.54425399478537,
+      "technicalDebt": 3.305084745762712
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\lib\\aiContextMenu.ts",
+      "lines": {
+        "total": 40,
+        "code": 23,
+        "comments": 9,
+        "blank": 8,
+        "commentRatio": 22.5
+      },
+      "cyclomatic": 2,
+      "cognitive": 1,
+      "halstead": {},
+      "maintainability": 56.02228580983023,
+      "technicalDebt": 0
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\hooks\\useNotes.ts",
+      "lines": {
+        "total": 166,
+        "code": 138,
+        "comments": 6,
+        "blank": 22,
+        "commentRatio": 3.614457831325301
+      },
+      "cyclomatic": 23,
+      "cognitive": 28,
+      "halstead": {},
+      "maintainability": 36.223161013634616,
+      "technicalDebt": 9.69277108433735
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\hooks\\useLocalNotes.ts",
+      "lines": {
+        "total": 642,
+        "code": 487,
+        "comments": 63,
+        "blank": 92,
+        "commentRatio": 9.813084112149532
+      },
+      "cyclomatic": 94,
+      "cognitive": 158,
+      "halstead": {},
+      "maintainability": 14.727038736212839,
+      "technicalDebt": 42.09345794392523
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\hooks\\useAuth.ts",
+      "lines": {
+        "total": 126,
+        "code": 102,
+        "comments": 6,
+        "blank": 18,
+        "commentRatio": 4.761904761904762
+      },
+      "cyclomatic": 16,
+      "cognitive": 18,
+      "halstead": {},
+      "maintainability": 40.028395004477616,
+      "technicalDebt": 5.619047619047619
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\main.tsx",
+      "lines": {
+        "total": 30,
+        "code": 21,
+        "comments": 4,
+        "blank": 5,
+        "commentRatio": 13.333333333333334
+      },
+      "cyclomatic": 3,
+      "cognitive": 3,
+      "halstead": {},
+      "maintainability": 56.74962078464472,
+      "technicalDebt": 0
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\App.tsx",
+      "lines": {
+        "total": 404,
+        "code": 350,
+        "comments": 25,
+        "blank": 29,
+        "commentRatio": 6.188118811881188
+      },
+      "cyclomatic": 35,
+      "cognitive": 50,
+      "halstead": {},
+      "maintainability": 25.792162532298168,
+      "technicalDebt": 14.405940594059405
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\hooks\\use-mobile.tsx",
+      "lines": {
+        "total": 25,
+        "code": 17,
+        "comments": 2,
+        "blank": 6,
+        "commentRatio": 8
+      },
+      "cyclomatic": 1,
+      "cognitive": 1,
+      "halstead": {},
+      "maintainability": 59.02050225681358,
+      "technicalDebt": 1
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\contexts\\ThemeContext.tsx",
+      "lines": {
+        "total": 58,
+        "code": 42,
+        "comments": 4,
+        "blank": 12,
+        "commentRatio": 6.896551724137931
+      },
+      "cyclomatic": 4,
+      "cognitive": 4,
+      "halstead": {},
+      "maintainability": 50.04846036062652,
+      "technicalDebt": 1.5517241379310347
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\InstallPrompt.tsx",
+      "lines": {
+        "total": 138,
+        "code": 104,
+        "comments": 11,
+        "blank": 23,
+        "commentRatio": 7.971014492753622
+      },
+      "cyclomatic": 9,
+      "cognitive": 9,
+      "halstead": {},
+      "maintainability": 40.785954658930805,
+      "technicalDebt": 1.014492753623189
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ErrorBoundary.tsx",
+      "lines": {
+        "total": 39,
+        "code": 30,
+        "comments": 2,
+        "blank": 7,
+        "commentRatio": 5.128205128205128
+      },
+      "cyclomatic": 3,
+      "cognitive": 2,
+      "halstead": {},
+      "maintainability": 53.37059499996199,
+      "technicalDebt": 2.435897435897436
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\workspace\\WorkspaceView.tsx",
+      "lines": {
+        "total": 616,
+        "code": 507,
+        "comments": 42,
+        "blank": 67,
+        "commentRatio": 6.8181818181818175
+      },
+      "cyclomatic": 56,
+      "cognitive": 112,
+      "halstead": {},
+      "maintainability": 19.456863610926757,
+      "technicalDebt": 24.59090909090909
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ui\\WaveformPlayer.tsx",
+      "lines": {
+        "total": 208,
+        "code": 173,
+        "comments": 6,
+        "blank": 29,
+        "commentRatio": 2.8846153846153846
+      },
+      "cyclomatic": 20,
+      "cognitive": 22,
+      "halstead": {},
+      "maintainability": 34.485258012864264,
+      "technicalDebt": 8.557692307692307
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\timeline\\TimelineView.tsx",
+      "lines": {
+        "total": 167,
+        "code": 143,
+        "comments": 5,
+        "blank": 19,
+        "commentRatio": 2.9940119760479043
+      },
+      "cyclomatic": 11,
+      "cognitive": 14,
+      "halstead": {},
+      "maintainability": 37.50001872669674,
+      "technicalDebt": 4.002994011976048
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\timeline\\DateFilter.tsx",
+      "lines": {
+        "total": 121,
+        "code": 108,
+        "comments": 5,
+        "blank": 8,
+        "commentRatio": 4.132231404958678
+      },
+      "cyclomatic": 3,
+      "cognitive": 4,
+      "halstead": {},
+      "maintainability": 41.23543225347927,
+      "technicalDebt": 2.933884297520661
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\settings\\SettingsView.tsx",
+      "lines": {
+        "total": 173,
+        "code": 161,
+        "comments": 2,
+        "blank": 10,
+        "commentRatio": 1.1560693641618496
+      },
+      "cyclomatic": 3,
+      "cognitive": 4,
+      "halstead": {},
+      "maintainability": 37.45284463164539,
+      "technicalDebt": 4.421965317919075
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\search\\SearchView.tsx",
+      "lines": {
+        "total": 128,
+        "code": 114,
+        "comments": 5,
+        "blank": 9,
+        "commentRatio": 3.90625
+      },
+      "cyclomatic": 14,
+      "cognitive": 15,
+      "halstead": {},
+      "maintainability": 39.243684309281335,
+      "technicalDebt": 5.046875
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\layout\\StatusBar.tsx",
+      "lines": {
+        "total": 132,
+        "code": 119,
+        "comments": 3,
+        "blank": 10,
+        "commentRatio": 2.272727272727273
+      },
+      "cyclomatic": 12,
+      "cognitive": 16,
+      "halstead": {},
+      "maintainability": 39.106031838862656,
+      "technicalDebt": 4.863636363636363
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\layout\\Sidebar.tsx",
+      "lines": {
+        "total": 1902,
+        "code": 1747,
+        "comments": 36,
+        "blank": 119,
+        "commentRatio": 1.8927444794952681
+      },
+      "cyclomatic": 152,
+      "cognitive": 208,
+      "halstead": {},
+      "maintainability": 0,
+      "technicalDebt": 75.05362776025237
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\layout\\Navigation.tsx",
+      "lines": {
+        "total": 318,
+        "code": 288,
+        "comments": 2,
+        "blank": 28,
+        "commentRatio": 0.628930817610063
+      },
+      "cyclomatic": 6,
+      "cognitive": 12,
+      "halstead": {},
+      "maintainability": 31.539856874069937,
+      "technicalDebt": 4.685534591194968
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\graph\\GraphView.tsx",
+      "lines": {
+        "total": 1305,
+        "code": 1112,
+        "comments": 59,
+        "blank": 134,
+        "commentRatio": 4.521072796934866
+      },
+      "cyclomatic": 93,
+      "cognitive": 197,
+      "halstead": {},
+      "maintainability": 7.039581485924774,
+      "technicalDebt": 44.23946360153257
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\editor\\VoiceRecorder.tsx",
+      "lines": {
+        "total": 733,
+        "code": 630,
+        "comments": 19,
+        "blank": 84,
+        "commentRatio": 2.592087312414734
+      },
+      "cyclomatic": 71,
+      "cognitive": 119,
+      "halstead": {},
+      "maintainability": 15.381552022699143,
+      "technicalDebt": 34.20395634379263
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\editor\\MarkdownPreview.tsx",
+      "lines": {
+        "total": 350,
+        "code": 286,
+        "comments": 20,
+        "blank": 44,
+        "commentRatio": 5.714285714285714
+      },
+      "cyclomatic": 35,
+      "cognitive": 36,
+      "halstead": {},
+      "maintainability": 27.705291051216545,
+      "technicalDebt": 14.642857142857142
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\editor\\MarkdownEditor.tsx",
+      "lines": {
+        "total": 255,
+        "code": 228,
+        "comments": 7,
+        "blank": 20,
+        "commentRatio": 2.7450980392156863
+      },
+      "cyclomatic": 11,
+      "cognitive": 13,
+      "halstead": {},
+      "maintainability": 33.08053558116957,
+      "technicalDebt": 4.127450980392156
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\command\\CommandPalette.tsx",
+      "lines": {
+        "total": 290,
+        "code": 266,
+        "comments": 2,
+        "blank": 22,
+        "commentRatio": 0.6896551724137931
+      },
+      "cyclomatic": 6,
+      "cognitive": 15,
+      "halstead": {},
+      "maintainability": 32.29267533953122,
+      "technicalDebt": 4.655172413793103
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\canvas\\CanvasView.tsx",
+      "lines": {
+        "total": 888,
+        "code": 775,
+        "comments": 44,
+        "blank": 69,
+        "commentRatio": 4.954954954954955
+      },
+      "cyclomatic": 109,
+      "cognitive": 388,
+      "halstead": {},
+      "maintainability": 8.30803155399865,
+      "technicalDebt": 52.02252252252252
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\auth\\AuthView.tsx",
+      "lines": {
+        "total": 156,
+        "code": 139,
+        "comments": 3,
+        "blank": 14,
+        "commentRatio": 1.9230769230769231
+      },
+      "cyclomatic": 7,
+      "cognitive": 7,
+      "halstead": {},
+      "maintainability": 38.306805448037835,
+      "technicalDebt": 4.038461538461538
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\auth\\AuthModal.tsx",
+      "lines": {
+        "total": 198,
+        "code": 175,
+        "comments": 4,
+        "blank": 19,
+        "commentRatio": 2.0202020202020203
+      },
+      "cyclomatic": 9,
+      "cognitive": 8,
+      "halstead": {},
+      "maintainability": 35.85589605573157,
+      "technicalDebt": 3.9898989898989896
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ai\\AISummaryModal.tsx",
+      "lines": {
+        "total": 477,
+        "code": 439,
+        "comments": 5,
+        "blank": 33,
+        "commentRatio": 1.0482180293501049
+      },
+      "cyclomatic": 19,
+      "cognitive": 44,
+      "halstead": {},
+      "maintainability": 25.797792129265577,
+      "technicalDebt": 8.975890985324948
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ai\\AISettingsSection.tsx",
+      "lines": {
+        "total": 235,
+        "code": 214,
+        "comments": 4,
+        "blank": 17,
+        "commentRatio": 1.702127659574468
+      },
+      "cyclomatic": 8,
+      "cognitive": 19,
+      "halstead": {},
+      "maintainability": 34.08438806403972,
+      "technicalDebt": 4.148936170212766
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ai\\AIPanel.tsx",
+      "lines": {
+        "total": 743,
+        "code": 644,
+        "comments": 35,
+        "blank": 64,
+        "commentRatio": 4.710632570659488
+      },
+      "cyclomatic": 45,
+      "cognitive": 79,
+      "halstead": {},
+      "maintainability": 18.67040682454467,
+      "technicalDebt": 20.144683714670258
+    },
+    {
+      "path": "C:\\Users\\Avalonchain\\jemanote-pwa\\src\\components\\ai\\AIContextMenu.tsx",
+      "lines": {
+        "total": 273,
+        "code": 243,
+        "comments": 9,
+        "blank": 21,
+        "commentRatio": 3.296703296703297
+      },
+      "cyclomatic": 12,
+      "cognitive": 15,
+      "halstead": {},
+      "maintainability": 32.34240915248248,
+      "technicalDebt": 4.351648351648351
+    }
+  ],
+  "summary": {
+    "totals": {
+      "lines": {
+        "total": 13799,
+        "code": 11610,
+        "comments": 775,
+        "blank": 1414
+      },
+      "cyclomatic": 1179,
+      "cognitive": 1948
+    },
+    "averages": {
+      "cyclomatic": 28.75609756097561,
+      "cognitive": 47.51219512195122
+    }
+  }
+}

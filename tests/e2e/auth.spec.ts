@@ -23,7 +23,7 @@ test.describe('Authentication', () => {
       const password = generateTestPassword();
 
       // Open auth modal
-      await page.getByRole('button', { name: /connexion|login/i }).click();
+      await page.getByRole('button', { name: /se connecter|connexion|login/i }).click();
 
       // Switch to registration tab
       await page.getByRole('button', { name: /inscription|sign up/i }).click();
@@ -45,7 +45,7 @@ test.describe('Authentication', () => {
     });
 
     test('should show error for invalid email format', async ({ page }) => {
-      await page.getByRole('button', { name: /connexion|login/i }).click();
+      await page.getByRole('button', { name: /se connecter|connexion|login/i }).click();
       await page.getByRole('button', { name: /inscription|sign up/i }).click();
 
       // Fill with invalid email
@@ -333,7 +333,7 @@ test.describe('Authentication', () => {
       await page.getByRole('button', { name: /connexion|login/i }).click();
 
       // Modal should be visible
-      await expect(page.getByText(/synchronisation|connexion|login/i).first()).toBeVisible();
+      await expect(page.getByText(/synchronisation| se connecter|connexion|login/i).first()).toBeVisible();
 
       // Close modal using X button
       await page.getByRole('button', { name: /fermer|close/i }).click();

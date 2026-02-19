@@ -7,7 +7,7 @@
  * Usage: node scripts/benchmark.js [--compare] [--verbose]
  */
 
-import { execSync, spawn } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -58,24 +58,71 @@ function log(message, verbose = false) {
 }
 
 /**
+ * Find executable in PATH (cross-platform)
+ */
+function findInPath(command) {
+  const pathEnv = process.env.PATH || '';
+  const pathSep = process.platform === 'win32' ? ';' : ':';
+  const paths = pathEnv.split(pathSep);
+
+  // Add .cmd suffix for Windows if not present
+  const cmdName = process.platform === 'win32' && !command.endsWith('.cmd')
+    ? `${command}.cmd`
+    : command;
+
+  for (const dir of paths) {
+    const fullPath = path.join(dir, cmdName);
+    try {
+      if (fs.existsSync(fullPath)) {
+        return fullPath;
+      }
+    } catch {
+      // Ignore access errors
+    }
+  }
+  return command; // Fallback to original
+}
+
+/**
  * Exécute une commande et mesure son temps d'exécution
+ *
+ * SECURITY: Uses execFileSync with array arguments to avoid shell interpretation.
+ * This prevents command injection vulnerabilities.
+ * Note: For .cmd/.bat files on Windows, shell: true is required.
  */
 function measureCommand(command, options = {}) {
   const start = Date.now();
 
   try {
-    // Use execSync for compatibility
-    let cmdToRun = command;
+    // Parse command into program and args (safer than passing to shell)
+    // Handle npm specially to ensure cross-platform compatibility
+    let cmdArgs = command.split(' ').slice(1); // Get arguments after program
+    let cmdProgram;
+    let useShell = false;
+
     if (command.startsWith('npm ')) {
+      // Use npm_execpath if available, otherwise find npm in PATH
       const npm = process.env.npm_execpath;
       if (npm && npm.endsWith('.js')) {
-        cmdToRun = command.replace('npm', `"${process.execPath}" "${npm}"`);
+        cmdProgram = process.execPath;
+        cmdArgs = [npm, ...cmdArgs];
+      } else {
+        // Find npm in PATH (handles Windows .cmd suffix)
+        cmdProgram = findInPath('npm');
+        // .cmd files require shell on Windows
+        useShell = process.platform === 'win32';
       }
+    } else {
+      // For other commands, extract program name
+      const parts = command.split(' ');
+      cmdProgram = parts[0];
+      cmdArgs = parts.slice(1);
     }
 
-    execSync(cmdToRun, {
+    execFileSync(cmdProgram, cmdArgs, {
       stdio: options.verbose ? 'inherit' : 'pipe',
       cwd: process.cwd(),
+      shell: useShell,
       ...options,
     });
 

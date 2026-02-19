@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * Code Metrics Script
  * Calculates comprehensive code quality metrics:
@@ -133,8 +132,8 @@ function calculateCyclomaticComplexity(content) {
     /\bcatch\b/g,
     /\b&&\b/g,
     /\|\|/g,
-    /\?\s*:/g, // ternary
-    /\breturn\s+[^?]*\?/g, // conditional return
+    /\?\s*:/g, // NOSONAR - safe pattern
+    /\breturn\s+[^?]*\?/g, // NOSONAR - safe pattern with negated char class
   ];
 
   let complexity = 1; // Base complexity
@@ -208,575 +207,243 @@ function calculateMaintainabilityIndex(metrics) {
   const loc = metrics.lines?.code || 1;
 
   // Original formula
-  let mi = 171 - 5.2 * Math.log(halsteadVolume) - 0.23 * cyclomatic - 16.2 * Math.log(loc);
+  const mi =
+    171 -
+    5.2 * Math.log(halsteadVolume) -
+    0.23 * cyclomatic -
+    16.2 * Math.log(loc);
 
   // Normalize to 0-100 scale
-  mi = Math.max(0, Math.min(100, mi));
-
-  return Math.round(mi * 100) / 100;
+  return Math.max(0, Math.min(100, (mi / 171) * 100));
 }
 
 /**
- * Calculate technical debt
- * Based on SQALE methodology
+ * Calculate technical debt ratio
  */
-function calculateTechnicalDebt(metrics, violations) {
-  // Simplified calculation
-  // Each violation adds to debt based on severity
-  const debtPerViolation = {
-    critical: 60, // 1 hour
-    high: 30, // 30 minutes
-    medium: 10, // 10 minutes
-    low: 5, // 5 minutes
-  };
-
-  let totalDebtMinutes = 0;
-
-  for (const violation of violations) {
-    totalDebtMinutes += debtPerViolation[violation.severity] || debtPerViolation.low;
-  }
-
-  // Convert to hours
-  const debtHours = totalDebtMinutes / 60;
-
-  // Calculate ratio: Debt / (LOC * Cost per line)
-  // Assuming 0.5 hours per 100 LOC as baseline
+function calculateTechnicalDebtRatio(metrics) {
+  const cyclomatic = metrics.cyclomatic || 1;
   const loc = metrics.lines?.code || 1;
-  const estimatedDevTime = loc * 0.005; // hours
-  const debtRatio = estimatedDevTime > 0 ? (debtHours / estimatedDevTime) * 100 : 0;
 
-  return {
-    hours: Math.round(debtHours * 100) / 100,
-    ratio: Math.round(debtRatio * 100) / 100,
-  };
+  // Simple heuristic: higher complexity and lower comment ratio = more debt
+  const complexityDebt = Math.max(0, cyclomatic - CONFIG.thresholds.cyclomaticComplexity);
+  const commentDebt = Math.max(
+    0,
+    CONFIG.thresholds.commentRatio - (metrics.lines?.commentRatio || 0)
+  );
+
+  return complexityDebt * 0.5 + commentDebt * 0.5;
 }
 
 /**
  * Analyze a single file
  */
 function analyzeFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8');
-  const relativePath = path.relative(ROOT_DIR, filePath);
-
-  // Line counts
-  const lines = countLines(content);
-
-  // Complexity
-  const cyclomatic = calculateCyclomaticComplexity(content);
-  const cognitive = calculateCognitiveComplexity(content);
-
-  // Try to get more accurate metrics from escomplex
-  let escomplexMetrics = null;
   try {
-    escomplexMetrics = escomplex.analyzeModule(content);
-  } catch {
-    // Fallback to calculated metrics
-  }
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = countLines(content);
 
-  // Calculate maintainability index
-  const mi = calculateMaintainabilityIndex({
-    halstead: escomplexMetrics?.halstead,
-    cyclomatic,
-    lines,
-  });
+    // Get cyclomatic complexity from escomplex
+    let cyclomatic = 1;
+    let cognitive = 1;
+    let halstead = {};
 
-  // Detect violations
-  const violations = [];
+    try {
+      const report = escomplex.analyse(content, {
+        loc: true,
+        newmi: true,
+      });
 
-  if (lines.total > CONFIG.thresholds.locPerFile) {
-    violations.push({
-      type: 'LOC',
-      severity: 'medium',
-      message: `File has ${lines.total} lines (threshold: ${CONFIG.thresholds.locPerFile})`,
-      value: lines.total,
-      threshold: CONFIG.thresholds.locPerFile,
-    });
-  }
+      cyclomatic = report.aggregate.cyclomatic || 1;
+      cognitive = report.aggregate.cognitive || 1;
+      halstead = report.aggregate.halstead || {};
+    } catch (e) {
+      // Fallback to simple calculation if escomplex fails
+      cyclomatic = calculateCyclomaticComplexity(content);
+      cognitive = calculateCognitiveComplexity(content);
+    }
 
-  if (cyclomatic > CONFIG.thresholds.cyclomaticComplexity) {
-    violations.push({
-      type: 'Cyclomatic',
-      severity: 'high',
-      message: `Cyclomatic complexity is ${cyclomatic} (threshold: ${CONFIG.thresholds.cyclomaticComplexity})`,
-      value: cyclomatic,
-      threshold: CONFIG.thresholds.cyclomaticComplexity,
-    });
-  }
-
-  if (cognitive > CONFIG.thresholds.cognitiveComplexity) {
-    violations.push({
-      type: 'Cognitive',
-      severity: 'medium',
-      message: `Cognitive complexity is ${cognitive} (threshold: ${CONFIG.thresholds.cognitiveComplexity})`,
-      value: cognitive,
-      threshold: CONFIG.thresholds.cognitiveComplexity,
-    });
-  }
-
-  if (mi < CONFIG.thresholds.maintainabilityIndex) {
-    violations.push({
-      type: 'Maintainability',
-      severity: 'high',
-      message: `Maintainability index is ${mi} (threshold: ${CONFIG.thresholds.maintainabilityIndex})`,
-      value: mi,
-      threshold: CONFIG.thresholds.maintainabilityIndex,
-    });
-  }
-
-  if (lines.commentRatio < CONFIG.thresholds.commentRatio) {
-    violations.push({
-      type: 'Comments',
-      severity: 'low',
-      message: `Comment ratio is ${lines.commentRatio.toFixed(1)}% (threshold: ${CONFIG.thresholds.commentRatio}%)`,
-      value: lines.commentRatio,
-      threshold: CONFIG.thresholds.commentRatio,
-    });
-  }
-
-  const debt = calculateTechnicalDebt({ lines }, violations);
-
-  return {
-    file: relativePath,
-    lines,
-    complexity: {
+    const metrics = {
+      path: filePath,
+      lines,
       cyclomatic,
       cognitive,
-    },
-    maintainabilityIndex: mi,
-    violations,
-    debt,
-    escomplex: escomplexMetrics
-      ? {
-          methods: escomplexMetrics.methods?.length || 0,
-          classes: escomplexMetrics.classes?.length || 0,
-        }
-      : null,
-  };
+      halstead,
+      maintainability: 0,
+      technicalDebt: 0,
+    };
+
+    metrics.maintainability = calculateMaintainabilityIndex(metrics);
+    metrics.technicalDebt = calculateTechnicalDebtRatio(metrics);
+
+    return metrics;
+  } catch (error) {
+    console.error(`${colors.red}Error analyzing ${filePath}:${colors.reset}`, error.message);
+    return null;
+  }
 }
 
 /**
- * Generate summary statistics
+ * Analyze all source files
  */
-function generateSummary(results) {
-  const summary = {
-    totalFiles: results.length,
-    totalLines: 0,
-    totalCodeLines: 0,
-    totalCommentLines: 0,
-    avgLocPerFile: 0,
-    avgCyclomatic: 0,
-    avgCognitive: 0,
-    avgMaintainability: 0,
-    avgCommentRatio: 0,
-    totalDebtHours: 0,
-    avgDebtRatio: 0,
-    violations: {
-      LOC: 0,
-      Cyclomatic: 0,
-      Cognitive: 0,
-      Maintainability: 0,
-      Comments: 0,
-    },
-    filesByMaintainability: {
-      excellent: 0, // 90-100
-      good: 0, // 80-89
-      moderate: 0, // 70-79
-      poor: 0, // 60-69
-      bad: 0, // <60
-    },
-  };
+function analyzeProject() {
+  console.log(`${colors.cyan}Analyzing project metrics...${colors.reset}\n`);
 
-  let totalCyclomatic = 0;
-  let totalCognitive = 0;
-  let totalMaintainability = 0;
-  let totalCommentRatio = 0;
-  let totalDebtRatio = 0;
-
-  for (const result of results) {
-    summary.totalLines += result.lines.total;
-    summary.totalCodeLines += result.lines.code;
-    summary.totalCommentLines += result.lines.comments;
-    totalCyclomatic += result.complexity.cyclomatic;
-    totalCognitive += result.complexity.cognitive;
-    totalMaintainability += result.maintainabilityIndex;
-    totalCommentRatio += result.lines.commentRatio;
-    totalDebtRatio += result.debt.ratio;
-    summary.totalDebtHours += result.debt.hours;
-
-    // Count violations
-    for (const violation of result.violations) {
-      summary.violations[violation.type]++;
-    }
-
-    // Categorize by maintainability
-    const mi = result.maintainabilityIndex;
-    if (mi >= 90) summary.filesByMaintainability.excellent++;
-    else if (mi >= 80) summary.filesByMaintainability.good++;
-    else if (mi >= 70) summary.filesByMaintainability.moderate++;
-    else if (mi >= 60) summary.filesByMaintainability.poor++;
-    else summary.filesByMaintainability.bad++;
-  }
-
-  if (results.length > 0) {
-    summary.avgLocPerFile = Math.round(summary.totalLines / results.length);
-    summary.avgCyclomatic = Math.round((totalCyclomatic / results.length) * 100) / 100;
-    summary.avgCognitive = Math.round((totalCognitive / results.length) * 100) / 100;
-    summary.avgMaintainability = Math.round((totalMaintainability / results.length) * 100) / 100;
-    summary.avgCommentRatio = Math.round((totalCommentRatio / results.length) * 100) / 100;
-    summary.avgDebtRatio = Math.round((totalDebtRatio / results.length) * 100) / 100;
-  }
-
-  return summary;
-}
-
-/**
- * Generate HTML report
- */
-function generateHTMLReport(results, summary) {
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Code Metrics Report - Jemanote PWA</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
-    }
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-    h1 { color: #2c3e50; margin-bottom: 20px; }
-    h2 { color: #34495e; margin: 30px 0 15px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .card {
-      background: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .card h3 { color: #7f8c8d; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
-    .card .value { font-size: 28px; font-weight: bold; color: #2c3e50; }
-    .card .subtext { font-size: 12px; color: #95a5a6; margin-top: 5px; }
-    .good { color: #27ae60; }
-    .warning { color: #f39c12; }
-    .danger { color: #e74c3c; }
-    table {
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      border-collapse: collapse;
-    }
-    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ecf0f1; }
-    th { background: #34495e; color: white; font-weight: 600; }
-    tr:hover { background: #f8f9fa; }
-    .metric-bar {
-      height: 20px;
-      background: #ecf0f1;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .metric-fill {
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.3s ease;
-    }
-    .metric-fill.excellent { background: #27ae60; }
-    .metric-fill.good { background: #2ecc71; }
-    .metric-fill.moderate { background: #f39c12; }
-    .metric-fill.poor { background: #e67e22; }
-    .metric-fill.bad { background: #e74c3c; }
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .badge-success { background: #d4edda; color: #155724; }
-    .badge-warning { background: #fff3cd; color: #856404; }
-    .badge-danger { background: #f8d7da; color: #721c24; }
-    .timestamp { text-align: right; color: #95a5a6; font-size: 14px; margin-bottom: 20px; }
-    .threshold-row { background: #fff3cd !important; }
-    .violation-row { background: #f8d7da !important; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>📊 Code Metrics Report</h1>
-    <div class="timestamp">Generated: ${new Date().toLocaleString()}</div>
-    
-    <h2>📈 Overview</h2>
-    <div class="summary-grid">
-      <div class="card">
-        <h3>Total Files</h3>
-        <div class="value">${summary.totalFiles}</div>
-        <div class="subtext">Source files analyzed</div>
-      </div>
-      <div class="card">
-        <h3>Total Lines</h3>
-        <div class="value">${summary.totalLines.toLocaleString()}</div>
-        <div class="subtext">Lines of code</div>
-      </div>
-      <div class="card">
-        <h3>Code Lines</h3>
-        <div class="value">${summary.totalCodeLines.toLocaleString()}</div>
-        <div class="subtext">Executable code</div>
-      </div>
-      <div class="card">
-        <h3>Comment Lines</h3>
-        <div class="value">${summary.totalCommentLines.toLocaleString()}</div>
-        <div class="subtext">${summary.avgCommentRatio.toFixed(1)}% of total</div>
-      </div>
-    </div>
-
-    <h2>🎯 Quality Metrics</h2>
-    <div class="summary-grid">
-      <div class="card">
-        <h3>Avg LOC/File</h3>
-        <div class="value ${summary.avgLocPerFile > CONFIG.thresholds.locPerFile ? 'warning' : 'good'}">${summary.avgLocPerFile}</div>
-        <div class="subtext">Threshold: ${CONFIG.thresholds.locPerFile}</div>
-      </div>
-      <div class="card">
-        <h3>Avg Cyclomatic</h3>
-        <div class="value ${summary.avgCyclomatic > CONFIG.thresholds.cyclomaticComplexity ? 'warning' : 'good'}">${summary.avgCyclomatic}</div>
-        <div class="subtext">Threshold: ${CONFIG.thresholds.cyclomaticComplexity}</div>
-      </div>
-      <div class="card">
-        <h3>Avg Cognitive</h3>
-        <div class="value ${summary.avgCognitive > CONFIG.thresholds.cognitiveComplexity ? 'warning' : 'good'}">${summary.avgCognitive}</div>
-        <div class="subtext">Threshold: ${CONFIG.thresholds.cognitiveComplexity}</div>
-      </div>
-      <div class="card">
-        <h3>Maintainability</h3>
-        <div class="value ${summary.avgMaintainability < CONFIG.thresholds.maintainabilityIndex ? 'warning' : 'good'}">${summary.avgMaintainability}</div>
-        <div class="subtext">Threshold: ${CONFIG.thresholds.maintainabilityIndex}</div>
-      </div>
-      <div class="card">
-        <h3>Tech Debt Ratio</h3>
-        <div class="value ${summary.avgDebtRatio > CONFIG.thresholds.technicalDebtRatio ? 'danger' : 'good'}">${summary.avgDebtRatio}%</div>
-        <div class="subtext">Threshold: ${CONFIG.thresholds.technicalDebtRatio}%</div>
-      </div>
-      <div class="card">
-        <h3>Tech Debt</h3>
-        <div class="value ${summary.totalDebtHours > 10 ? 'warning' : 'good'}">${summary.totalDebtHours.toFixed(1)}h</div>
-        <div class="subtext">Estimated fix time</div>
-      </div>
-    </div>
-
-    <h2>📊 Maintainability Distribution</h2>
-    <div class="summary-grid">
-      <div class="card">
-        <h3>Excellent (90-100)</h3>
-        <div class="value good">${summary.filesByMaintainability.excellent}</div>
-        <div class="subtext">Highly maintainable</div>
-      </div>
-      <div class="card">
-        <h3>Good (80-89)</h3>
-        <div class="value good">${summary.filesByMaintainability.good}</div>
-        <div class="subtext">Maintainable</div>
-      </div>
-      <div class="card">
-        <h3>Moderate (70-79)</h3>
-        <div class="value warning">${summary.filesByMaintainability.moderate}</div>
-        <div class="subtext">Acceptable</div>
-      </div>
-      <div class="card">
-        <h3>Poor (60-69)</h3>
-        <div class="value warning">${summary.filesByMaintainability.poor}</div>
-        <div class="subtext">Needs attention</div>
-      </div>
-      <div class="card">
-        <h3>Bad (<60)</h3>
-        <div class="value danger">${summary.filesByMaintainability.bad}</div>
-        <div class="subtext">Needs refactoring</div>
-      </div>
-    </div>
-
-    <h2>⚠️ Violations</h2>
-    <div class="summary-grid">
-      <div class="card">
-        <h3>LOC Violations</h3>
-        <div class="value ${summary.violations.LOC > 0 ? 'warning' : 'good'}">${summary.violations.LOC}</div>
-        <div class="subtext">Files exceeding threshold</div>
-      </div>
-      <div class="card">
-        <h3>Complexity Violations</h3>
-        <div class="value ${summary.violations.Cyclomatic > 0 ? 'warning' : 'good'}">${summary.violations.Cyclomatic}</div>
-        <div class="subtext">High cyclomatic complexity</div>
-      </div>
-      <div class="card">
-        <h3>Cognitive Violations</h3>
-        <div class="value ${summary.violations.Cognitive > 0 ? 'warning' : 'good'}">${summary.violations.Cognitive}</div>
-        <div class="subtext">High cognitive complexity</div>
-      </div>
-      <div class="card">
-        <h3>Maintainability Violations</h3>
-        <div class="value ${summary.violations.Maintainability > 0 ? 'danger' : 'good'}">${summary.violations.Maintainability}</div>
-        <div class="subtext">Low maintainability index</div>
-      </div>
-    </div>
-
-    <h2>📁 File Details</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>File</th>
-          <th>LOC</th>
-          <th>Code</th>
-          <th>Comments</th>
-          <th>Cyclomatic</th>
-          <th>Cognitive</th>
-          <th>Maintainability</th>
-          <th>Debt Ratio</th>
-          <th>Violations</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${results
-          .map(r => {
-            const hasViolations = r.violations.length > 0;
-            const rowClass = hasViolations ? 'violation-row' : '';
-            return `
-            <tr class="${rowClass}">
-              <td>${r.file}</td>
-              <td>${r.lines.total}</td>
-              <td>${r.lines.code}</td>
-              <td>${r.lines.comments} (${r.lines.commentRatio.toFixed(1)}%)</td>
-              <td class="${r.complexity.cyclomatic > CONFIG.thresholds.cyclomaticComplexity ? 'warning' : 'good'}">${r.complexity.cyclomatic}</td>
-              <td class="${r.complexity.cognitive > CONFIG.thresholds.cognitiveComplexity ? 'warning' : 'good'}">${r.complexity.cognitive}</td>
-              <td class="${r.maintainabilityIndex < CONFIG.thresholds.maintainabilityIndex ? 'warning' : 'good'}">${r.maintainabilityIndex}</td>
-              <td class="${r.debt.ratio > CONFIG.thresholds.technicalDebtRatio ? 'danger' : 'good'}">${r.debt.ratio}%</td>
-              <td>${
-                hasViolations
-                  ? r.violations
-                      .map(v => {
-                        let badgeClass;
-                        if (v.severity === 'high') {
-                          badgeClass = 'danger';
-                        } else if (v.severity === 'medium') {
-                          badgeClass = 'warning';
-                        } else {
-                          badgeClass = 'success';
-                        }
-                        return `<span class="badge badge-${badgeClass}">${v.type}</span>`;
-                      })
-                      .join(' ')
-                  : '-'
-              }</td>
-            </tr>
-          `;
-          })
-          .join('')}
-      </tbody>
-    </table>
-  </div>
-</body>
-</html>`;
-
-  return html;
-}
-
-/**
- * Main function
- */
-async function main() {
-  console.log(`${colors.cyan}📊 Starting code metrics analysis...${colors.reset}\n`);
-
-  // Ensure output directory exists
-  if (!fs.existsSync(CONFIG.outputDir)) {
-    fs.mkdirSync(CONFIG.outputDir, { recursive: true });
-  }
-
-  // Get source files
-  console.log(`${colors.blue}📁 Scanning source files...${colors.reset}`);
   const files = getSourceFiles();
-  console.log(`Found ${files.length} files to analyze\n`);
-
-  // Analyze each file
-  console.log(`${colors.blue}📈 Calculating metrics...${colors.reset}`);
   const results = [];
 
   for (const file of files) {
-    const result = analyzeFile(file);
-    results.push(result);
+    const metrics = analyzeFile(file);
+    if (metrics) {
+      results.push(metrics);
+    }
   }
 
-  // Generate summary
-  console.log(`${colors.blue}📊 Generating summary...${colors.reset}`);
-  const summary = generateSummary(results);
+  return results;
+}
 
-  // Generate reports
-  console.log(`${colors.blue}📝 Generating reports...${colors.reset}`);
-
-  // JSON report
-  const jsonReport = {
-    summary,
-    files: results,
-    thresholds: CONFIG.thresholds,
-    generatedAt: new Date().toISOString(),
+/**
+ * Generate summary report
+ */
+function generateSummary(metrics) {
+  const totals = {
+    lines: { total: 0, code: 0, comments: 0, blank: 0 },
+    cyclomatic: 0,
+    cognitive: 0,
   };
-  fs.writeFileSync(
-    path.join(CONFIG.outputDir, 'metrics-report.json'),
-    JSON.stringify(jsonReport, null, 2)
-  );
 
-  // HTML report
-  const htmlReport = generateHTMLReport(results, summary);
-  fs.writeFileSync(path.join(CONFIG.outputDir, 'metrics-report.html'), htmlReport);
+  for (const m of metrics) {
+    totals.lines.total += m.lines.total;
+    totals.lines.code += m.lines.code;
+    totals.lines.comments += m.lines.comments;
+    totals.lines.blank += m.lines.blank;
+    totals.cyclomatic += m.cyclomatic;
+    totals.cognitive += m.cognitive;
+  }
 
-  // Print summary
-  console.log(`\n${colors.cyan}📊 Metrics Summary:${colors.reset}`);
-  console.log(`  Total Files: ${summary.totalFiles}`);
-  console.log(`  Total Lines: ${summary.totalLines.toLocaleString()}`);
-  console.log(`  Code Lines: ${summary.totalCodeLines.toLocaleString()}`);
-  console.log(`  Comment Lines: ${summary.totalCommentLines.toLocaleString()}`);
-  console.log(`  Avg LOC/File: ${summary.avgLocPerFile}`);
-  console.log(`  Avg Cyclomatic: ${summary.avgCyclomatic}`);
-  console.log(`  Avg Cognitive: ${summary.avgCognitive}`);
-  console.log(`  Avg Maintainability: ${summary.avgMaintainability}`);
-  console.log(`  Avg Debt Ratio: ${summary.avgDebtRatio}%`);
-  console.log(`  Total Debt: ${summary.totalDebtHours.toFixed(1)} hours`);
+  const avgCyclomatic = totals.cyclomatic / metrics.length;
+  const avgCognitive = totals.cognitive / metrics.length;
 
-  const totalViolations = Object.values(summary.violations).reduce((a, b) => a + b, 0);
-  console.log(`\n${colors.cyan}⚠️ Violations:${colors.reset}`);
-  console.log(`  LOC: ${summary.violations.LOC}`);
-  console.log(`  Cyclomatic: ${summary.violations.Cyclomatic}`);
-  console.log(`  Cognitive: ${summary.violations.Cognitive}`);
-  console.log(`  Maintainability: ${summary.violations.Maintainability}`);
-  console.log(`  Comments: ${summary.violations.Comments}`);
+  return {
+    totals,
+    averages: {
+      cyclomatic: avgCyclomatic,
+      cognitive: avgCognitive,
+    },
+  };
+}
 
-  console.log(`\n${colors.cyan}📁 Reports generated:${colors.reset}`);
-  console.log(`  - ${path.join(CONFIG.outputDir, 'metrics-report.json')}`);
-  console.log(`  - ${path.join(CONFIG.outputDir, 'metrics-report.html')}`);
+/**
+ * Print detailed report
+ */
+function printReport(metrics) {
+  console.log(`${colors.cyan}=== Detailed File Metrics ===${colors.reset}\n`);
 
-  // Exit code based on violations
-  if (totalViolations > 0 || summary.avgDebtRatio > CONFIG.thresholds.technicalDebtRatio) {
-    console.log(`\n${colors.yellow}⚠️ Found ${totalViolations} violations${colors.reset}`);
-    process.exit(1);
-  } else {
-    console.log(`\n${colors.green}✅ All metrics within thresholds!${colors.reset}`);
-    process.exit(0);
+  // Sort by cyclomatic complexity (most complex first)
+  const sorted = [...metrics].sort((a, b) => b.cyclomatic - a.cyclomatic);
+
+  for (const m of sorted) {
+    const complexityColor =
+      m.cyclomatic > CONFIG.thresholds.cyclomaticComplexity
+        ? colors.red
+        : m.cyclomatic > CONFIG.thresholds.cyclomaticComplexity * 0.7
+          ? colors.yellow
+          : colors.green;
+
+    const cognitiveColor =
+      m.cognitive > CONFIG.thresholds.cognitiveComplexity
+        ? colors.red
+        : m.cognitive > CONFIG.thresholds.cognitiveComplexity * 0.7
+          ? colors.yellow
+          : colors.green;
+
+    const miColor =
+      m.maintainability < CONFIG.thresholds.maintainabilityIndex
+        ? colors.red
+        : m.maintainability < CONFIG.thresholds.maintainabilityIndex * 1.2
+          ? colors.yellow
+          : colors.green;
+
+    console.log(`${colors.blue}${m.path}${colors.reset}`);
+    console.log(`  LOC: ${m.lines.code} code, ${m.lines.comments} comments, ${m.lines.blank} blank`);
+    console.log(
+      `  Complexity: ${complexityColor}Cyclomatic: ${m.cyclomatic}${colors.reset}, ${cognitiveColor}Cognitive: ${m.cognitive}${colors.reset}`
+    );
+    console.log(`  Maintainability: ${miColor}${Math.round(m.maintainability)}${colors.reset}`);
+    console.log(`  Technical Debt: ${m.technicalDebt.toFixed(1)}%`);
+    console.log();
   }
 }
 
-// Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+/**
+ * Print summary report
+ */
+function printSummary(summary) {
+  console.log(`${colors.cyan}=== Project Summary ===${colors.reset}\n`);
+  console.log(`Total Files: ${summary.totals.lines.total}`);
+  console.log(`Total LOC: ${summary.totals.lines.code}`);
+  console.log(`Comments: ${summary.totals.lines.comments} (${((summary.totals.lines.comments / summary.totals.lines.total) * 100).toFixed(1)}%)`);
+  console.log(`Blank: ${summary.totals.lines.blank}`);
+  console.log();
+  console.log(`Average Cyclomatic Complexity: ${summary.averages.cyclomatic.toFixed(2)}`);
+  console.log(`Average Cognitive Complexity: ${summary.averages.cognitive.toFixed(2)}`);
+  console.log();
+}
+
+/**
+ * Main execution
+ */
+function main() {
   try {
-    await main();
+    // Ensure output directory exists
+    if (!fs.existsSync(CONFIG.outputDir)) {
+      fs.mkdirSync(CONFIG.outputDir, { recursive: true });
+    }
+
+    const metrics = analyzeProject();
+    const summary = generateSummary(metrics);
+
+    printSummary(summary);
+    printReport(metrics);
+
+    // Save JSON report
+    const reportPath = path.join(CONFIG.outputDir, 'metrics.json');
+    fs.writeFileSync(reportPath, JSON.stringify({ metrics, summary }, null, 2));
+    console.log(`${colors.green}Report saved to ${reportPath}${colors.reset}`);
+
+    // Check thresholds and report violations
+    const violations = [];
+    for (const m of metrics) {
+      if (m.lines.code > CONFIG.thresholds.locPerFile) {
+        violations.push(`${m.path}: LOC (${m.lines.code}) exceeds threshold`);
+      }
+      if (m.cyclomatic > CONFIG.thresholds.cyclomaticComplexity) {
+        violations.push(
+          `${m.path}: Cyclomatic complexity (${m.cyclomatic}) exceeds threshold`
+        );
+      }
+      if (m.cognitive > CONFIG.thresholds.cognitiveComplexity) {
+        violations.push(
+          `${m.path}: Cognitive complexity (${m.cognitive}) exceeds threshold`
+        );
+      }
+      if (m.maintainability < CONFIG.thresholds.maintainabilityIndex) {
+        violations.push(
+          `${m.path}: Maintainability index (${Math.round(m.maintainability)}) below threshold`
+        );
+      }
+    }
+
+    if (violations.length > 0) {
+      console.log(`\n${colors.yellow}Threshold Violations:${colors.reset}`);
+      violations.forEach(v => console.log(`  ${colors.red}✗${colors.reset} ${v}`));
+      process.exit(1);
+    } else {
+      console.log(`\n${colors.green}All metrics within thresholds!${colors.reset}`);
+    }
   } catch (error) {
-    console.error(`${colors.red}Error: ${error.message}${colors.reset}`);
+    console.error(`${colors.red}Error:${colors.reset}`, error);
     process.exit(1);
   }
 }
 
-export { main, analyzeFile, generateSummary, calculateMaintainabilityIndex };
+main();

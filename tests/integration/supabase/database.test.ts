@@ -637,7 +637,7 @@ describe('Supabase Database Integration', () => {
         )
       )
 
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('notes')
         .insert({
           user_id: testUserId,

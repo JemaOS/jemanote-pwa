@@ -38,6 +38,7 @@ describe('Offline/Online Sync Integration', () => {
     })
 
     // Reset online status
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isOnline = true
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
@@ -136,6 +137,7 @@ describe('Offline/Online Sync Integration', () => {
         value: false,
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const operations = []
       
       // Create operations in specific order

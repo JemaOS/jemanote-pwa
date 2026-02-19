@@ -549,7 +549,7 @@ describe('Supabase Database Integration', () => {
         )
       )
 
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('notes')
         .select('*')
 
@@ -569,7 +569,7 @@ describe('Supabase Database Integration', () => {
         )
       )
 
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('notes')
         .insert({
           user_id: testUserId,
@@ -595,7 +595,7 @@ describe('Supabase Database Integration', () => {
         )
       )
 
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('notes')
         .select('*')
 
@@ -615,7 +615,7 @@ describe('Supabase Database Integration', () => {
         )
       )
 
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('notes')
         .update({ title: 'Updated' })
         .eq('id', 'non-existent')

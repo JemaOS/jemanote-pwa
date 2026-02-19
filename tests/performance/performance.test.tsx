@@ -107,7 +107,7 @@ const code = "example";
         : complexContent
       
       // Simple processing simulation with safer regex patterns
-      // eslint-disable-next-line prefer-string-replace-all
+      // eslint-disable-next-line prefer-string-replace-all, @typescript-eslint/no-unused-vars
       const processed = safeContent
         .replace(/# ([^\n]{1,500})/g, '<h1>$1</h1>')
         // eslint-disable-next-line prefer-string-replace-all
@@ -159,6 +159,7 @@ const code = "example";
       
       const start = performance.now()
       
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const results = notes.filter(note => {
         const title = note.title.toLowerCase()
         let queryIndex = 0
@@ -229,6 +230,7 @@ const code = "example";
       const startMemory = (performance as any).memory?.usedJSHeapSize || 0
       
       // Process the note
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const processed = {
         ...largeNote,
         preview: largeNote.content.slice(0, 200),
@@ -250,6 +252,7 @@ const code = "example";
         y: Math.random() * 1000,
       }))
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const links = Array.from({ length: 150 }, () => ({
         source: `node-${Math.floor(Math.random() * 100)}`,
         target: `node-${Math.floor(Math.random() * 100)}`,

@@ -452,7 +452,7 @@ describe('Supabase Auth Integration', () => {
         password: 'SecurePassword123!',
       })
 
-      const { data, error } = await supabase.auth.updateUser({
+      const { data: _data, error } = await supabase.auth.updateUser({
         data: { full_name: 'John Doe' },
       })
 

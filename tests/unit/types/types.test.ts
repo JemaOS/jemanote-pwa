@@ -451,6 +451,7 @@ describe('Type Definitions', () => {
 
   describe('type compatibility', () => {
     it('should ensure Note IDs are strings', () => {
+      // eslint-disable-next-line @typescript-eslint/no-redundant-type-constitution
       type NoteId = string
       const id: NoteId = 'note-123'
       

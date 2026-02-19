@@ -164,6 +164,7 @@ test.describe('Authentication Security', () => {
 
   test('should prevent authentication bypass attempts', async ({ page }) => {
     // Try various bypass payloads
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const payload of AUTH_BYPASS_PAYLOADS) {
       // These should not result in successful authentication
       // The actual behavior depends on the auth implementation

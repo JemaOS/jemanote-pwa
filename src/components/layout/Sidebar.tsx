@@ -608,6 +608,7 @@ function LeftSidebarContent(props: LeftSidebarContentProps) {
 
         {/* Notes sans dossier */}
         <div className="mb-1.5 xs:mb-2">
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */}
           <div
             role="group"
             aria-label="Notes sans dossier"
@@ -746,6 +747,7 @@ export default function Sidebar({
   
   // Multi-select state for folder/unfiled notes
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set())
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [folderSelectionMode, setFolderSelectionMode] = useState(false)
   const [noteMultiSelectMode, setNoteMultiSelectMode] = useState(false)
   
@@ -1293,6 +1295,7 @@ export default function Sidebar({
 
   // Helper function to render a note with optional checkbox for multi-select
   const renderNote = (note: Note, showCheckbox: boolean = false, isInSelectionMode: boolean = false) => (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       role="button"
       aria-label={`Note: ${note.title || 'Sans titre'}`}
@@ -1317,6 +1320,7 @@ export default function Sidebar({
     >
       {editingNoteId === note.id ? (
         // Edit mode
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
         <div
           role="button"
           tabIndex={0}

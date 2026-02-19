@@ -288,10 +288,10 @@ describe('Security Tests', () => {
 
     it('should reject dangerous file types', () => {
       const dangerousTypes = ['application/x-msdownload', 'application/x-executable']
-      const allowedTypes = ['image/jpeg', 'image/png']
+      const allowedTypes = new Set(['image/jpeg', 'image/png'])
 
       dangerousTypes.forEach(type => {
-        expect(allowedTypes.includes(type)).toBe(false)
+        expect(allowedTypes.has(type)).toBe(false)
       })
     })
 

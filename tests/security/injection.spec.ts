@@ -283,7 +283,7 @@ test.describe('Injection Attack Prevention', () => {
       { input: '\x1a', description: 'Substitute character' },
     ]
     
-    for (const { input, description } of specialChars) {
+    for (const { input, description: _description } of specialChars) {
       await page.evaluate((content) => {
         const notes = [{
           // SECURITY NOTE: Math.random() is acceptable here for test ID generation

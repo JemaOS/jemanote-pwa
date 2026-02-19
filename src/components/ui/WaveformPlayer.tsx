@@ -170,6 +170,7 @@ export default function WaveformPlayer({
           handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)));
         }}
         aria-label="Audio waveform"
+        role="button"
         tabIndex={0}
       >
         {waveformData.map((value, idx) => {

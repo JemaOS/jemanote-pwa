@@ -578,6 +578,9 @@ export default function VoiceRecorder({
           <div
             ref={waveformContainerRef}
             className="relative py-2 cursor-pointer select-none"
+            role="button"
+            tabIndex={0}
+            aria-label="Waveform player"
             onKeyDown={e => {
               if (e.key === 'ArrowLeft') {
                 e.preventDefault();

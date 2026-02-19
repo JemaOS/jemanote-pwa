@@ -31,17 +31,16 @@ async function loginUser(page: Page) {
   await page.waitForTimeout(500);
 
   // Switch to register tab
-  await page.getByRole('button', { name: /inscription|sign up|register/i }).click();
+  await page.getByRole('button', { name: /inscription|sign up/i }).click();
   await page.waitForTimeout(500);
 
-  // Fill form
-  await page.locator('input[type="email"], input[name="email"]').fill(email);
-  await page.locator('input[type="password"], input[name="password"]').fill(password);
-  await page.locator('input[type="password"], input[name="confirmPassword"]').fill(password);
+  // Fill form using placeholders (matching auth.spec.ts)
+  await page.getByPlaceholder(/email/i).fill(email);
+  await page.getByPlaceholder(/mot de passe|password/i).fill(password);
 
   // Submit
-  await page.getByRole('button', { name: /inscription|sign up|register|créer/i }).click();
-  await page.waitForTimeout(2000);
+  await page.getByRole('button', { name: /s'inscrire|sign up|register/i }).click();
+  await page.waitForTimeout(3000);
 }
 
 // Helper to create a note with content

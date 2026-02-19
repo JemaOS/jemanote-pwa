@@ -359,7 +359,7 @@ test.describe('Authentication Security', () => {
     const maliciousRedirects = [
       'https://evil.com',
       '//evil.com',
-      '/\\evil.com',
+      String.raw`/\evil.com`,
       'javascript:alert(1)',
       'data:text/html,<script>alert(1)</script>',
     ]

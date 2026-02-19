@@ -74,7 +74,7 @@ const URL_SANITIZATION_CASES = [
  */
 const FILENAME_SANITIZATION_CASES = [
   { input: '../../../etc/passwd', shouldNotContain: ['..', '/'] },
-  { input: '..\\windows\\system32\\config\\sam', shouldNotContain: ['..', '\\'] },
+  { input: String.raw`..\windows\system32\config\sam`, shouldNotContain: ['..', '\\'] },
   { input: 'file.txt<script>alert(1)</script>', shouldNotContain: ['<script>'] },
   { input: 'normal-file.txt', shouldContain: ['normal-file.txt'] },
   { input: 'file with spaces.txt', shouldContain: ['file with spaces.txt'] },

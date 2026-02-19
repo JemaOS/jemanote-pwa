@@ -482,7 +482,7 @@ function findUnusedImports(content: string): string[] {
       }
       
       // Check if import is used (excluding the import statement itself)
-      const usageRegex = new RegExp(`\\b${imp}\\b`, 'g');
+      const usageRegex = new RegExp(String.raw`\b${imp}\b`, 'g');
       const usages = content.match(usageRegex) || [];
 
       // If only one usage (the import itself), it's unused

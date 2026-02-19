@@ -2,55 +2,7 @@
 // Authentication Security Tests
 
 import { test, expect } from '@playwright/test';
-
-/**
- * Weak passwords that should be rejected
- */
-const WEAK_PASSWORDS = [
-  '123456', // NOSONAR
-  'password', // NOSONAR
-  'qwerty', // NOSONAR
-  'abc123', // NOSONAR
-  'letmein', // NOSONAR
-  'welcome', // NOSONAR
-  'monkey', // NOSONAR
-  '1234567890', // NOSONAR
-  'password123', // NOSONAR
-  'admin', // NOSONAR
-  'root', // NOSONAR
-  'toor', // NOSONAR
-  '1234', // NOSONAR
-  '111111', // NOSONAR
-  'master', // NOSONAR
-  'sunshine', // NOSONAR
-  'princess', // NOSONAR
-  'football', // NOSONAR
-  'baseball', // NOSONAR
-  'iloveyou', // NOSONAR
-];
-
-/**
- * Strong passwords that should be accepted
- */
-const STRONG_PASSWORDS = [
-  'MyStr0ng!P@ssw0rd',
-  'C0mpl3xP@ss#2024',
-  'S3cur3!P@ssw0rd$',
-  'Tr0ub4dor&3xtra',
-  'xK9#mP2$vL7@nQ4',
-];
-
-/**
- * Common authentication bypass attempts
- */
-const AUTH_BYPASS_PAYLOADS = [
-  { email: "admin' OR '1'='1", password: 'anything' }, // NOSONAR
-  { email: 'admin@example.com', password: "' OR '1'='1" }, // NOSONAR
-  { email: "admin'--", password: 'anything' }, // NOSONAR
-  { email: "admin'/*", password: 'anything' }, // NOSONAR
-  { email: 'admin@example.com', password: 'password', otp: '000000' }, // NOSONAR
-  { email: 'admin@example.com', password: 'password', otp: '123456' }, // NOSONAR
-];
+import { WEAK_PASSWORDS, STRONG_PASSWORDS, AUTH_BYPASS_PAYLOADS } from './payloads';
 
 test.describe('Authentication Security', () => {
   test.beforeEach(async ({ page }) => {

@@ -2,102 +2,13 @@
 // SQL/NoSQL Injection Protection Tests
 
 import { test, expect } from '@playwright/test';
-
-/**
- * SQL Injection payloads
- */
-const SQL_INJECTION_PAYLOADS = [
-  // Classic SQL injection
-  "' OR '1'='1",
-  "' OR '1'='1' --",
-  "' OR '1'='1' /*",
-  "' OR 1=1 --",
-  "' OR 1=1 #",
-  "' OR 1=1; DROP TABLE users --",
-
-  // Union-based
-  "' UNION SELECT * FROM users --", // NOSONAR
-  "' UNION SELECT null, username, password FROM users --", // NOSONAR
-
-  // Time-based blind
-  "' OR SLEEP(5) --",
-  "' OR pg_sleep(5) --",
-  "' OR WAITFOR DELAY '0:0:5' --",
-
-  // Error-based
-  "' AND 1=CONVERT(int, (SELECT @@version)) --",
-
-  // Stacked queries
-  "'; DROP TABLE notes; --",
-  "'; DELETE FROM users; --",
-
-  // Boolean-based blind
-  "' AND 1=1 --",
-  "' AND 1=2 --",
-
-  // Comment variations
-  "'--",
-  "'/*",
-  "' #",
-  "';--",
-];
-
-/**
- * NoSQL Injection payloads
- */
-const NOSQL_INJECTION_PAYLOADS = [
-  // MongoDB injection
-  '{"$gt": ""}',
-  '{"$ne": null}',
-  '{"$regex": ".*"}',
-  '{"$where": "this.password.length > 0"}',
-  '{"$or": [{"username": "admin"}, {"username": {"$ne": null}}]}',
-
-  // JavaScript injection in MongoDB
-  '{$where: function() { return true }}',
-  'true, $where: "sleep(5000)"',
-
-  // Array injection
-  '{"username": {"$in": ["admin", "user"]}}',
-  '{"id": {"$nin": []}}',
-];
-
-/**
- * Command injection payloads
- */
-const COMMAND_INJECTION_PAYLOADS = [
-  '; cat /etc/passwd',
-  '| cat /etc/passwd',
-  '&& cat /etc/passwd',
-  '|| cat /etc/passwd',
-  '`cat /etc/passwd`',
-  '$(cat /etc/passwd)',
-  '; rm -rf /',
-  '| whoami',
-  '&& dir',
-];
-
-/**
- * LDAP Injection payloads
- */
-const LDAP_INJECTION_PAYLOADS = [
-  '*)(uid=*))(&(uid=*',
-  '*)(|(mail=*))',
-  '*)(uid=*))(&(uid=*',
-  'admin)(&))',
-  '*)(uid=*))(&(uid=*',
-];
-
-/**
- * XPath Injection payloads
- */
-const XPATH_INJECTION_PAYLOADS = [
-  "' or '1'='1",
-  "' or '1'='1' or '1'='1",
-  "' or ''='",
-  "' or 1=1 or ''='",
-  "' or 'a'='a",
-];
+import {
+  SQL_INJECTION_PAYLOADS,
+  NOSQL_INJECTION_PAYLOADS,
+  COMMAND_INJECTION_PAYLOADS,
+  LDAP_INJECTION_PAYLOADS,
+  XPATH_INJECTION_PAYLOADS,
+} from './payloads';
 
 test.describe('Injection Attack Prevention', () => {
   test.beforeEach(async ({ page }) => {

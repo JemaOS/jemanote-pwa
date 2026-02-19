@@ -28,10 +28,10 @@ const CONFIG = {
     '**/dist/**',
     '**/build/**',
     '**/coverage/**',
-    '**/*.test.ts',
-    '**/*.test.tsx',
-    '**/*.spec.ts',
-    '**/*.spec.tsx',
+    // '**/*.test.ts',
+    // '**/*.test.tsx',
+    // '**/*.spec.ts',
+    // '**/*.spec.tsx',
     '**/__mocks__/**',
     '**/mocks/**',
     '**/*.stories.tsx',
@@ -69,7 +69,8 @@ const colors = {
  */
 function checkJscpd() {
   try {
-    execFileSync('npx', ['jscpd', '--version'], { stdio: 'pipe' });  // NOSONAR
+    const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    execFileSync(npx, ['jscpd', '--version'], { stdio: 'pipe' });  // NOSONAR
     return true;
   } catch {
     return false;
@@ -87,6 +88,7 @@ function runJscpd() {
   const args = [
     'jscpd',
     path.join(ROOT_DIR, 'src'),
+    path.join(ROOT_DIR, 'tests'),
     '--min-lines',
     String(CONFIG.minLines),
     '--min-tokens',
@@ -105,7 +107,8 @@ function runJscpd() {
   try {
     // Use execFileSync instead of execSync to avoid shell injection vulnerabilities
     // execFileSync does not use shell, so no shell injection is possible
-    const output = execFileSync('npx', args, {  // NOSONAR
+    const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    const output = execFileSync(npx, args, {  // NOSONAR
       encoding: 'utf-8',
       cwd: ROOT_DIR,
     });
@@ -498,13 +501,8 @@ async function main() {
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  try {
-    await main();
-  } catch (error) {
-    console.error(`${colors.red}Error: ${error.message}${colors.reset}`);
-    process.exit(1);
-  }
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
 }
 
 export { main, runJscpd, parseReport, generateSummary };

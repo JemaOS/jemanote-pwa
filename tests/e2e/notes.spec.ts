@@ -7,42 +7,10 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
+import { generateUniqueId, clearLocalStorage, createNote } from './utils';
 
-// Generate unique test data
-// SECURITY NOTE: Math.random() is acceptable here for test ID generation
-const generateUniqueId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`; // NOSONAR
 const generateNoteTitle = () => `Test Note ${generateUniqueId()}`;
 const generateFolderName = () => `Test Folder ${generateUniqueId()}`;
-
-// Helper to clear localStorage
-async function clearLocalStorage(page: Page) {
-  await page.evaluate(() => {
-    localStorage.clear();
-    indexedDB.deleteDatabase('ObsidianPWA');
-  });
-}
-
-// Helper to create a note
-async function createNote(page: Page, title: string, content: string = '') {
-  await page.getByRole('button', { name: /nouvelle note|new note/i }).click();
-  await page.waitForTimeout(500);
-
-  // Fill in the note (title is usually auto-selected or focused)
-  const titleInput = page
-    .locator('input[placeholder*="titre" i], input[placeholder*="title" i]')
-    .first();
-  if (await titleInput.isVisible().catch(() => false)) {
-    await titleInput.fill(title);
-  }
-
-  // Fill content if editor is visible
-  const editor = page.locator('.cm-editor .cm-content, [contenteditable="true"]').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
-  }
-
-  await page.waitForTimeout(500);
-}
 
 test.describe('Notes Management', () => {
   test.beforeEach(async ({ page }) => {

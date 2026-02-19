@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Security Tests
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 
 describe('Security Tests', () => {
   describe('XSS Prevention', () => {
@@ -13,18 +13,21 @@ describe('Security Tests', () => {
         ? maliciousContent.substring(0, MAX_CONTENT_LENGTH)
         : maliciousContent
       // Using a simpler, safer regex pattern with length limits
+      // eslint-disable-next-line prefer-string-replace-all
       const sanitized = safeContent.replace(/<script\b[^<]{0,1000}(?:(?!<\/script>)<[^<]{0,1000}){0,100}<\/script>/gi, '')
       expect(sanitized).not.toContain('<script>')
     })
 
     it('should sanitize event handlers in content', () => {
       const maliciousContent = '<img src="x" onerror="alert(\'XSS\')">'
+      // eslint-disable-next-line prefer-string-replace-all
       const sanitized = maliciousContent.replace(/on\w+\s*=/gi, 'data-blocked=')
       expect(sanitized).not.toContain('onerror')
     })
 
     it('should sanitize javascript: URLs', () => {
       const maliciousContent = '<a href="javascript:alert(\'XSS\')">Click me</a>'
+      // eslint-disable-next-line prefer-string-replace-all
       const sanitized = maliciousContent.replace(/javascript:/gi, 'blocked:')
       expect(sanitized).not.toContain('javascript:')
     })
@@ -38,11 +41,11 @@ describe('Security Tests', () => {
     it('should escape HTML entities in text content', () => {
       const content = '<div>Test & "quotes" \'apostrophes\'</div>'
       const escaped = content
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll('\'', '&#x27;')
       expect(escaped).not.toContain('<div>')
       expect(escaped).toContain('&lt;div&gt;')
     })
@@ -82,6 +85,7 @@ describe('Security Tests', () => {
     it('should sanitize file names', () => {
       const maliciousFileName = '../../../etc/passwd'
       // Replace path traversal and special characters
+      // eslint-disable-next-line prefer-string-replace-all
       const sanitized = maliciousFileName.replace(/\.\./g, '').replace(/[^a-zA-Z0-9._-]/g, '_')
       expect(sanitized).not.toContain('..')
     })
@@ -212,7 +216,7 @@ describe('Security Tests', () => {
       let errorThrown = false
       try {
         localStorage.setItem('test', largeData)
-      } catch (e) {
+      } catch {
         errorThrown = true
       }
 
@@ -310,6 +314,7 @@ describe('Security Tests', () => {
         const MAX_INPUT_LENGTH = 10000
         const safeInput = input.length > MAX_INPUT_LENGTH ? input.substring(0, MAX_INPUT_LENGTH) : input
         // First remove path traversal sequences, then replace special chars
+        // eslint-disable-next-line prefer-string-replace-all
         const sanitized = safeInput.replace(/\.\./g, '').replace(/[^a-zA-Z0-9._-]/g, '_')
         expect(sanitized).not.toContain('..')
         expect(sanitized).not.toContain('<')

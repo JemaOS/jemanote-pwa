@@ -40,4 +40,4 @@ export const test = base.extend<TestFixtures>(
   }
 )
 
-export { expect }
+export { expect } from '@playwright/test'

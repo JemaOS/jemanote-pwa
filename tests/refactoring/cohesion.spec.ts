@@ -165,7 +165,7 @@ describe('Module Cohesion Analysis', () => {
           
           // SECURITY FIX: Use safer regex with length limits
           const hookRegex = new RegExp(
-            `export\\s+function\\s+${hookName}\\s*\\([^)]{0,500}\\)\\s*\\{[\\s\\S]{0,50000}\\}`,
+            String.raw`export\s+function\s+${hookName}\s*\([^)]{0,500}\)\s*\{[\s\S]{0,50000}\}`,
             's'
           );
           const hookMatch = safeContent.match(hookRegex);
@@ -485,7 +485,7 @@ function calculateCohesion(exports: FileAnalysis['exports'], content: string): n
   const exportDependencies: string[][] = [];
 
   for (const exp of allExports) {
-    const regex = new RegExp(`${exp}.*?\\{([^}]*)\\}`, 's');
+    const regex = new RegExp(String.raw`${exp}.*?\{([^}]*)\}`, 's');
     const match = content.match(regex);
     if (match) {
       const deps = (match[1].match(/\b\w+\b/g) || []).filter(w =>

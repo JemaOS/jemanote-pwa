@@ -248,8 +248,7 @@ test.describe('Content Security Policy', () => {
       
       allElements.forEach(el => {
         const attributes = el.attributes
-        for (let i = 0; i < attributes.length; i++) {
-          const attr = attributes[i]
+        for (const attr of attributes) {
           if (attr.name.startsWith('on')) {
             inlineHandlers.push(`${el.tagName}.${attr.name}`)
           }

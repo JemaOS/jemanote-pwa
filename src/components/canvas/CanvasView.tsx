@@ -578,6 +578,8 @@ export default function CanvasView({ userId, notes = [], onOpenNote, deleteNote,
       </div>
 
       {/* Canvas */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <div
         ref={canvasRef}
         role="application"

@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import InstallPrompt from '@/components/InstallPrompt';
 
-import { render, screen, waitFor } from '@/tests/utils/test-utils';
+import { render, screen, waitFor } from '@tests/utils/test-utils';
 
 describe('InstallPrompt', () => {
   const mockBeforeInstallPrompt: Event | null = null;

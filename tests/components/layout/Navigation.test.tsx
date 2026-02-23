@@ -7,7 +7,7 @@ import { describe, it, expect, vi } from 'vitest';
 import Navigation from '@/components/layout/Navigation';
 import type { ViewMode } from '@/types';
 
-import { render, screen } from '@/tests/utils/test-utils';
+import { render, screen } from '@tests/utils/test-utils';
 
 // Mock useAuth hook
 vi.mock('@/hooks/useAuth', () => ({

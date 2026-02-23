@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 
 import AuthModal from '@/components/auth/AuthModal';
 import CommandPalette from '@/components/command/CommandPalette';
@@ -11,13 +11,11 @@ import StatusBar from '@/components/layout/StatusBar';
 import WorkspaceView from '@/components/workspace/WorkspaceView';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalNotes } from '@/hooks/useLocalNotes';
-import { ViewMode } from '@/types';
+import { ViewMode, Note } from '@/types';
 
 // Lazy load heavy view components for better code splitting
 // WorkspaceView is the default view - imported directly to avoid lazy-load delay
 // Sidebar is lazy-loaded since it starts closed on mobile (most users)
-const CanvasView = React.lazy(() => import('@/components/canvas/CanvasView'));
-const GraphView = React.lazy(() => import('@/components/graph/GraphView'));
 const SearchView = React.lazy(() => import('@/components/search/SearchView'));
 const SettingsView = React.lazy(() => import('@/components/settings/SettingsView'));
 const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView'));
@@ -103,24 +101,40 @@ function App() {
     };
   }, [leftSidebarOpen, hasUserToggledSidebar]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - Toggle command palette with Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + K: Open command palette
+      // Cmd/Ctrl + K: Toggle command palette
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setShowCommandPalette(true);
+        setShowCommandPalette(prev => !prev);
       }
       // Cmd/Ctrl + N: Create new note
       if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
         e.preventDefault();
-        handleCreateNote();
+        const button = document.querySelector('[data-new-note]');
+        if (button) (button as HTMLElement).click();
       }
     };
 
     globalThis.addEventListener('keydown', handleKeyDown);
     return () => {
       globalThis.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Escape key handler (separate effect to avoid stale closure)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowCommandPalette(false);
+      }
+    };
+
+    globalThis.addEventListener('keydown', handleEscape);
+    return () => {
+      globalThis.removeEventListener('keydown', handleEscape);
     };
   }, []);
 
@@ -168,12 +182,12 @@ function App() {
     }
   };
 
-  // Wrapper pour créer une note depuis le modal IA
+  // Wrapper pour créer une note (utilisé par les fonctionnalités IA et Canvas)
   const handleCreateNoteFromAI = async (
     title: string,
     content: string,
     folderId?: string
-  ): Promise<any> => {
+  ): Promise<Note | null> => {
     const result = await createNote(title, content, folderId);
     return result.data || null;
   };
@@ -219,35 +233,11 @@ function App() {
         );
       case 'settings':
         return <SettingsView userId={user?.id ?? null} />;
-      case 'canvas':
-        return (
-          <CanvasView
-            userId={user?.id ?? null}
-            notes={notes}
-            onOpenNote={noteId => {
-              setActiveNoteId(noteId);
-              setCurrentView('workspace');
-            }}
-            deleteNote={deleteNote}
-            createNote={handleCreateNoteFromAI}
-          />
-        );
       case 'timeline':
         return (
           <TimelineView
             notes={notes}
             onOpenNote={noteId => {
-              setActiveNoteId(noteId);
-              setCurrentView('workspace');
-            }}
-          />
-        );
-      case 'graph':
-        return (
-          <GraphView
-            userId={user?.id ?? null}
-            notes={notes}
-            onNoteSelect={noteId => {
               setActiveNoteId(noteId);
               setCurrentView('workspace');
             }}

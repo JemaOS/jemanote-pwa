@@ -33,11 +33,9 @@ import {
   lineNumbers,
   highlightActiveLineGutter,
 } from '@codemirror/view';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
-import AIContextMenu from '@/components/ai/AIContextMenu';
 import { useTheme } from '@/contexts/ThemeContext';
-import { aiContextMenuExtension } from '@/lib/aiContextMenu';
 import { audioWidgetPlugin } from '@/lib/audioWidgetExtension';
 import { wikiLinksPlugin } from '@/lib/wikiLinks';
 
@@ -54,11 +52,6 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
   const themeCompartment = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
   const onWikiLinkClickRef = useRef(onWikiLinkClick);
-  const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-    selectedText: string;
-  } | null>(null);
 
   // Keep refs up to date with latest callbacks
   useEffect(() => {
@@ -109,9 +102,6 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
         markdown(),
         wikiLinksPlugin,
         audioWidgetPlugin,
-        aiContextMenuExtension(position => {
-          setContextMenu(position);
-        }),
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             const newValue = update.state.doc.toString();
@@ -179,6 +169,9 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
     });
 
     viewRef.current = view;
+    
+    // Make editor view accessible for e2e tests
+    (window as any).editorView = view;
 
     return () => {
       view.destroy();
@@ -208,47 +201,9 @@ export default function MarkdownEditor({ value, onChange, onWikiLinkClick }: Mar
     }
   }, [value]);
 
-  // Fonction pour insérer ou remplacer du texte dans l'éditeur
-  const handleInsertText = (text: string) => {
-    if (!viewRef.current) {
-      return;
-    }
-
-    const view = viewRef.current;
-    const selection = view.state.selection.main;
-
-    // Remplacer le texte sélectionné par le nouveau texte
-    view.dispatch({
-      changes: {
-        from: selection.from,
-        to: selection.to,
-        insert: text,
-      },
-      selection: {
-        anchor: selection.from + text.length,
-      },
-    });
-
-    // Fermer le menu contextuel
-    setContextMenu(null);
-  };
-
   return (
     <>
       <div ref={editorRef} className="h-full w-full" />
-
-      {/* Menu contextuel IA */}
-      {contextMenu && (
-        <AIContextMenu
-          key={`ai-menu-${contextMenu.x.toString()}-${contextMenu.y.toString()}-${Date.now().toString()}`}
-          position={{ x: contextMenu.x, y: contextMenu.y }}
-          selectedText={contextMenu.selectedText}
-          onClose={() => {
-            setContextMenu(null);
-          }}
-          onInsert={handleInsertText}
-        />
-      )}
     </>
   );
 }

@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import MarkdownPreview from '@/components/editor/MarkdownPreview';
 
-import { render, screen, waitFor } from '@/tests/utils/test-utils';
+import { render, screen, waitFor } from '@tests/utils/test-utils';
 
 // Mock LocalStorage
 vi.mock('@/lib/localStorage', () => ({

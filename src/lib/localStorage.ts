@@ -7,7 +7,7 @@ import { Note, Folder, Tag, Link, Attachment } from '@/types';
 
 // Configure localforage for better performance
 localforage.config({
-  name: 'ObsidianPWA',
+  name: 'Jemanote',
   version: 1,
   storeName: 'notes_store',
   description: 'Local storage for Obsidian PWA notes',

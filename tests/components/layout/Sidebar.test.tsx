@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Sidebar from '@/components/layout/Sidebar';
 import type { Note, Folder } from '@/types';
 
-import { render, screen, waitFor } from '@/tests/utils/test-utils';
+import { render, screen, waitFor } from '@tests/utils/test-utils';
 
 // Mock LocalStorage
 vi.mock('@/lib/localStorage', () => ({

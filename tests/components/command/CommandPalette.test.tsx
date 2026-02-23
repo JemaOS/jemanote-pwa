@@ -7,11 +7,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CommandPalette from '@/components/command/CommandPalette';
 import type { Note, ViewMode } from '@/types';
 
-import { render, screen } from '@/tests/utils/test-utils';
+import { render, screen } from '@tests/utils/test-utils';
 
 // Mock ThemeContext
 vi.mock('@/contexts/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'light', toggleTheme: vi.fn() }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useTheme: () => ({ theme: 'light', setTheme: vi.fn(), toggleTheme: vi.fn() }),
 }));
 
 describe('CommandPalette', () => {

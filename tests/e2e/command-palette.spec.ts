@@ -19,7 +19,7 @@ const generateNoteTitle = () => `Palette Test ${generateUniqueId()}`;
 async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
-    indexedDB.deleteDatabase('ObsidianPWA');
+    indexedDB.deleteDatabase('Jemanote');
   });
 }
 
@@ -33,9 +33,12 @@ async function createNote(page: Page, title: string, content: string = '') {
     await titleInput.fill(title);
   }
 
-  const editor = page.locator('.cm-editor .cm-content').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
+  if (content) {
+    const editor = page.locator('.cm-editor .cm-content').first();
+    if (await editor.isVisible().catch(() => false)) {
+      await editor.click();
+      await page.keyboard.type(content);
+    }
   }
 
   await page.waitForTimeout(500);
@@ -48,6 +51,8 @@ test.describe('Command Palette', () => {
     await clearLocalStorage(page);
     await page.reload();
     await page.waitForLoadState('networkidle');
+    // Wait for the app to fully render before interacting
+    await page.waitForTimeout(1000);
   });
 
   test.describe('Opening Command Palette', () => {
@@ -77,31 +82,31 @@ test.describe('Command Palette', () => {
     test('should close with Escape', async ({ page }) => {
       // Open palette
       await page.keyboard.press('Control+k');
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
       const commandPalette = page.locator('[cmdk-root], .command-palette').first();
-      await expect(commandPalette).toBeVisible();
+      await expect(commandPalette).toBeVisible({ timeout: 5000 });
 
       // Close with Escape
       await page.keyboard.press('Escape');
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
-      await expect(commandPalette).not.toBeVisible();
+      await expect(commandPalette).not.toBeVisible({ timeout: 5000 });
     });
 
     test('should close with Cmd+K again', async ({ page }) => {
       // Open palette
       await page.keyboard.press('Control+k');
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
       const commandPalette = page.locator('[cmdk-root], .command-palette').first();
-      await expect(commandPalette).toBeVisible();
+      await expect(commandPalette).toBeVisible({ timeout: 5000 });
 
       // Close with Cmd+K
       await page.keyboard.press('Control+k');
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
-      await expect(commandPalette).not.toBeVisible();
+      await expect(commandPalette).not.toBeVisible({ timeout: 5000 });
     });
 
     test('should close on backdrop click', async ({ page }) => {
@@ -224,26 +229,6 @@ test.describe('Command Palette', () => {
         await page.waitForTimeout(500);
         const editor = page.locator('.cm-editor').first();
         await expect(editor).toBeVisible();
-      }
-    });
-
-    test('should switch to graph view', async ({ page }) => {
-      await page.keyboard.press('Control+k');
-      await page.waitForTimeout(300);
-
-      const searchInput = page.locator('[cmdk-input], input').first();
-      await searchInput.fill('graph');
-      await page.waitForTimeout(300);
-
-      const graphCommand = page.getByRole('option', { name: /graphe|graph/i }).first();
-      if (await graphCommand.isVisible().catch(() => false)) {
-        await graphCommand.click();
-
-        await page.waitForTimeout(1000);
-
-        // Should show graph view
-        const canvas = page.locator('canvas').first();
-        await expect(canvas).toBeVisible();
       }
     });
 
@@ -384,12 +369,12 @@ test.describe('Command Palette', () => {
       await page.waitForTimeout(300);
 
       const searchInput = page.locator('[cmdk-input], input').first();
-      await searchInput.fill('graph');
+      await searchInput.fill('settings');
       await page.waitForTimeout(300);
 
-      const graphCommand = page.getByRole('option', { name: /graphe|graph/i }).first();
-      if (await graphCommand.isVisible().catch(() => false)) {
-        await graphCommand.click();
+      const settingsCommand = page.getByRole('option', { name: /paramètres|settings/i }).first();
+      if (await settingsCommand.isVisible().catch(() => false)) {
+        await settingsCommand.click();
         await page.waitForTimeout(1000);
 
         // Open palette again

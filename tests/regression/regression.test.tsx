@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 import type { Note, Folder } from '@/types';
 
-import { waitFor } from '@/tests/utils/test-utils';
+import { waitFor } from '@tests/utils/test-utils';
 
 describe('Regression Tests', () => {
   describe('Note Synchronization', () => {
@@ -290,35 +290,6 @@ describe('Regression Tests', () => {
       await waitFor(() => {
         expect(switchView).toHaveBeenCalledTimes(4);
       });
-    });
-  });
-
-  describe('AI Features', () => {
-    it('should handle AI service timeout (BUG-014)', async () => {
-      const timeout = 30000;
-
-      // Should timeout before completion
-      const quickCall = new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('Timeout'));
-        }, timeout);
-      });
-
-      await expect(quickCall).rejects.toThrow('Timeout');
-    });
-
-    it('should handle empty AI response (BUG-015)', async () => {
-      const emptyResponse = '';
-
-      const processResponse = (response: string): string[] => {
-        if (!response.trim()) {
-          return [];
-        }
-        return response.split('\n').filter(line => line.trim());
-      };
-
-      const result = processResponse(emptyResponse);
-      expect(result).toEqual([]);
     });
   });
 

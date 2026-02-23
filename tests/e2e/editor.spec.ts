@@ -17,7 +17,7 @@ const generateNoteTitle = () => `Editor Test ${generateUniqueId()}`;
 async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
-    indexedDB.deleteDatabase('ObsidianPWA');
+    indexedDB.deleteDatabase('Jemanote');
   });
 }
 
@@ -32,10 +32,13 @@ async function createAndOpenNote(page: Page, title: string, content: string = ''
     await titleInput.fill(title);
   }
 
-  // Fill content
-  const editor = page.locator('.cm-editor .cm-content').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
+  // Fill content using click + type for CodeMirror compatibility
+  if (content) {
+    const editor = page.locator('.cm-editor .cm-content').first();
+    if (await editor.isVisible().catch(() => false)) {
+      await editor.click();
+      await page.keyboard.type(content);
+    }
   }
 
   await page.waitForTimeout(500);
@@ -48,6 +51,8 @@ test.describe('Markdown Editor', () => {
     await clearLocalStorage(page);
     await page.reload();
     await page.waitForLoadState('networkidle');
+    // Wait for the app to fully render
+    await page.waitForTimeout(1000);
   });
 
   test.describe('Text Input', () => {
@@ -278,7 +283,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('**bold text**');
+      await editor.click();
+      await page.keyboard.type('**bold text**');
 
       // Check that bold marker is present in editor
       const content = await editor.textContent();
@@ -291,7 +297,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('*italic text*');
+      await editor.click();
+      await page.keyboard.type('*italic text*');
 
       const content = await editor.textContent();
       expect(content).toContain('italic text');
@@ -303,7 +310,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('~~strikethrough~~');
+      await editor.click();
+      await page.keyboard.type('~~strikethrough~~');
 
       const content = await editor.textContent();
       expect(content).toContain('strikethrough');
@@ -315,7 +323,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('`inline code`');
+      await editor.click();
+      await page.keyboard.type('`inline code`');
 
       const content = await editor.textContent();
       expect(content).toContain('inline code');
@@ -395,7 +404,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('See [[Another Note]] for details');
+      await editor.click();
+      await page.keyboard.type('See [[Another Note]] for details');
 
       const content = await editor.textContent();
       expect(content).toContain('[[Another Note]]');
@@ -426,7 +436,8 @@ console.log(x);
       await page.waitForTimeout(500);
       await page.locator('input').first().fill(note2Title);
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill(`Link to [[${note1Title}]]`);
+      await editor.click();
+      await page.keyboard.type(`Link to [[${note1Title}]]`);
       await page.waitForTimeout(500);
 
       // Click on wiki link in preview if available
@@ -500,7 +511,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('First text');
+      await editor.click();
+      await page.keyboard.type('First text');
       await page.waitForTimeout(500);
 
       // Undo
@@ -540,7 +552,8 @@ console.log(x);
       await createAndOpenNote(page, title);
 
       const editor = page.locator('.cm-editor .cm-content').first();
-      await editor.fill('Auto-save test content');
+      await editor.click();
+      await page.keyboard.type('Auto-save test content');
 
       // Wait for auto-save
       await page.waitForTimeout(2000);

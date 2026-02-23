@@ -65,13 +65,6 @@ export const WithSearch: Story = {
   },
 };
 
-export const GraphView: Story = {
-  args: {
-    ...defaultProps,
-    currentView: 'graph',
-  },
-};
-
 export const SettingsView: Story = {
   args: {
     ...defaultProps,

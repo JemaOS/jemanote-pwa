@@ -340,7 +340,7 @@ export default function VoiceRecorder({
   };
 
   const updatePlaybackProgress = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !audioRef.current.paused && !audioRef.current.ended) {
       setAudioCurrentTime(audioRef.current.currentTime);
       playbackAnimationFrameRef.current = requestAnimationFrame(updatePlaybackProgress);
     }
@@ -351,14 +351,28 @@ export default function VoiceRecorder({
       return;
     }
 
+    // Cancel any existing animation frame
+    if (playbackAnimationFrameRef.current) {
+      cancelAnimationFrame(playbackAnimationFrameRef.current);
+      playbackAnimationFrameRef.current = null;
+    }
+
     // Si l'audio existe déjà, juste le reprendre
     if (audioRef.current) {
+      setIsPlayingAudio(true);
       audioRef.current
         .play()
         .then(() => {
-          updatePlaybackProgress();
+          const animate = () => {
+            if (audioRef.current && !audioRef.current.paused && !audioRef.current.ended) {
+              setAudioCurrentTime(audioRef.current.currentTime);
+              playbackAnimationFrameRef.current = requestAnimationFrame(animate);
+            }
+          };
+          playbackAnimationFrameRef.current = requestAnimationFrame(animate);
         })
         .catch(err => {
+          setIsPlayingAudio(false);
           console.error('Erreur lecture:', err);
         });
       return;
@@ -369,27 +383,34 @@ export default function VoiceRecorder({
     const audio = new Audio(url);
     audioRef.current = audio;
 
-    audio.ontimeupdate = () => {
-      setAudioCurrentTime(audio.currentTime);
-    };
     audio.onloadedmetadata = () => {
-      setAudioDuration(audio.duration);
+      if (audio.duration && Number.isFinite(audio.duration)) {
+        setAudioDuration(audio.duration);
+      }
     };
     audio.onplay = () => {
       setIsPlayingAudio(true);
-      updatePlaybackProgress();
+      const animate = () => {
+        if (audioRef.current && !audioRef.current.paused && !audioRef.current.ended) {
+          setAudioCurrentTime(audioRef.current.currentTime);
+          playbackAnimationFrameRef.current = requestAnimationFrame(animate);
+        }
+      };
+      playbackAnimationFrameRef.current = requestAnimationFrame(animate);
     };
     audio.onended = () => {
       setIsPlayingAudio(false);
       setAudioCurrentTime(0);
       if (playbackAnimationFrameRef.current) {
         cancelAnimationFrame(playbackAnimationFrameRef.current);
+        playbackAnimationFrameRef.current = null;
       }
     };
     audio.onpause = () => {
       setIsPlayingAudio(false);
       if (playbackAnimationFrameRef.current) {
         cancelAnimationFrame(playbackAnimationFrameRef.current);
+        playbackAnimationFrameRef.current = null;
       }
     };
 

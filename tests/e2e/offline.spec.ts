@@ -19,7 +19,7 @@ const generateNoteTitle = () => `Offline Test ${generateUniqueId()}`;
 async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
-    indexedDB.deleteDatabase('ObsidianPWA');
+    indexedDB.deleteDatabase('Jemanote');
   });
 }
 
@@ -33,9 +33,12 @@ async function createNote(page: Page, title: string, content: string = '') {
     await titleInput.fill(title);
   }
 
-  const editor = page.locator('.cm-editor .cm-content').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
+  if (content) {
+    const editor = page.locator('.cm-editor .cm-content').first();
+    if (await editor.isVisible().catch(() => false)) {
+      await editor.click();
+      await page.keyboard.type(content);
+    }
   }
 
   await page.waitForTimeout(500);
@@ -80,7 +83,8 @@ test.describe('Offline Mode', () => {
 
       const editor = page.locator('.cm-editor .cm-content').first();
       if (await editor.isVisible().catch(() => false)) {
-        await editor.fill('Edited offline content');
+        await editor.click();
+        await page.keyboard.type('Edited offline content');
         await page.waitForTimeout(1000);
       }
 
@@ -304,7 +308,7 @@ test.describe('Offline Mode', () => {
       // Check IndexedDB
       const hasData = await page.evaluate(async () => {
         return new Promise(resolve => {
-          const request = indexedDB.open('ObsidianPWA');
+          const request = indexedDB.open('Jemanote');
           request.onsuccess = event => {
             const db = (event.target as IDBOpenDBRequest).result;
             resolve(db.objectStoreNames.length > 0);

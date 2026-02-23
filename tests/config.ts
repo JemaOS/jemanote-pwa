@@ -79,7 +79,6 @@ export const TEST_URLS = {
     TIMELINE: '/timeline',
     SETTINGS: '/settings',
     SEARCH: '/search',
-    AI: '/ai',
   },
 
   /** Endpoints API */

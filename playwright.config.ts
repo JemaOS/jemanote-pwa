@@ -92,12 +92,14 @@ export default defineConfig({
   ],
 
   /* Run local dev server before starting the tests (disabled when using remote URL) */
-  webServer: {
-    command: 'npm run dev',
-    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173', // NOSONAR
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  webServer: process.env.PLAYWRIGHT_BASE_URL 
+    ? undefined 
+    : {
+        command: 'npm run dev',
+        url: 'http://localhost:5173',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120000,
+      },
 
   /* Output directory for test artifacts */
   outputDir: 'test-results/',

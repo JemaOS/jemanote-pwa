@@ -282,27 +282,36 @@ export function useLocalNotes(userId?: string | null) {
     noteId: string,
     updates: Partial<Note>
   ): Promise<{ data: Note | null; error: Error | null }> => {
-    const existingNote = notes.find(n => n.id === noteId);
-    if (!existingNote) {
+    let updatedNote: Note | null = null;
+
+    // Update state IMMEDIATELY (synchronous) - this is what makes it feel instant
+    // Use functional state update to avoid stale closures
+    setNotes(prev => {
+      const existingNote = prev.find(n => n.id === noteId);
+      if (!existingNote) return prev;
+
+      updatedNote = {
+        ...existingNote,
+        ...updates,
+        updated_at: new Date().toISOString(),
+      } as Note;
+
+      return prev.map(note => (note.id === noteId ? updatedNote! : note));
+    });
+
+    if (!updatedNote) {
       return { data: null, error: new Error('Note not found') };
     }
 
-    const updatedNote = {
-      ...existingNote,
-      ...updates,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Update state IMMEDIATELY (synchronous) - this is what makes it feel instant
-    setNotes(prev => prev.map(note => (note.id === noteId ? updatedNote : note)));
+    const finalNote = updatedNote as Note;
 
     // INSTANT SAVE: Use synchronous localStorage save for immediate persistence
     // This ensures data survives even if browser closes immediately after typing
-    LocalStorage.saveNoteSync(updatedNote);
+    LocalStorage.saveNoteSync(finalNote);
 
     // Fire-and-forget: extract and update wiki links in background
     if (updates.content !== undefined) {
-      const linkedTitles = extractWikiLinks(updatedNote.content);
+      const linkedTitles = extractWikiLinks(finalNote.content);
       LocalStorage.updateLinksForNote(noteId, linkedTitles).catch(err => {
         console.error('Error updating wiki links:', err);
       });

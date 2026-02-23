@@ -160,7 +160,7 @@ export default function WaveformPlayer({
       </button>
 
       <div // NOSONAR
-        className="flex-1 h-8 cursor-pointer relative"
+        className="flex-1 h-8 cursor-pointer relative flex items-end overflow-hidden gap-px"
         role="slider"
         tabIndex={0}
         aria-label="Seek audio"
@@ -190,8 +190,8 @@ export default function WaveformPlayer({
 
           return (
             <div
-              key={`waveform-${value}`}
-              className="flex-1 rounded-full transition-all pointer-events-none"
+              key={`waveform-${idx}`}
+              className="flex-1 min-w-0 rounded-full transition-all pointer-events-none"
               style={{
                 height: `${Math.max(20, value * 100)}%`,
                 backgroundColor: isPassed ? progressColor : color,

@@ -8,7 +8,7 @@ export async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
     if (globalThis.indexedDB) {
-      globalThis.indexedDB.deleteDatabase('ObsidianPWA');
+      globalThis.indexedDB.deleteDatabase('Jemanote');
     }
   });
 }
@@ -24,9 +24,12 @@ export async function createNote(page: Page, title: string, content: string = ''
     await titleInput.fill(title);
   }
 
-  const editor = page.locator('.cm-editor .cm-content, [contenteditable="true"]').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
+  if (content) {
+    const editor = page.locator('.cm-editor .cm-content, [contenteditable="true"]').first();
+    if (await editor.isVisible().catch(() => false)) {
+      await editor.click();
+      await page.keyboard.type(content);
+    }
   }
 
   await page.waitForTimeout(500);

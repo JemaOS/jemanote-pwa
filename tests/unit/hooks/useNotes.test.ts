@@ -56,7 +56,7 @@ describe('useNotes', () => {
   };
 
   const createMockQueryBuilder = (returnData: any = [], error: any = null) => ({
-    select: vi.fn().mockReturnThis(),
+    select: vi.fn().mockResolvedValue({ data: returnData, error }),
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),

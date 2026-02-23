@@ -1,9 +1,20 @@
 import { vi } from 'vitest';
+import React from 'react';
 import '@testing-library/jest-dom';
 
 import { mockLocalforage } from './__mocks__/localStorage';
 
 console.log('[SETUP] Loading test setup...');
+
+// Mock ThemeContext
+vi.mock('@/contexts/ThemeContext', () => ({
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children as React.ReactElement,
+  useTheme: () => ({
+    theme: 'light',
+    setTheme: vi.fn(),
+    toggleTheme: vi.fn(),
+  }),
+}));
 
 // Mock localforage
 vi.mock('localforage', () => ({

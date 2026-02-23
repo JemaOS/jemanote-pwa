@@ -1,10 +1,9 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import { Palette, Type, Cloud, Moon, Sun } from 'lucide-react';
+import { Palette, Type, Cloud, Moon, Sun, Keyboard } from 'lucide-react';
 import React from 'react';
 
-import AISettingsSection from '@/components/ai/AISettingsSection';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface SettingsViewProps {
@@ -121,8 +120,52 @@ export default function SettingsView({ userId }: SettingsViewProps) {
             </div>
           </div>
 
-          {/* Configuration IA */}
-          <AISettingsSection />
+          {/* Raccourcis clavier */}
+          <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Keyboard className="h-6 w-6 text-primary-500" />
+              <h3 className="text-subtitle font-semibold text-neutral-900 dark:text-neutral-100">
+                Raccourcis clavier
+              </h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Palette de commandes</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + K</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Nouvelle note</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + N</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Rechercher</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + F</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Gras</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + B</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Italique</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + I</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Annuler</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + Z</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Rétablir</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + Shift + Z</kbd>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-body text-neutral-700 dark:text-neutral-300">Fermer / Échapper</span>
+                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Échap</kbd>
+              </div>
+              <p className="text-caption text-neutral-500 dark:text-neutral-400 mt-2">
+                Sur Mac, remplacez <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-xs font-mono">Ctrl</kbd> par <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-xs font-mono">⌘ Cmd</kbd>
+              </p>
+            </div>
+          </div>
 
           {userId && (
             <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">

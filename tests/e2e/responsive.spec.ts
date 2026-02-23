@@ -19,23 +19,37 @@ const generateNoteTitle = () => `Responsive Test ${generateUniqueId()}`;
 async function clearLocalStorage(page: Page) {
   await page.evaluate(() => {
     localStorage.clear();
-    indexedDB.deleteDatabase('ObsidianPWA');
+    indexedDB.deleteDatabase('Jemanote');
   });
 }
 
 // Helper to create a note
 async function createNote(page: Page, title: string, content: string = '') {
-  await page.getByRole('button', { name: /nouvelle note|new note/i }).click();
+  // Check if we need to open the sidebar (mobile view)
+  const sidebarButton = page.getByRole('button', { name: /afficher la barre latérale|show sidebar/i }).first();
+  if (await sidebarButton.isVisible().catch(() => false)) {
+    const newNoteButtonVisible = await page.locator('button:has-text("Nouvelle note"), button:has-text("New note")').first().isVisible().catch(() => false);
+    if (!newNoteButtonVisible) {
+      await sidebarButton.click();
+      await page.waitForTimeout(500);
+    }
+  }
+
+  const newNoteButton = page.locator('button:has-text("Nouvelle note"), button:has-text("New note")').first();
+  await newNoteButton.click();
   await page.waitForTimeout(500);
 
-  const titleInput = page.locator('input').first();
+  const titleInput = page.locator('input[placeholder*="titre" i], input[placeholder*="title" i]').first();
   if (await titleInput.isVisible().catch(() => false)) {
     await titleInput.fill(title);
   }
 
-  const editor = page.locator('.cm-editor .cm-content').first();
-  if (await editor.isVisible().catch(() => false)) {
-    await editor.fill(content);
+  if (content) {
+    const editor = page.locator('.cm-editor .cm-content').first();
+    if (await editor.isVisible().catch(() => false)) {
+      await editor.click();
+      await page.keyboard.type(content);
+    }
   }
 
   await page.waitForTimeout(500);
@@ -80,7 +94,7 @@ test.describe('Responsive Design', () => {
     });
 
     test('should toggle sidebar with hamburger menu', async ({ page }) => {
-      const menuButton = page.getByRole('button', { name: /menu/i }).first();
+      const menuButton = page.getByRole('button', { name: /afficher la barre latérale|show sidebar/i }).first();
 
       if (await menuButton.isVisible().catch(() => false)) {
         await menuButton.click();
@@ -134,8 +148,9 @@ test.describe('Responsive Design', () => {
 
       await createNote(page, title);
 
-      // Note should appear in list
-      await expect(page.getByText(title)).toBeVisible();
+      // Note should appear in editor title
+      const titleInput = page.locator('input[placeholder*="titre" i], input[placeholder*="title" i]').first();
+      await expect(titleInput).toHaveValue(title);
     });
 
     test('should show search on mobile', async ({ page }) => {

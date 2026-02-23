@@ -243,6 +243,33 @@ export function useLocalNotes(userId?: string | null) {
     };
   }, [userId, syncEnabled, loading]);
 
+  const createFolder = async (name: string, parentId?: string) => {
+    try {
+      const newFolder: Folder = {
+        id: crypto.randomUUID(),
+        user_id: userId || 'local',
+        name: name.trim(),
+        path: parentId ? `/${name.trim()}` : `/${name.trim()}`,
+        parent_id: parentId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Save to local storage
+      await LocalStorage.saveFolder(newFolder);
+      setFolders(prev => [newFolder, ...prev]);
+
+      // Sync to cloud if user is logged in
+      if (userId && syncEnabled) {
+        await supabase.from('folders').insert({ ...newFolder, user_id: userId });
+      }
+
+      return { data: newFolder, error: null };
+    } catch (error) {
+      return { data: null, error: error as Error };
+    }
+  };
+
   const createNote = async (title: string, content: string = '', folderId?: string) => {
     try {
       const newNote: Note = {
@@ -538,6 +565,7 @@ export function useLocalNotes(userId?: string | null) {
     syncing,
     syncEnabled,
     createNote,
+    createFolder,
     updateNote,
     deleteNote,
     restoreNote,

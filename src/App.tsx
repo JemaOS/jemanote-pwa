@@ -32,6 +32,7 @@ function App() {
     syncing,
     syncEnabled,
     createNote,
+    createFolder,
     updateNote,
     deleteNote,
     restoreNote,
@@ -342,6 +343,7 @@ function App() {
                 trashNotes={trashNotes}
                 trashFolders={trashFolders}
                 createNote={createNote}
+                createFolder={createFolder}
                 updateNote={updateNote}
                 deleteNote={deleteNote}
                 restoreNote={restoreNote}

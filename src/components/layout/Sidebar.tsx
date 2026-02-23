@@ -435,6 +435,7 @@ interface SidebarProps {
   readonly trashNotes?: readonly Note[];
   readonly trashFolders?: readonly Folder[];
   readonly createNote?: (title: string, content?: string, folderId?: string) => Promise<any>;
+  readonly createFolder?: (name: string, parentId?: string) => Promise<any>;
   readonly updateNote?: (noteId: string, updates: Partial<Note>) => Promise<any>;
   readonly deleteNote?: (noteId: string) => Promise<any>;
   readonly restoreNote?: (noteId: string) => Promise<any>;
@@ -1011,6 +1012,7 @@ export default function Sidebar({
   trashNotes = [],
   trashFolders = [],
   createNote,
+  createFolder,
   updateNote,
   deleteNote,
   restoreNote,
@@ -1063,20 +1065,28 @@ export default function Sidebar({
     }
 
     try {
-      const folder: Folder = {
-        id: crypto.randomUUID(),
-        user_id: userId || 'local',
-        name: newFolderName.trim(),
-        path: `/${newFolderName.trim()}`,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
-      await LocalStorage.saveFolder(folder);
-      await loadFolders();
+      if (createFolder) {
+        // Use the hook's createFolder which handles local + cloud sync
+        const result = await createFolder(newFolderName.trim());
+        if (result.data) {
+          setExpandedFolders(prev => new Set(prev).add(result.data.id));
+        }
+      } else {
+        // Fallback: local only
+        const folder: Folder = {
+          id: crypto.randomUUID(),
+          user_id: userId || 'local',
+          name: newFolderName.trim(),
+          path: `/${newFolderName.trim()}`,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        await LocalStorage.saveFolder(folder);
+        await loadFolders();
+        setExpandedFolders(prev => new Set(prev).add(folder.id));
+      }
       setNewFolderName('');
       setCreatingFolder(false);
-      setExpandedFolders(prev => new Set(prev).add(folder.id));
     } catch (error) {
       console.error('Erreur lors de la création du dossier:', error);
     }

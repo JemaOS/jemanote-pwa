@@ -16,7 +16,7 @@ const VoiceRecorder = React.lazy(() => import('@/components/editor/VoiceRecorder
 
 // Lightweight fallback for lazy-loaded editor components
 const EditorFallback = () => (
-  <div className="flex-1 bg-gray-900 animate-pulse" style={{ minHeight: '200px' }} />
+  <div className="flex-1 bg-neutral-50 dark:bg-neutral-900 animate-pulse" style={{ minHeight: '200px' }} />
 );
 
 interface WorkspaceViewProps {

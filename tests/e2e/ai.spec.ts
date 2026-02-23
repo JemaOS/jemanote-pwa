@@ -25,7 +25,8 @@ async function clearLocalStorage(page: Page) {
 // Helper to login user
 async function loginUser(page: Page) {
   const email = `test-${Date.now()}@example.com`;
-  const password = 'TestPassword123!';
+  // SECURITY NOTE: This is a dummy test password for E2E tests only, not a real credential. NOSONAR
+  const password = process.env.E2E_TEST_PASSWORD ?? 'TestPassword123!'; // NOSONAR
 
   // Wait for page to fully load
   await page.waitForLoadState('networkidle');

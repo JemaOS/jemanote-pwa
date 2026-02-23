@@ -29,13 +29,21 @@
     />
 
     <style>
-      /* Critical CSS for initial paint */
+      /* Critical CSS for initial paint - prevents black flash */
       * {
         box-sizing: border-box;
       }
-      body {
+      html, body {
         margin: 0;
         padding: 0;
+        background-color: #FAFAFA;
+        color: #171717;
+      }
+      html.dark, html.dark body {
+        background-color: #171717;
+        color: #F5F5F5;
+      }
+      body {
         font-family:
           'Inter',
           -apple-system,
@@ -49,8 +57,24 @@
         height: 100vh;
         display: flex;
         flex-direction: column;
+        background-color: inherit;
       }
     </style>
+    <!-- Theme init: apply dark class before React loads to prevent flash -->
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('jemanote-theme');
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#171717';
+            document.body && (document.body.style.backgroundColor = '#171717');
+          } else {
+            document.documentElement.style.backgroundColor = '#FAFAFA';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body>

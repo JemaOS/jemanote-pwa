@@ -22,13 +22,82 @@ async function clearLocalStorage(page: Page) {
   });
 }
 
+// Helper: click the login button (with fallback)
+async function clickLoginButton(page: Page): Promise<boolean> {
+  const loginButton = page.getByRole('button', { name: 'Se connecter pour synchroniser' });
+  try {
+    await loginButton.waitFor({ state: 'visible', timeout: 5000 });
+    await loginButton.click();
+    return true;
+  } catch {
+    const fallbackButton = page.getByRole('button', { name: /se connecter|login|connexion/i }).first();
+    if (await fallbackButton.isVisible().catch(() => false)) {
+      await fallbackButton.click();
+      return true;
+    }
+    console.log('Could not find login button, assuming already logged in or auth not required');
+    return false;
+  }
+}
+
+// Helper: attempt one modal-close strategy
+async function tryCloseModalOnce(page: Page): Promise<boolean> {
+  const modal = page.locator('dialog[open]');
+
+  // Strategy 1: Escape key
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(500);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(500);
+  if (!await modal.isVisible().catch(() => false)) return true;
+
+  // Strategy 2: Close button
+  const closeButton = page.locator('dialog button[aria-label="Fermer"]');
+  if (await closeButton.isVisible().catch(() => false)) {
+    await closeButton.click();
+    await page.waitForTimeout(500);
+    if (!await modal.isVisible().catch(() => false)) return true;
+  }
+
+  // Strategy 3: JS close
+  await page.evaluate(() => {
+    const dialog = document.querySelector('dialog[open]');
+    if (dialog) (dialog as HTMLDialogElement).close();
+  });
+  await page.waitForTimeout(500);
+  if (!await modal.isVisible().catch(() => false)) return true;
+
+  // Strategy 4: Click outside
+  await page.click('body', { position: { x: 10, y: 10 } });
+  await page.waitForTimeout(500);
+  return !await modal.isVisible().catch(() => false);
+}
+
+// Helper: force-close modal after login
+async function forceCloseModal(page: Page): Promise<void> {
+  const modal = page.locator('dialog[open]');
+  let attempts = 0;
+  while (await modal.isVisible().catch(() => false) && attempts < 10) {
+    console.log(`Modal still open after login (attempt ${attempts + 1}), forcing close...`);
+    const closed = await tryCloseModalOnce(page);
+    if (closed) break;
+    attempts++;
+  }
+  // Strategy 5: Reload if still stuck
+  if (await modal.isVisible().catch(() => false)) {
+    console.log('Modal still stuck after all attempts, reloading page...');
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+  }
+}
+
 // Helper to login user
 async function loginUser(page: Page) {
   const email = `test-${Date.now()}@example.com`;
   // SECURITY NOTE: This is a dummy test password for E2E tests only, not a real credential. NOSONAR
   const password = process.env.E2E_TEST_PASSWORD ?? 'TestPassword123!'; // NOSONAR
 
-  // Wait for page to fully load
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 
@@ -39,99 +108,29 @@ async function loginUser(page: Page) {
     return;
   }
 
-  // Try to find and click login button - use specific title to avoid strict mode violation
-  const loginButton = page.getByRole('button', { name: 'Se connecter pour synchroniser' });
-  
-  try {
-    await loginButton.waitFor({ state: 'visible', timeout: 5000 });
-    await loginButton.click();
-  } catch {
-    // Fallback - use any login button
-    const fallbackButton = page.getByRole('button', { name: /se connecter|login|connexion/i }).first();
-    if (await fallbackButton.isVisible().catch(() => false)) {
-      await fallbackButton.click();
-    } else {
-      console.log('Could not find login button, assuming already logged in or auth not required');
-      return;
-    }
-  }
-  
+  const clicked = await clickLoginButton(page);
+  if (!clicked) return;
+
   await page.waitForTimeout(1000);
 
-  // Switch to register tab
+  // Switch to register tab if visible
   const registerTab = page.getByRole('button', { name: /inscription|sign up/i });
   if (await registerTab.isVisible().catch(() => false)) {
     await registerTab.click();
     await page.waitForTimeout(1000);
   }
 
-  // Fill form
+  // Fill and submit form
   await page.getByPlaceholder(/email/i).fill(email);
   await page.getByLabel(/mot de passe|password/i).fill(password);
+  await page.getByRole('button', { name: /s'inscrire|sign up|register/i }).click();
 
-  // Submit
-  const submitButton = page.getByRole('button', { name: /s'inscrire|sign up|register/i });
-  await submitButton.click();
-  
-  // Wait for registration to complete - wait longer for Supabase
+  // Wait for Supabase registration
   await page.waitForTimeout(8000);
-  
-  // CRITICAL: Force close the modal if it's still open
-  const modal = page.locator('dialog[open]');
-  let attempts = 0;
-  while (await modal.isVisible().catch(() => false) && attempts < 10) {
-    console.log(`Modal still open after login (attempt ${attempts + 1}), forcing close...`);
-    
-    // Strategy 1: Try pressing Escape multiple times
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
-    
-    // Strategy 2: Click on the close button with aria-label
-    if (await modal.isVisible().catch(() => false)) {
-      const closeButton = page.locator('dialog button[aria-label="Fermer"]');
-      if (await closeButton.isVisible().catch(() => false)) {
-        await closeButton.click();
-        await page.waitForTimeout(500);
-        if (!await modal.isVisible().catch(() => false)) break;
-      }
-    }
-    
-    // Strategy 3: Use JavaScript to close the dialog
-    if (await modal.isVisible().catch(() => false)) {
-      await page.evaluate(() => {
-        const dialog = document.querySelector('dialog[open]');
-        if (dialog) {
-          (dialog as HTMLDialogElement).close();
-        }
-      });
-      await page.waitForTimeout(500);
-      if (!await modal.isVisible().catch(() => false)) break;
-    }
-    
-    // Strategy 4: Click outside modal
-    if (await modal.isVisible().catch(() => false)) {
-      await page.click('body', { position: { x: 10, y: 10 } });
-      await page.waitForTimeout(500);
-      if (!await modal.isVisible().catch(() => false)) break;
-    }
-    
-    attempts++;
-  }
-  
-  // Strategy 5: Reload page if modal is still stuck after all attempts
-  if (await modal.isVisible().catch(() => false)) {
-    console.log('Modal still stuck after all attempts, reloading page...');
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
-  }
-  
-  // Final wait for the main app interface to be ready
+
+  await forceCloseModal(page);
+
   await page.waitForTimeout(2000);
-  
-  // Verify we're logged in by checking for user-related UI or absence of login button
   console.log('Login completed, verifying session...');
 }
 

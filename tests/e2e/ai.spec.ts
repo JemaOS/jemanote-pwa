@@ -134,168 +134,127 @@ async function loginUser(page: Page) {
   console.log('Login completed, verifying session...');
 }
 
-// Helper to create a note with content
-async function createNoteWithContent(page: Page, title: string, content: string) {
-  // Make sure modal is closed before creating a note
+// Helper: close dialog via JS evaluate
+async function closeDialogViaJS(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const dialog = document.querySelector('dialog[open]');
+    if (dialog) (dialog as HTMLDialogElement).close();
+  });
+}
+
+// Helper: close modal with retry loop
+async function closeModalWithRetry(page: Page, maxAttempts: number, delay: number): Promise<void> {
   const modal = page.locator('dialog[open]');
-  let modalAttempts = 0;
-  while (await modal.isVisible().catch(() => false) && modalAttempts < 10) {
-    console.log(`Modal still open before creating note (attempt ${modalAttempts + 1}), forcing close...`);
-    await page.evaluate(() => {
-      const dialog = document.querySelector('dialog[open]');
-      if (dialog) {
-        (dialog as HTMLDialogElement).close();
-      }
-    });
-    await page.waitForTimeout(800);
-    modalAttempts++;
+  let attempts = 0;
+  while (await modal.isVisible().catch(() => false) && attempts < maxAttempts) {
+    await closeDialogViaJS(page);
+    await page.waitForTimeout(delay);
+    attempts++;
   }
-  
+}
+
+// Helper: ensure modal is closed before proceeding (with reload fallback)
+async function ensureModalClosed(page: Page): Promise<void> {
+  await closeModalWithRetry(page, 10, 800);
+  const modal = page.locator('dialog[open]');
   if (await modal.isVisible().catch(() => false)) {
     console.log('Modal still open after 10 attempts, reloading page...');
     await page.reload();
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
-    // Try to close modal again after reload
-    modalAttempts = 0;
-    while (await modal.isVisible().catch(() => false) && modalAttempts < 5) {
-      await page.evaluate(() => {
-        const dialog = document.querySelector('dialog[open]');
-        if (dialog) {
-          (dialog as HTMLDialogElement).close();
-        }
-      });
-      await page.waitForTimeout(800);
-      modalAttempts++;
-    }
+    await closeModalWithRetry(page, 5, 800);
   }
-  
-  // Check if we need to open the sidebar (mobile view)
-  const sidebarButton = page.getByRole('button', { name: /afficher la barre latérale|show sidebar/i }).first();
-  if (await sidebarButton.isVisible().catch(() => false)) {
-    console.log('Sidebar button is visible, checking new note button...');
-    const newNoteButtonVisible = await page.locator('button[aria-label="Nouvelle note"], button[title="Nouvelle note"]').first().isVisible().catch(() => false);
-    if (!newNoteButtonVisible) {
-      console.log('New note button not visible, clicking sidebar button...');
-      await sidebarButton.click();
-      await page.waitForTimeout(1000); // Wait longer for animation
-    } else {
-      console.log('New note button is already visible');
-    }
-  } else {
-    console.log('Sidebar button is NOT visible');
-  }
+}
 
-  // Click new note button - try multiple selectors
-  console.log('Clicking new note button...');
+// Helper: open sidebar if new note button is not visible
+async function ensureSidebarOpen(page: Page): Promise<void> {
+  const sidebarButton = page.getByRole('button', { name: /afficher la barre latérale|show sidebar/i }).first();
+  if (!await sidebarButton.isVisible().catch(() => false)) return;
+  const newNoteVisible = await page.locator('button[aria-label="Nouvelle note"], button[title="Nouvelle note"]').first().isVisible().catch(() => false);
+  if (!newNoteVisible) {
+    await sidebarButton.click();
+    await page.waitForTimeout(1000);
+  }
+}
+
+// Helper: click editor with modal-close retries
+async function clickEditorWithRetry(page: Page): Promise<boolean> {
+  const modal = page.locator('dialog[open]');
+  const editor = page.locator('.cm-editor .cm-content').first();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      await editor.click({ timeout: 5000 });
+      await page.waitForTimeout(500);
+      return true;
+    } catch {
+      if (await modal.isVisible().catch(() => false)) {
+        await closeDialogViaJS(page);
+        await page.waitForTimeout(500);
+      }
+    }
+  }
+  console.log('Failed to click editor after 5 attempts, skipping note creation');
+  return false;
+}
+
+// Helper to create a note with content
+async function createNoteWithContent(page: Page, title: string, content: string) {
+  await ensureModalClosed(page);
+
+  await ensureSidebarOpen(page);
+
+  // Click new note button
   const newNoteButton = page.locator('button:has-text("Nouvelle note"), button:has-text("New note")').first();
-  
   try {
     await newNoteButton.waitFor({ state: 'visible', timeout: 5000 });
     await newNoteButton.click();
   } catch (e) {
-    console.log('Failed to find new note button. Saving HTML to file...');
     const bodyHtml = await page.locator('body').innerHTML();
     fs.writeFileSync('failed-body.html', bodyHtml);
     throw e;
   }
-  
-  await page.waitForTimeout(2000);
 
-  // Wait for the editor to be ready
+  await page.waitForTimeout(2000);
   await page.waitForSelector('.cm-editor', { timeout: 10000 });
-  
-  // Make sure modal is still closed before interacting with editor
-  modalAttempts = 0;
-  while (await modal.isVisible().catch(() => false) && modalAttempts < 10) {
-    console.log(`Modal reappeared before editor interaction (attempt ${modalAttempts + 1}), forcing close...`);
-    await page.evaluate(() => {
-      const dialog = document.querySelector('dialog[open]');
-      if (dialog) {
-        (dialog as HTMLDialogElement).close();
-      }
-    });
-    await page.waitForTimeout(1000);
-    modalAttempts++;
-  }
-  
-  // If modal is still open after all attempts, skip this step
+
+  // Close modal if it reappeared
+  await closeModalWithRetry(page, 10, 1000);
+  const modal = page.locator('dialog[open]');
   if (await modal.isVisible().catch(() => false)) {
     console.log('Modal still open after all attempts, skipping note creation');
     return;
   }
-  
-  // Give some time for modal to fully disappear from DOM
+
   await page.waitForTimeout(500);
-  
+
   // Set note title
-  const titleInput = page
-    .locator('input[placeholder*="titre" i], input[placeholder*="title" i]')
-    .first();
+  const titleInput = page.locator('input[placeholder*="titre" i], input[placeholder*="title" i]').first();
   if (await titleInput.isVisible().catch(() => false)) {
     await titleInput.fill(title);
   }
-  
-  // Fill the editor content using CodeMirror's internal method
-  const editor = page.locator('.cm-editor .cm-content').first();
-  
-  // Attempt click on editor with retries in case modal still intercepts
-  let clickAttempts = 0;
-  while (clickAttempts < 5) {
-    try {
-      await editor.click({ timeout: 5000 });
-      await page.waitForTimeout(500);
-      break; // Click succeeded
-    } catch (error) {
-      console.log(`Click attempt ${clickAttempts + 1} failed, checking for modal...`);
-      clickAttempts++;
-      
-      // Check if modal reappeared
-      if (await modal.isVisible().catch(() => false)) {
-        console.log('Modal reappeared, closing again...');
-        await page.evaluate(() => {
-          const dialog = document.querySelector('dialog[open]');
-          if (dialog) {
-            (dialog as HTMLDialogElement).close();
-          }
-        });
-        await page.waitForTimeout(500);
-      }
-      
-      if (clickAttempts === 5) {
-        console.log('Failed to click editor after 5 attempts, skipping note creation');
-        return;
-      }
-    }
-  }
-  
-  // Use CodeMirror's internal API to set content reliably
+
+  // Click editor with retries
+  const clicked = await clickEditorWithRetry(page);
+  if (!clicked) return;
+
+  // Set content via CodeMirror API
   await page.evaluate((text) => {
     const view = (window as any).editorView;
     if (view) {
-      view.dispatch({
-        changes: {
-          from: 0,
-          to: view.state.doc.length,
-          insert: text
-        }
-      });
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text } });
     }
   }, content);
   await page.waitForTimeout(500);
-    
-    // Verify content was entered by checking the editor has text
-    const editorText = await editor.textContent();
-    console.log('Editor content after fill:', editorText?.substring(0, 100));
-    console.log('Content length:', editorText?.length, 'Expected:', content.length);
-    
-    const debugContent = await page.evaluate(() => (window as any).debugContent);
-    console.log(`Debug content from React state: ${debugContent}`);
-    
-    // Verify the note was created by checking the title input
-    await page.waitForTimeout(1500);
-    const titleInputAfter = page.locator('input[placeholder*="titre" i], input[placeholder*="title" i]').first();
-    await expect(titleInputAfter).toHaveValue(title, { timeout: 5000 });
+
+  const editor = page.locator('.cm-editor .cm-content').first();
+  const editorText = await editor.textContent();
+  console.log('Editor content after fill:', editorText?.substring(0, 100));
+  console.log('Content length:', editorText?.length, 'Expected:', content.length);
+  console.log(`Debug content from React state: ${await page.evaluate(() => (window as any).debugContent)}`);
+
+  await page.waitForTimeout(1500);
+  const titleInputAfter = page.locator('input[placeholder*="titre" i], input[placeholder*="title" i]').first();
+  await expect(titleInputAfter).toHaveValue(title, { timeout: 5000 });
 }
 
 test.describe('AI Features', () => {

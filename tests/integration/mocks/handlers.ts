@@ -65,6 +65,154 @@ const createMockNote = (overrides?: Partial<Note>): Note => ({
   ...overrides,
 });
 
+// Mistral API Handlers
+export const mistralHandlers = [
+  // Mistral Proxy Edge Function
+  http.post(
+    'https://yadtnmgyrmigqbndnmho.supabase.co/functions/v1/mistral-proxy',
+    async ({ request }) => {
+      const body = (await request.json()) as {
+        model?: string;
+        messages?: Array<{ role: string; content: string }>;
+        max_tokens?: number;
+        temperature?: number;
+      };
+
+      // Simulate network delay
+      await delay(100);
+
+      const userMessage = body.messages?.find(m => m.role === 'user')?.content || '';
+      const systemMessage = body.messages?.find(m => m.role === 'system')?.content || '';
+
+      // Generate contextual responses based on prompts
+      let responseContent = '';
+
+      if (
+        userMessage.toLowerCase().includes('résume') ||
+        userMessage.toLowerCase().includes('summary')
+      ) {
+        responseContent =
+          'Ceci est un résumé concis du texte fourni, mettant en avant les points clés.';
+      } else if (
+        userMessage.toLowerCase().includes('continue') ||
+        userMessage.toLowerCase().includes('texte à continuer')
+      ) {
+        responseContent =
+          'Voici la continuation naturelle et cohérente du texte, développant les idées présentées.';
+      } else if (
+        userMessage.toLowerCase().includes('améliore') ||
+        userMessage.toLowerCase().includes('improve')
+      ) {
+        responseContent =
+          'Voici une version améliorée, plus claire et mieux structurée du texte original.';
+      } else if (
+        userMessage.toLowerCase().includes('traduis') ||
+        userMessage.toLowerCase().includes('translate')
+      ) {
+        responseContent = 'This is the translated version of the provided text.';
+      } else if (
+        userMessage.toLowerCase().includes('tags') ||
+        systemMessage.toLowerCase().includes('tags')
+      ) {
+        responseContent = 'productivité, organisation, notes, idées, projet';
+      } else if (
+        userMessage.toLowerCase().includes('idées') ||
+        userMessage.toLowerCase().includes('brainstorming')
+      ) {
+        responseContent =
+          "Idée 1: Explorer de nouvelles approches\nIdée 2: Collaborer avec l'équipe\nIdée 3: Documenter les processus\nIdée 4: Automatiser les tâches répétitives\nIdée 5: Mesurer les résultats";
+      } else if (
+        userMessage.toLowerCase().includes('synthétise') ||
+        userMessage.toLowerCase().includes('synthesize')
+      ) {
+        responseContent = 'Synthèse des notes fournies en un document cohérent et structuré.';
+      } else {
+        responseContent = `Réponse générée par l'IA pour: ${userMessage.substring(0, 50)}`;
+      }
+
+      const response: MistralResponse = {
+        data: {
+          choices: [
+            {
+              message: {
+                content: responseContent,
+              },
+            },
+          ],
+          usage: {
+            promptTokens: userMessage.length / 4,
+            completionTokens: responseContent.length / 4,
+            totalTokens: (userMessage.length + responseContent.length) / 4,
+          },
+        },
+      };
+
+      return HttpResponse.json(response);
+    }
+  ),
+
+  // Rate limit error simulation
+  http.post(
+    'https://yadtnmgyrmigqbndnmho.supabase.co/functions/v1/mistral-proxy',
+    async ({ request }) => {
+      const body = (await request.json()) as { simulateError?: string };
+
+      if (body.simulateError === 'rate_limit') {
+        return HttpResponse.json({ error: { message: 'Rate limit exceeded' } }, { status: 429 });
+      }
+
+      return undefined; // Pass to next handler
+    },
+    { once: true }
+  ),
+
+  // Server error simulation
+  http.post(
+    'https://yadtnmgyrmigqbndnmho.supabase.co/functions/v1/mistral-proxy',
+    async ({ request }) => {
+      const body = (await request.json()) as { simulateError?: string };
+
+      if (body.simulateError === 'server_error') {
+        return HttpResponse.json({ error: { message: 'Internal server error' } }, { status: 500 });
+      }
+
+      return undefined;
+    },
+    { once: true }
+  ),
+
+  // Timeout simulation
+  http.post(
+    'https://yadtnmgyrmigqbndnmho.supabase.co/functions/v1/mistral-proxy',
+    async ({ request }) => {
+      const body = (await request.json()) as { simulateError?: string };
+
+      if (body.simulateError === 'timeout') {
+        await delay(30000); // Long delay to trigger timeout
+        return HttpResponse.json({ error: { message: 'Request timeout' } }, { status: 504 });
+      }
+
+      return undefined;
+    },
+    { once: true }
+  ),
+
+  // Unauthorized error simulation
+  http.post(
+    'https://yadtnmgyrmigqbndnmho.supabase.co/functions/v1/mistral-proxy',
+    async ({ request }) => {
+      const body = (await request.json()) as { simulateError?: string };
+
+      if (body.simulateError === 'unauthorized') {
+        return HttpResponse.json({ error: { message: 'Invalid API key' } }, { status: 401 });
+      }
+
+      return undefined;
+    },
+    { once: true }
+  ),
+];
+
 // Supabase Auth Handlers
 export const supabaseAuthHandlers = [
   // Sign up
@@ -435,6 +583,7 @@ export const mockDataHelpers = {
 
 // Combine all handlers
 export const handlers = [
+  ...mistralHandlers,
   ...supabaseAuthHandlers,
   ...supabaseDatabaseHandlers,
   ...supabaseRealtimeHandlers,

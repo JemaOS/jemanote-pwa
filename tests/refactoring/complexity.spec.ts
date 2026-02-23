@@ -217,12 +217,6 @@ describe('Code Complexity Analysis', () => {
       const averageMaintainability =
         analysisResults.length > 0 ? totalMaintainability / analysisResults.length : 0;
 
-      // Skip test if maintainability data is not available from escomplex
-      if (averageMaintainability === 0) {
-        console.warn('Maintainability index not available from complexity analysis - skipping test');
-        return;
-      }
-
       expect(averageMaintainability).toBeGreaterThan(85);
     });
   });

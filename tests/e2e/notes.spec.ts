@@ -102,9 +102,7 @@ test.describe('Notes Management', () => {
       // Edit content
       const editor = page.locator('.cm-editor .cm-content, [contenteditable="true"]').first();
       if (await editor.isVisible().catch(() => false)) {
-        await editor.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type(newContent);
+        await editor.fill(newContent);
         await page.waitForTimeout(1000); // Wait for auto-save
 
         // Reload and verify content persisted
@@ -125,8 +123,7 @@ test.describe('Notes Management', () => {
 
       const editor = page.locator('.cm-editor .cm-content, [contenteditable="true"]').first();
       if (await editor.isVisible().catch(() => false)) {
-        await editor.click();
-        await page.keyboard.type('Auto-save test content');
+        await editor.fill('Auto-save test content');
 
         // Wait for auto-save indicator
         await page.waitForTimeout(1500);

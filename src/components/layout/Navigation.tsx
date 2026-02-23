@@ -174,6 +174,17 @@ export default function Navigation({
 
           <button
             onClick={() => {
+              onViewChange('canvas');
+            }}
+            className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('canvas')}`}
+            title="Canvas"
+            aria-label="Canvas"
+          >
+            <LayoutTemplate className="h-5 w-5 laptop:h-5.5 laptop:w-5.5 laptop-lg:h-6 laptop-lg:w-6" />
+          </button>
+
+          <button
+            onClick={() => {
               onViewChange('timeline');
             }}
             className={`p-2 laptop:p-2.5 rounded-md transition-colors ${viewButtonClass('timeline')}`}
@@ -244,6 +255,16 @@ export default function Navigation({
             >
               <Layout className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
               <span className="font-medium">Espace de travail</span>
+            </button>
+
+            <button
+              onClick={() => {
+                handleViewChange('canvas');
+              }}
+              className={mobileViewButtonClass('canvas')}
+            >
+              <LayoutTemplate className="h-4.5 w-4.5 xs:h-5 xs:w-5 sm:h-5.5 sm:w-5.5" />
+              <span className="font-medium">Canvas</span>
             </button>
 
             <button

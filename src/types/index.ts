@@ -62,6 +62,32 @@ export interface Attachment {
   created_at: string;
 }
 
+export interface Canvas {
+  id: string;
+  user_id: string;
+  name: string;
+  width: number;
+  height: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CanvasItem {
+  id: string;
+  canvas_id: string;
+  user_id: string;
+  item_type: string;
+  note_id?: string;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: number;
+  content?: string;
+  style?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface UserSettings {
   user_id: string;
   theme: 'light' | 'dark' | 'auto';
@@ -83,4 +109,4 @@ export interface User {
   updated_at?: string;
 }
 
-export type ViewMode = 'workspace' | 'search' | 'settings' | 'timeline';
+export type ViewMode = 'workspace' | 'search' | 'settings' | 'canvas' | 'timeline';

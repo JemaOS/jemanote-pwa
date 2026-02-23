@@ -6,7 +6,6 @@ import {
   FileText,
   Search,
   Settings,
-  Network,
   Moon,
   Sun,
   Plus,
@@ -50,7 +49,7 @@ export default function CommandPalette({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         onClose();
       }
@@ -171,6 +170,21 @@ export default function CommandPalette({
                 <FileText className="h-5 w-5" />
                 <span>Espace de travail</span>
                 {currentView === 'workspace' && (
+                  <span className="ml-auto text-caption text-primary-500">Actif</span>
+                )}
+              </Command.Item>
+
+              <Command.Item
+                onSelect={() => {
+                  handleSelect(() => {
+                    onViewChange('canvas');
+                  });
+                }}
+                className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 text-body text-neutral-900 dark:text-neutral-100"
+              >
+                <Paintbrush className="h-5 w-5" />
+                <span>Canvas</span>
+                {currentView === 'canvas' && (
                   <span className="ml-auto text-caption text-primary-500">Actif</span>
                 )}
               </Command.Item>

@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Jema Technology.
 // Distributed under the license specified in the root directory of this project.
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 
 import AuthModal from '@/components/auth/AuthModal';
 import CommandPalette from '@/components/command/CommandPalette';
@@ -11,11 +11,12 @@ import StatusBar from '@/components/layout/StatusBar';
 import WorkspaceView from '@/components/workspace/WorkspaceView';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalNotes } from '@/hooks/useLocalNotes';
-import { ViewMode, Note } from '@/types';
+import { ViewMode } from '@/types';
 
 // Lazy load heavy view components for better code splitting
 // WorkspaceView is the default view - imported directly to avoid lazy-load delay
 // Sidebar is lazy-loaded since it starts closed on mobile (most users)
+const CanvasView = React.lazy(() => import('@/components/canvas/CanvasView'));
 const SearchView = React.lazy(() => import('@/components/search/SearchView'));
 const SettingsView = React.lazy(() => import('@/components/settings/SettingsView'));
 const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView'));
@@ -101,40 +102,24 @@ function App() {
     };
   }, [leftSidebarOpen, hasUserToggledSidebar]);
 
-  // Keyboard shortcuts - Toggle command palette with Ctrl+K
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + K: Toggle command palette
+      // Cmd/Ctrl + K: Open command palette
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setShowCommandPalette(prev => !prev);
+        setShowCommandPalette(true);
       }
       // Cmd/Ctrl + N: Create new note
       if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
         e.preventDefault();
-        const button = document.querySelector('[data-new-note]');
-        if (button) (button as HTMLElement).click();
+        handleCreateNote();
       }
     };
 
     globalThis.addEventListener('keydown', handleKeyDown);
     return () => {
       globalThis.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  // Escape key handler (separate effect to avoid stale closure)
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        setShowCommandPalette(false);
-      }
-    };
-
-    globalThis.addEventListener('keydown', handleEscape);
-    return () => {
-      globalThis.removeEventListener('keydown', handleEscape);
     };
   }, []);
 
@@ -182,12 +167,12 @@ function App() {
     }
   };
 
-  // Wrapper pour créer une note (utilisé par les fonctionnalités IA et Canvas)
+  // Wrapper pour créer une note depuis le modal IA
   const handleCreateNoteFromAI = async (
     title: string,
     content: string,
     folderId?: string
-  ): Promise<Note | null> => {
+  ): Promise<any> => {
     const result = await createNote(title, content, folderId);
     return result.data || null;
   };
@@ -233,6 +218,19 @@ function App() {
         );
       case 'settings':
         return <SettingsView userId={user?.id ?? null} />;
+      case 'canvas':
+        return (
+          <CanvasView
+            userId={user?.id ?? null}
+            notes={notes}
+            onOpenNote={noteId => {
+              setActiveNoteId(noteId);
+              setCurrentView('workspace');
+            }}
+            deleteNote={deleteNote}
+            createNote={handleCreateNoteFromAI}
+          />
+        );
       case 'timeline':
         return (
           <TimelineView

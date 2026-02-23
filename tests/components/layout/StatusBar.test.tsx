@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import StatusBar from '@/components/layout/StatusBar';
 
-import { render, screen } from '@tests/utils/test-utils';
+import { render, screen } from '@/tests/utils/test-utils';
 
 describe('StatusBar', () => {
   const defaultProps = {

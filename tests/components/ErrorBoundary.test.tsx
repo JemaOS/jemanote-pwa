@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-import { render, screen } from '@tests/utils/test-utils';
+import { render, screen } from '@/tests/utils/test-utils';
 
 // Component that throws an error
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {

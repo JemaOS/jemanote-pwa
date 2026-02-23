@@ -3,10 +3,12 @@
 
 /**
  * Service de détection de liens intelligents entre notes
- * Utilise l'analyse de mots-clés pour suggérer des connexions pertinentes
+ * Utilise l'analyse de mots-clés et l'IA Mistral pour suggérer des connexions pertinentes
  */
 
 import type { Note } from '@/types';
+
+import { aiService } from './ai/mistralService';
 
 export interface LinkSuggestion {
   targetNoteId: string;
@@ -180,6 +182,69 @@ class LinkDetectionService {
 
     // Trier par confiance décroissante et retourner les 5 meilleures suggestions
     return suggestions.toSorted((a, b) => b.confidence - a.confidence).slice(0, 5);
+  }
+
+  /**
+   * Détecter les liens avec l'aide de l'IA Mistral (optionnel, plus avancé)
+   */
+  async detectLinksWithAI(currentNote: Note, allNotes: Note[]): Promise<LinkSuggestion[]> {
+    try {
+      // Préparer un résumé des notes disponibles
+      const noteSummaries = allNotes
+        .filter(note => note.id !== currentNote.id && note.content.length > 50)
+        .slice(0, 20) // Limiter à 20 notes pour ne pas dépasser la limite de tokens
+        .map((note, idx) => `${idx + 1}. "${note.title}" - ${note.content.substring(0, 150)}...`)
+        .join('\n');
+
+      // Demander à l'IA de suggérer des liens
+      const prompt = `Note actuelle: "${currentNote.title}"
+Contenu: ${currentNote.content.substring(0, 500)}...
+
+Notes disponibles:
+${noteSummaries}
+
+Analyse ces notes et identifie les 3 notes les plus pertinentes à lier avec la note actuelle. Pour chaque suggestion, donne:
+- Le numéro de la note
+- La raison du lien (1 phrase courte)
+
+Format de réponse:
+1. [Numéro]: [Raison]
+2. [Numéro]: [Raison]
+3. [Numéro]: [Raison]`;
+
+      const response = await aiService.continueText(prompt);
+
+      // Parser la réponse de l'IA
+      const suggestions: LinkSuggestion[] = [];
+      // SECURITY FIX: Limit line length to prevent ReDoS on regex matching
+      const lines = response.split('\n').filter(line => line.length <= 500 && /^\d+\./.test(line));
+
+      for (const line of lines) {
+        // SECURITY FIX: Use safer regex with length limits for AI response parsing
+        const matchResult = /^\d{1,3}\.\s*\[?(\d{1,5})\]?:\s*(.{1,500})$/.exec(line);
+        if (matchResult) {
+          const noteIndex = Number.parseInt(matchResult[1], 10) - 1;
+          const reason = matchResult[2].trim();
+
+          if (noteIndex >= 0 && noteIndex < allNotes.length) {
+            const targetNote = allNotes[noteIndex];
+            suggestions.push({
+              targetNoteId: targetNote.id,
+              targetNoteTitle: targetNote.title,
+              reason,
+              confidence: 85, // Confiance IA élevée
+              keywords: [],
+            });
+          }
+        }
+      }
+
+      return suggestions;
+    } catch (error) {
+      console.error('Erreur détection liens IA:', error);
+      // Fallback sur la détection par mots-clés
+      return this.detectLinks(currentNote, allNotes);
+    }
   }
 }
 

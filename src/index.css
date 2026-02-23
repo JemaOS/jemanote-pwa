@@ -68,6 +68,18 @@ img {
   object-position: top;
 }
 
+/* Remove browser default dialog border/outline */
+dialog {
+  border: none;
+  outline: none;
+  padding: 0;
+  background: transparent;
+}
+
+dialog::backdrop {
+  display: none;
+}
+
 .fixed {
   position: fixed;
 }

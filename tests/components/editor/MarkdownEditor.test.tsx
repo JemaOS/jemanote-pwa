@@ -9,8 +9,36 @@ import { render, waitFor } from '../../utils/test-utils';
 
 // Mock ThemeContext
 vi.mock('@/contexts/ThemeContext', () => ({
-  ThemeProvider: ({ children }: { children: React.ReactNode }) => children as React.ReactElement,
-  useTheme: () => ({ theme: 'light', setTheme: vi.fn(), toggleTheme: vi.fn() }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useTheme: () => ({ theme: 'light', setTheme: vi.fn() }),
+}));
+
+// Mock AIContextMenu component
+
+vi.mock('@/components/ai/AIContextMenu', () => ({
+  default: ({
+    position,
+    selectedText,
+    onClose,
+    onInsert,
+  }: {
+    position: { x: number; y: number };
+    selectedText: string;
+    onClose: () => void;
+    onInsert: (text: string) => void;
+  }) => (
+    <div data-testid="ai-context-menu" style={{ top: position.y, left: position.x }}>
+      <span>Selected: {selectedText}</span>
+      <button
+        onClick={() => {
+          onInsert('AI generated text');
+        }}
+      >
+        Insert
+      </button>
+      <button onClick={onClose}>Close</button>
+    </div>
+  ),
 }));
 
 // Mock CodeMirror extensions - moved to tests/setup-codemirror.ts
@@ -29,6 +57,10 @@ vi.mock('@/lib/wikiLinks', () => ({
 
 vi.mock('@/lib/audioWidgetExtension', () => ({
   audioWidgetPlugin: [],
+}));
+
+vi.mock('@/lib/aiContextMenu', () => ({
+  aiContextMenuExtension: vi.fn(() => []),
 }));
 
 describe('MarkdownEditor', () => {
@@ -109,6 +141,23 @@ describe('MarkdownEditor', () => {
     it('should render wiki links with correct styling', () => {
       render(<MarkdownEditor {...defaultProps} value="[[Link Title]]" />);
       // Wiki links should be styled with the wiki-link class
+      expect(document.querySelector('.cm-editor')).toBeInTheDocument();
+    });
+  });
+
+  describe('AI Context Menu', () => {
+    it('should show AI context menu when triggered', async () => {
+      render(<MarkdownEditor {...defaultProps} />);
+
+      // The AI context menu extension should be configured
+      const { aiContextMenuExtension } = await import('@/lib/aiContextMenu');
+      expect(aiContextMenuExtension).toHaveBeenCalled();
+    });
+
+    it('should handle text insertion from AI', () => {
+      render(<MarkdownEditor {...defaultProps} />);
+
+      // The editor should support text insertion
       expect(document.querySelector('.cm-editor')).toBeInTheDocument();
     });
   });

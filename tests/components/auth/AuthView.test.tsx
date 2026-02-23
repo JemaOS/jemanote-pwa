@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import AuthView from '@/components/auth/AuthView';
 
-import { render, screen, waitFor } from '@tests/utils/test-utils';
+import { render, screen, waitFor } from '@/tests/utils/test-utils';
 
 // Mock useAuth hook
 vi.mock('@/hooks/useAuth', () => ({

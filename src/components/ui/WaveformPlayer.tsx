@@ -2,7 +2,7 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { Play, Pause } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface WaveformPlayerProps {
   readonly blob: Blob;
@@ -25,12 +25,35 @@ export default function WaveformPlayer({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const animationRef = useRef<number | null>(null);
 
+  const stopAnimation = useCallback(() => {
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  }, []);
+
+  const startAnimation = useCallback(
+    (audio: HTMLAudioElement) => {
+      stopAnimation();
+      const tick = () => {
+        setCurrentTime(audio.currentTime);
+        if (!audio.paused && !audio.ended) {
+          animationRef.current = requestAnimationFrame(tick);
+        } else {
+          animationRef.current = null;
+        }
+      };
+      animationRef.current = requestAnimationFrame(tick);
+    },
+    [stopAnimation]
+  );
+
   useEffect(() => {
     if (!blob) {
       return;
     }
 
-    // Générer waveform
+    // Générer waveform via Web Audio API
     const generateWaveform = async () => {
       try {
         const arrayBuffer = await blob.arrayBuffer();
@@ -38,7 +61,7 @@ export default function WaveformPlayer({
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         const rawData = audioBuffer.getChannelData(0);
-        const samples = 60; // Moins de barres pour un affichage compact
+        const samples = 60;
         const blockSize = Math.floor(rawData.length / samples);
         const waveform: number[] = [];
 
@@ -46,14 +69,14 @@ export default function WaveformPlayer({
           const start = blockSize * i;
           let sum = 0;
           for (let j = 0; j < blockSize; j++) {
-            sum += Math.abs(rawData[start + j]);
+            sum += Math.abs(rawData[start + j] ?? 0);
           }
           waveform.push(sum / blockSize);
         }
 
         // Normaliser
         const max = Math.max(...waveform);
-        const normalized = waveform.map(v => v / max);
+        const normalized = max > 0 ? waveform.map(v => v / max) : waveform;
         setWaveformData(normalized);
         setDuration(audioBuffer.duration);
 
@@ -70,16 +93,6 @@ export default function WaveformPlayer({
     const audio = new Audio(url);
     audioRef.current = audio;
 
-    // Utiliser requestAnimationFrame pour une mise à jour fluide
-    const updateProgress = () => {
-      if (audio.paused || audio.ended) {
-        animationRef.current = null;
-        return;
-      }
-      setCurrentTime(audio.currentTime);
-      animationRef.current = requestAnimationFrame(updateProgress);
-    };
-
     audio.onloadedmetadata = () => {
       if (audio.duration && Number.isFinite(audio.duration)) {
         setDuration(audio.duration);
@@ -88,69 +101,66 @@ export default function WaveformPlayer({
 
     audio.onplay = () => {
       setIsPlaying(true);
-      animationRef.current = requestAnimationFrame(updateProgress);
+      startAnimation(audio);
     };
 
     audio.onended = () => {
       setIsPlaying(false);
       setCurrentTime(0);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
+      stopAnimation();
     };
 
     audio.onpause = () => {
       setIsPlaying(false);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
+      stopAnimation();
+    };
+
+    audio.ontimeupdate = () => {
+      setCurrentTime(audio.currentTime);
     };
 
     return () => {
       audio.pause();
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      stopAnimation();
       URL.revokeObjectURL(url);
+      audioRef.current = null;
     };
-  }, [blob]);
+  }, [blob, startAnimation, stopAnimation]);
 
   const togglePlay = () => {
-    if (!audioRef.current) {
-      return;
-    }
+    if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      audioRef.current.play().catch(err => {
+        console.error('Erreur lecture audio:', err);
+      });
     }
   };
 
-  const handleSeek = (index: number) => {
-    if (!audioRef.current || waveformData.length === 0) {
-      return;
-    }
-
-    const percentage = index / waveformData.length;
+  const handleSeek = (percentage: number) => {
+    if (!audioRef.current || duration === 0) return;
     const newTime = percentage * duration;
-
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
 
   const formatTime = (seconds: number) => {
+    if (!Number.isFinite(seconds) || isNaN(seconds)) return '00:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const progress = duration > 0 ? currentTime / duration : 0;
+
   return (
-    <div className="flex items-center gap-3 p-2 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm select-none max-w-md">
+    <div className="flex items-center gap-3 p-2 bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm select-none w-full max-w-md">
+      {/* Play/Pause button */}
       <button
         onClick={togglePlay}
         className="flex items-center justify-center w-8 h-8 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all flex-shrink-0"
+        aria-label={isPlaying ? 'Pause' : 'Lecture'}
       >
         {isPlaying ? (
           <Pause className="h-4 w-4 fill-white" />
@@ -159,8 +169,10 @@ export default function WaveformPlayer({
         )}
       </button>
 
+      {/* Waveform + playhead */}
       <div // NOSONAR
-        className="flex-1 h-8 cursor-pointer relative flex items-end overflow-hidden gap-px"
+        className="relative flex-1 cursor-pointer overflow-hidden"
+        style={{ height }}
         role="slider"
         tabIndex={0}
         aria-label="Seek audio"
@@ -168,49 +180,50 @@ export default function WaveformPlayer({
         aria-valuemin={0}
         aria-valuemax={duration}
         onKeyDown={e => {
-          if (waveformData.length === 0 || duration === 0) return;
-          const currentIndex = Math.floor((currentTime / duration) * waveformData.length);
+          if (duration === 0) return;
           if (e.key === 'ArrowLeft') {
-            handleSeek(Math.max(0, currentIndex - 1));
+            handleSeek(Math.max(0, progress - 0.02));
           } else if (e.key === 'ArrowRight') {
-            handleSeek(Math.min(waveformData.length - 1, currentIndex + 1));
+            handleSeek(Math.min(1, progress + 0.02));
           }
         }}
         onClick={e => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left;
-          const percentage = x / rect.width;
-          const index = Math.floor(percentage * waveformData.length);
-          handleSeek(Math.max(0, Math.min(index, waveformData.length - 1)));
+          handleSeek(Math.max(0, Math.min(1, x / rect.width)));
         }}
       >
-        {waveformData.map((value, idx) => {
-          const progress = duration > 0 ? currentTime / duration : 0;
-          const isPassed = idx / waveformData.length <= progress;
+        {/* Bars container — flex row, items centered vertically */}
+        <div className="absolute inset-0 flex items-center gap-px">
+          {waveformData.map((value, idx) => {
+            const barProgress = idx / waveformData.length;
+            const isPassed = barProgress <= progress;
+            return (
+              <div
+                key={idx}
+                className="flex-1 rounded-full pointer-events-none"
+                style={{
+                  height: `${Math.max(15, value * 100)}%`,
+                  backgroundColor: isPassed ? progressColor : color,
+                }}
+              />
+            );
+          })}
+        </div>
 
-          return (
-            <div
-              key={`waveform-${idx}`}
-              className="flex-1 min-w-0 rounded-full transition-all pointer-events-none"
-              style={{
-                height: `${Math.max(20, value * 100)}%`,
-                backgroundColor: isPassed ? progressColor : color,
-              }}
-            />
-          );
-        })}
-
-        {/* Ligne de lecture (Playhead) */}
+        {/* Playhead line */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-primary-600 pointer-events-none transition-none"
+          className="absolute top-0 bottom-0 w-0.5 pointer-events-none"
           style={{
-            left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-            willChange: 'left',
+            left: `${progress * 100}%`,
+            backgroundColor: progressColor,
+            opacity: 0.9,
           }}
         />
       </div>
 
-      <div className="text-xs font-mono text-neutral-500 dark:text-neutral-400 w-10 text-right flex-shrink-0">
+      {/* Time display */}
+      <div className="text-xs font-mono text-neutral-500 dark:text-neutral-400 flex-shrink-0 w-10 text-right">
         {formatTime(currentTime)}
       </div>
     </div>

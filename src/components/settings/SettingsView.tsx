@@ -2,8 +2,8 @@
 // Distributed under the license specified in the root directory of this project.
 
 import { Palette, Type, Cloud, Moon, Sun, Keyboard } from 'lucide-react';
-import React from 'react';
 
+import AISettingsSection from '@/components/ai/AISettingsSection';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface SettingsViewProps {
@@ -128,44 +128,45 @@ export default function SettingsView({ userId }: SettingsViewProps) {
                 Raccourcis clavier
               </h3>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Palette de commandes</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + K</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Nouvelle note</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + N</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Rechercher</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + F</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Gras</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + B</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Italique</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + I</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Annuler</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + Z</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Rétablir</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Ctrl + Shift + Z</kbd>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-body text-neutral-700 dark:text-neutral-300">Fermer / Échapper</span>
-                <kbd className="px-2 py-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded text-sm font-mono">Échap</kbd>
-              </div>
-              <p className="text-caption text-neutral-500 dark:text-neutral-400 mt-2">
-                Sur Mac, remplacez <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-xs font-mono">Ctrl</kbd> par <kbd className="px-1 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded text-xs font-mono">⌘ Cmd</kbd>
-              </p>
+            <div className="space-y-2">
+              {[
+                { keys: ['Ctrl', 'K'], description: 'Ouvrir la palette de commandes' },
+                { keys: ['Ctrl', 'N'], description: 'Créer une nouvelle note' },
+                { keys: ['Ctrl', 'S'], description: 'Sauvegarder la note' },
+                { keys: ['Ctrl', 'F'], description: 'Rechercher dans les notes' },
+                { keys: ['Ctrl', 'Shift', 'L'], description: 'Basculer le thème clair/sombre' },
+                { keys: ['Ctrl', 'B'], description: 'Texte en gras' },
+                { keys: ['Ctrl', 'I'], description: 'Texte en italique' },
+                { keys: ['Ctrl', 'Z'], description: 'Annuler' },
+                { keys: ['Ctrl', 'Y'], description: 'Rétablir' },
+                { keys: ['Échap'], description: 'Fermer le panneau actif' },
+              ].map(({ keys, description }) => (
+                <div
+                  key={description}
+                  className="flex items-center justify-between py-2 border-b border-neutral-200 dark:border-neutral-700 last:border-0"
+                >
+                  <span className="text-body text-neutral-700 dark:text-neutral-300">
+                    {description}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {keys.map((key, index) => (
+                      <span key={key} className="flex items-center gap-1">
+                        {index > 0 && (
+                          <span className="text-caption text-neutral-400 dark:text-neutral-500">+</span>
+                        )}
+                        <kbd className="px-2 py-1 text-caption font-mono bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 rounded shadow-sm text-neutral-700 dark:text-neutral-300">
+                          {key}
+                        </kbd>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Configuration IA */}
+          <AISettingsSection />
 
           {userId && (
             <div className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6">

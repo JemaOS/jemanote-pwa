@@ -77,7 +77,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 border-0 outline-none m-0 max-w-none max-h-none w-full h-full"
     >
       <div className="relative w-full max-w-md bg-white dark:bg-neutral-900 rounded-xl shadow-modal p-4 sm:p-6 md:p-8">
         <button

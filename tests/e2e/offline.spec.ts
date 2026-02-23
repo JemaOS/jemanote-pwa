@@ -33,12 +33,9 @@ async function createNote(page: Page, title: string, content: string = '') {
     await titleInput.fill(title);
   }
 
-  if (content) {
-    const editor = page.locator('.cm-editor .cm-content').first();
-    if (await editor.isVisible().catch(() => false)) {
-      await editor.click();
-      await page.keyboard.type(content);
-    }
+  const editor = page.locator('.cm-editor .cm-content').first();
+  if (await editor.isVisible().catch(() => false)) {
+    await editor.fill(content);
   }
 
   await page.waitForTimeout(500);
@@ -83,8 +80,7 @@ test.describe('Offline Mode', () => {
 
       const editor = page.locator('.cm-editor .cm-content').first();
       if (await editor.isVisible().catch(() => false)) {
-        await editor.click();
-        await page.keyboard.type('Edited offline content');
+        await editor.fill('Edited offline content');
         await page.waitForTimeout(1000);
       }
 

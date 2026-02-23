@@ -7,7 +7,9 @@ import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react
 import { LocalStorage } from '@/lib/localStorage';
 import { Note, Attachment } from '@/types';
 
-// Lazy-load heavy editor components to reduce initial bundle size
+// Lazy-load heavy editor and AI components to reduce initial bundle size
+const AIPanel = React.lazy(() => import('@/components/ai/AIPanel'));
+const AISummaryModal = React.lazy(() => import('@/components/ai/AISummaryModal'));
 const MarkdownEditor = React.lazy(() => import('@/components/editor/MarkdownEditor'));
 const MarkdownPreview = React.lazy(() => import('@/components/editor/MarkdownPreview'));
 const VoiceRecorder = React.lazy(() => import('@/components/editor/VoiceRecorder'));
@@ -46,8 +48,10 @@ export default function WorkspaceView({
   const [title, setTitle] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('edit');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const [showAISummary, setShowAISummary] = useState(false);
   const [showAutoSuggest, setShowAutoSuggest] = useState(false);
   const [autoSuggestDismissed, setAutoSuggestDismissed] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   // Refs pour le tracking des valeurs sauvegardées et timers
@@ -162,7 +166,7 @@ export default function WorkspaceView({
 
     autoSuggestTimerRef.current = setTimeout(() => {
       const charCount = newContent.trim().length;
-      if (charCount > 500 && !autoSuggestDismissed) {
+      if (charCount > 500 && !autoSuggestDismissed && !showAISummary) {
         setShowAutoSuggest(true);
       } else if (charCount <= 500) {
         setShowAutoSuggest(false);
@@ -358,6 +362,12 @@ export default function WorkspaceView({
     setAutoSuggestDismissed(true);
   };
 
+  // Ouvrir le modal IA depuis l'auto-suggestion
+  const handleOpenAIFromSuggest = () => {
+    setShowAutoSuggest(false);
+    setShowAISummary(true);
+  };
+
   if (!activeNote) {
     return (
       <div className="flex h-full items-center justify-center bg-white dark:bg-neutral-900">
@@ -389,6 +399,12 @@ export default function WorkspaceView({
               </p>
             </div>
             <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleOpenAIFromSuggest}
+                className="px-2 laptop:px-3 laptop-lg:px-4 py-1 laptop:py-1.5 text-xs laptop:text-sm laptop-lg:text-base bg-primary-500 text-white hover:bg-primary-600 rounded transition-colors font-medium whitespace-nowrap min-h-[32px] laptop:min-h-[36px]"
+              >
+                Générer
+              </button>
               <button
                 onClick={handleDismissAutoSuggest}
                 className="p-1 laptop:p-1.5 hover:bg-primary-100 dark:hover:bg-primary-900/40 rounded transition-colors min-w-[32px] laptop:min-w-[36px] min-h-[32px] laptop:min-h-[36px] flex items-center justify-center"
@@ -424,6 +440,35 @@ export default function WorkspaceView({
               title="Enregistrer une note vocale avec transcription"
             >
               <Mic className="w-4 h-4" />
+            </button>
+
+            {/* Boutons IA - Compacts */}
+            <button
+              onClick={() => {
+                setShowAISummary(true);
+              }}
+              disabled={!content.trim()}
+              className="flex items-center justify-center gap-1 px-2 laptop:px-2.5 laptop-lg:px-3 py-1.5 laptop:py-2 bg-primary-500 text-white hover:bg-primary-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs laptop:text-sm font-medium min-h-touch flex-shrink-0"
+              title="Générer un résumé avec l'IA"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden laptop-lg:inline">Résumé</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowAIPanel(!showAIPanel);
+              }}
+              className={`flex items-center justify-center gap-1 px-2 laptop:px-2.5 laptop-lg:px-3 py-1.5 laptop:py-2 rounded-lg transition-colors text-xs laptop:text-sm font-medium min-h-touch flex-shrink-0 ${
+                showAIPanel
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+              }`}
+              title="Ouvrir l'Assistant IA"
+              aria-label="Assistant IA"
+            >
+              <Bot className="w-4 h-4" />
+              <span className="hidden laptop-lg:inline">Assistant IA</span>
             </button>
 
             {/* Boutons de mode de visualisation - Toujours visibles */}
@@ -517,6 +562,56 @@ export default function WorkspaceView({
           </div>
         )}
       </div>
+
+      {/* Modal de résumé IA */}
+      {showAISummary && (
+        <Suspense fallback={null}>
+          <AISummaryModal
+            content={content}
+            noteId={activeNoteId || undefined}
+            noteTitle={title || undefined}
+            onClose={() => {
+              setShowAISummary(false);
+            }}
+            onApply={handleApplySummary}
+            onCreateNote={createNote ? handleCreateNoteFromSummary : undefined}
+          />
+        </Suspense>
+      )}
+
+      {/* Panel IA - Sidebar dédiée */}
+      {showAIPanel && (
+        <Suspense fallback={<EditorFallback />}>
+          <AIPanel
+            currentNote={activeNote}
+            notes={notes}
+            onClose={() => {
+              setShowAIPanel(false);
+            }}
+            onCreateNote={async (title, content) => {
+              if (createNote) {
+                await createNote(title, content, activeNote?.folder_id);
+              }
+            }}
+            onUpdateNoteTags={(noteId, tags) => {
+              // Ajouter les tags au contenu de la note
+              const note = notes.find(n => n.id === noteId);
+              if (note) {
+                const tagString = tags.map(t => `#${t}`).join(' ');
+                const newContent = `${note.content}\n\n${tagString}`;
+                updateNote(noteId, { content: newContent });
+              }
+            }}
+            onUpdateNoteContent={async (noteId, newContent) => {
+              await updateNote(noteId, { content: newContent });
+              setContent(newContent); // Mettre à jour l'état local pour refléter le changement immédiatement
+            }}
+            onNavigateToNote={noteId => {
+              handleNoteChange(noteId);
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

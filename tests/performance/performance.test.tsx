@@ -328,4 +328,52 @@ const code = "example";
       expect(parsed.length).toBe(100);
     });
   });
+
+  describe('AI Operations', () => {
+    it('should process text chunks efficiently', () => {
+      const longText = 'Word '.repeat(10000); // 50k characters
+
+      const start = performance.now();
+
+      // Simulate text chunking for AI processing
+      const chunkSize = 4000;
+      const chunks: string[] = [];
+      for (let i = 0; i < longText.length; i += chunkSize) {
+        chunks.push(longText.slice(i, i + chunkSize));
+      }
+
+      const end = performance.now();
+      expect(end - start).toBeLessThan(50);
+      expect(chunks.length).toBeGreaterThan(0);
+    });
+
+    it('should extract keywords efficiently', () => {
+      const text = `
+        Artificial intelligence and machine learning are transforming technology.
+        Natural language processing enables computers to understand human language.
+        Deep learning models can recognize patterns in large datasets.
+      `.repeat(100);
+
+      const start = performance.now();
+
+      // SECURITY FIX: Limit text size for regex processing
+      const MAX_TEXT_LENGTH = 1000000; // 1MB max
+      const safeText = text.length > MAX_TEXT_LENGTH ? text.substring(0, MAX_TEXT_LENGTH) : text;
+
+      // Simple keyword extraction with safer regex
+      const words = safeText.toLowerCase().match(/\b[a-zA-Z]{4,50}\b/g) || [];
+      const frequency: Record<string, number> = {};
+      words.forEach(word => {
+        frequency[word] = (frequency[word] || 0) + 1;
+      });
+      const keywords = Object.entries(frequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([word]) => word);
+
+      const end = performance.now();
+      expect(end - start).toBeLessThan(100);
+      expect(keywords.length).toBeGreaterThan(0);
+    });
+  });
 });

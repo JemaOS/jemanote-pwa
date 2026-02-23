@@ -9,6 +9,7 @@ import InstallPrompt from '@/components/InstallPrompt';
 import Navigation from '@/components/layout/Navigation';
 import StatusBar from '@/components/layout/StatusBar';
 import WorkspaceView from '@/components/workspace/WorkspaceView';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalNotes } from '@/hooks/useLocalNotes';
 import { ViewMode } from '@/types';
@@ -23,6 +24,7 @@ const TimelineView = React.lazy(() => import('@/components/timeline/TimelineView
 const Sidebar = React.lazy(() => import('@/components/layout/Sidebar'));
 
 function App() {
+  const { toggleTheme } = useTheme();
   const { user, loading, signOut } = useAuth();
   const {
     notes,
@@ -105,15 +107,48 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + K: Open command palette
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      const ctrl = e.metaKey || e.ctrlKey;
+
+      // Ignore shortcuts when typing in an input/textarea (except specific ones)
+      const target = e.target as HTMLElement;
+      const isEditing =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable;
+
+      // Ctrl+K: Open command palette (always)
+      if (ctrl && e.key === 'k') {
         e.preventDefault();
         setShowCommandPalette(true);
+        return;
       }
-      // Cmd/Ctrl + N: Create new note
-      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+
+      // Ctrl+N: Create new note (always)
+      if (ctrl && e.key === 'n') {
         e.preventDefault();
         handleCreateNote();
+        return;
+      }
+
+      // Ctrl+Shift+L: Toggle theme (always)
+      if (ctrl && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        toggleTheme();
+        return;
+      }
+
+      // Ctrl+F: Go to search view (always)
+      if (ctrl && e.key === 'f' && !isEditing) {
+        e.preventDefault();
+        setCurrentView('search');
+        return;
+      }
+
+      // Escape: Close command palette / auth modal
+      if (e.key === 'Escape') {
+        setShowCommandPalette(false);
+        setShowAuthModal(false);
+        return;
       }
     };
 
@@ -121,7 +156,7 @@ function App() {
     return () => {
       globalThis.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [toggleTheme]);
 
   // Sauvegarder avant de fermer l'application (F5, fermeture onglet, etc.)
   useEffect(() => {

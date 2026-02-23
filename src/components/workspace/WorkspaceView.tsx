@@ -209,6 +209,20 @@ export default function WorkspaceView({
     }
   };
 
+  // Ctrl+S: Force save
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        handleForceSave();
+      }
+    };
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => {
+      globalThis.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleForceSave]);
+
   // Ref pour stocker les valeurs actuelles dans le cleanup
   const contentRef = useRef(content);
   const titleRef = useRef(title);
